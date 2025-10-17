@@ -23,8 +23,8 @@ Ce document décrit les principales entités de la base de données pour le MVP 
 - statut (vérifié, en attente, expiré)
 - tags (tableau)
 - donneesExtraites (dates, montants, noms, adresses, etc. — via Gemini)
-- apercu (miniature, preview)
 - dateUpload
+- size
 
 ## Dossier
 - _id

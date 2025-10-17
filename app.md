@@ -103,3 +103,9 @@ Chaque entité reste simple et adaptée au MVP.
 - Page d’erreur / accès refusé
 - Chargement (OAuth redirect)
 - Déconnexion / session expirée
+
+
+
+
+## infos
+- we will have a lists of demarches in the app that are added by the admins and then users will make click on a demarche to get and collect the needed documents for this demarche if we have all the documents we can download if not we need to give the needed documents

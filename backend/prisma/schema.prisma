@@ -1,0 +1,229 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider = "zod-prisma-types"
+  output   = "../src/generated/zod"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+// Enums
+enum DocumentType {
+  FACTURE
+  CONTRAT
+  CARTE_IDENTITE
+  PASSEPORT
+  JUSTIFICATIF_DOMICILE
+  ACTE_NAISSANCE
+  ACTE_MARIAGE
+  DIPLOME
+  ATTESTATION_TRAVAIL
+  FICHE_PAIE
+  RELEVE_BANCAIRE
+  ASSURANCE
+  PERMIS_CONDUIRE
+  CARTE_VITALE
+  AUTRE
+}
+
+enum DocumentStatut {
+  VERIFIE
+  EN_ATTENTE
+  EXPIRE
+  REFUSE
+}
+
+enum NotificationType {
+  EXPIRATION
+  RAPPEL
+  INFO
+  ALERTE
+}
+
+enum NotificationPriorite {
+  BASSE
+  NORMALE
+  HAUTE
+}
+
+enum DemarcheStatut {
+  EN_COURS
+  COMPLETE
+  ABANDONNEE
+}
+
+enum DemarcheCategorie {
+  ADMINISTRATIF
+  FINANCIER
+  JURIDIQUE
+  PERSONNEL
+  AUTRE
+}
+
+// Models
+model User {
+  id                     String                  @id @default(auto()) @map("_id") @db.ObjectId
+  email                  String                  @unique
+  nom                    String
+  urlAvatar              String?
+  googleId               String?                 @unique
+  password               String?
+  dateInscription        DateTime                @default(now())
+  preferences            UserPreferences?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  
+  // Relations
+  documents              Document[]
+  dossiers               Dossier[]
+  demarchesUtilisateur   DemarcheUtilisateur[]
+  notifications          Notification[]
+
+  @@map("users")
+}
+
+type UserPreferences {
+  notifications Boolean @default(true)
+  language      String  @default("fr")
+}
+
+model Document {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  idProprietaire    String              @db.ObjectId
+  nomFichier        String
+  urlStockage       String?
+  idGridFs          String?             @db.ObjectId
+  type              DocumentType
+  statut            DocumentStatut      @default(EN_ATTENTE)
+  tags              String[]
+  donneesExtraites  DonneesExtraites?
+  dateUpload        DateTime            @default(now())
+  size              Int
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  proprietaire      User                @relation(fields: [idProprietaire], references: [id], onDelete: Cascade)
+  dossiers          Dossier[]           @relation(fields: [dossierIds], references: [id])
+  dossierIds        String[]            @db.ObjectId
+  notifications     Notification[]
+  documentsFournis  DocumentFourni[]
+
+  @@index([idProprietaire])
+  @@index([type])
+  @@index([statut])
+  @@index([tags])
+  @@index([idProprietaire, type])
+  @@index([idProprietaire, statut])
+  @@index([idProprietaire, tags])
+  @@map("documents")
+}
+
+type DonneesExtraites {
+  dates     DateTime[]
+  montants  Float[]
+  noms      String[]
+  adresses  String[]
+  autres    Json?
+}
+
+model Dossier {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  idProprietaire String     @db.ObjectId
+  nom            String
+  idsDocuments   String[]   @db.ObjectId
+  couleur        String     @default("#3B82F6")
+  icone          String     @default("folder")
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  
+  // Relations
+  proprietaire   User       @relation(fields: [idProprietaire], references: [id], onDelete: Cascade)
+  documents      Document[] @relation(fields: [idsDocuments], references: [id])
+
+  @@index([idProprietaire])
+  @@map("dossiers")
+}
+
+model ModeleDemarche {
+  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  titre                 String                  @unique
+  description           String?
+  typesDocumentsRequis  String[]
+  categorie             DemarcheCategorie       @default(AUTRE)
+  actif                 Boolean                 @default(true)
+  ordre                 Int                     @default(0)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  
+  // Relations
+  demarchesUtilisateur  DemarcheUtilisateur[]
+
+  @@index([actif, ordre])
+  @@map("modele_demarches")
+}
+
+model DemarcheUtilisateur {
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  idUtilisateur     String             @db.ObjectId
+  idModele          String             @db.ObjectId
+  documentsFournis  DocumentFourni[]
+  complete          Boolean            @default(false)
+  dateDebut         DateTime           @default(now())
+  dateCompletion    DateTime?
+  statut            DemarcheStatut     @default(EN_COURS)
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  // Relations
+  utilisateur       User               @relation(fields: [idUtilisateur], references: [id], onDelete: Cascade)
+  modele            ModeleDemarche     @relation(fields: [idModele], references: [id], onDelete: Cascade)
+
+  @@index([idUtilisateur])
+  @@index([complete])
+  @@index([statut])
+  @@index([idUtilisateur, statut])
+  @@index([idUtilisateur, complete])
+  @@map("demarche_utilisateurs")
+}
+
+type DocumentFourni {
+  typeDocument String
+  idDocument   String   @db.ObjectId
+  dateAjout    DateTime @default(now())
+}
+
+model Notification {
+  id             String                @id @default(auto()) @map("_id") @db.ObjectId
+  idUser         String                @db.ObjectId
+  type           NotificationType
+  message        String
+  idDocumentLie  String?               @db.ObjectId
+  lu             Boolean               @default(false)
+  dateCreation   DateTime              @default(now())
+  priorite       NotificationPriorite  @default(NORMALE)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  
+  // Relations
+  user           User                  @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  documentLie    Document?             @relation(fields: [idDocumentLie], references: [id], onDelete: SetNull)
+
+  @@index([idUser])
+  @@index([type])
+  @@index([lu])
+  @@index([dateCreation])
+  @@index([idUser, lu])
+  @@index([idUser, dateCreation])
+  @@index([idUser, type, lu])
+  @@map("notifications")
+}
