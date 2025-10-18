@@ -94,7 +94,7 @@ type UserPreferences {
   notifications Boolean @default(true)
   language      String  @default("fr")
 }
-
+//Document is will contain data about the document it self like name url etc
 model Document {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
   idProprietaire    String              @db.ObjectId
@@ -104,7 +104,6 @@ model Document {
   type              DocumentType
   statut            DocumentStatut      @default(EN_ATTENTE)
   tags              String[]
-  donneesExtraites  DonneesExtraites?
   dateUpload        DateTime            @default(now())
   size              Int
   createdAt         DateTime            @default(now())
@@ -115,7 +114,6 @@ model Document {
   dossiers          Dossier[]           @relation(fields: [dossierIds], references: [id])
   dossierIds        String[]            @db.ObjectId
   notifications     Notification[]
-  documentsFournis  DocumentFourni[]
 
   @@index([idProprietaire])
   @@index([type])
@@ -127,13 +125,6 @@ model Document {
   @@map("documents")
 }
 
-type DonneesExtraites {
-  dates     DateTime[]
-  montants  Float[]
-  noms      String[]
-  adresses  String[]
-  autres    Json?
-}
 
 model Dossier {
   id             String     @id @default(auto()) @map("_id") @db.ObjectId
@@ -175,7 +166,6 @@ model DemarcheUtilisateur {
   id                String             @id @default(auto()) @map("_id") @db.ObjectId
   idUtilisateur     String             @db.ObjectId
   idModele          String             @db.ObjectId
-  documentsFournis  DocumentFourni[]
   complete          Boolean            @default(false)
   dateDebut         DateTime           @default(now())
   dateCompletion    DateTime?
@@ -194,12 +184,6 @@ model DemarcheUtilisateur {
   @@index([idUtilisateur, statut])
   @@index([idUtilisateur, complete])
   @@map("demarche_utilisateurs")
-}
-
-type DocumentFourni {
-  typeDocument String
-  idDocument   String   @db.ObjectId
-  dateAjout    DateTime @default(now())
 }
 
 model Notification {

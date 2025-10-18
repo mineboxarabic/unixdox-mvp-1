@@ -23,6 +23,7 @@ Le MVP vise à valider l’intérêt utilisateur et poser les bases techniques :
      - Dates importantes (échéances, validité)
      - Données structurées (montants, noms, adresses, etc.)
      - Tags et classification automatiques
+     - est-ce que c'est verifie ou pas (document verifier donc c'est un document reel pas just un doc non officiel ou bou de papier)
    - Visualisation des documents (tableau clair : type, date, statut, tags).
    - Vérification documentaire (statut *Vérifié* visible).
 
@@ -32,7 +33,7 @@ Le MVP vise à valider l’intérêt utilisateur et poser les bases techniques :
 
 4. **Démarches Administratives (POC)**
    - Sélection d’une démarche type depuis une liste.
-   - Wizard pour collecter les infos nécessaires.
+   - Wizard pour collecter les infos nécessaires (ca commence par un preselection depuii **l'IA**).
    - Génération automatique d’un brouillon de courrier/pdf.
    - Possibilité d’attacher les documents existants.
 
