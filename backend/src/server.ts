@@ -4,6 +4,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { connectDatabase, disconnectDatabase } from './config/prisma';
+import apiRoutes from './routes';
+import { errorHandler, notFoundHandler } from './middleware';
 
 dotenv.config();
 
@@ -31,6 +33,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Unidox API is running' });
 });
 
+// API Routes
+app.use('/api', apiRoutes);
+
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 // Start Server
 const startServer = async () => {
   await connectDatabase();
@@ -38,6 +47,8 @@ const startServer = async () => {
   const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    console.log(`🔗 API endpoint: http://localhost:${PORT}/api`);
   });
 
   // Graceful shutdown

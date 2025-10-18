@@ -1,69 +1,104 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../utils/errors.util';
-import { sendError } from '../utils/response.util';
+
+export interface ApiError extends Error {
+  statusCode?: number;
+  code?: string;
+}
 
 /**
- * Global error handling middleware
- * Must be registered AFTER all routes
+ * Global error handler middleware
  */
 export const errorHandler = (
-  err: Error | AppError,
+  error: ApiError,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // Log error for debugging
-  console.error('Error:', err);
+  console.error('Error:', error);
 
-  // Handle known AppErrors
-  if (err instanceof AppError) {
-    return sendError(res, err.message, err.statusCode);
+  // Prisma errors
+  if (error.name === 'PrismaClientKnownRequestError') {
+    const prismaError = error as any;
+    
+    if (prismaError.code === 'P2002') {
+      return res.status(409).json({
+        success: false,
+        message: 'A record with this unique field already exists',
+        error: prismaError.meta?.target || 'Unique constraint violation',
+      });
+    }
+
+    if (prismaError.code === 'P2025') {
+      return res.status(404).json({
+        success: false,
+        message: 'Record not found',
+        error: prismaError.meta?.cause || 'Record does not exist',
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: 'Database error',
+      error: prismaError.message,
+    });
   }
 
-  // Handle Mongoose validation errors
-  if (err.name === 'ValidationError') {
-    return sendError(res, 'Erreur de validation', 400, [err.message]);
+  // Validation errors
+  if (error.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation error',
+      error: error.message,
+    });
   }
 
-  // Handle Mongoose CastError (invalid ObjectId)
-  if (err.name === 'CastError') {
-    return sendError(res, 'ID invalide', 400);
+  // JWT errors
+  if (error.name === 'JsonWebTokenError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid token',
+      error: error.message,
+    });
   }
 
-  // Handle MongoDB duplicate key error
-  if ('code' in err && err.code === 11000) {
-    return sendError(res, 'Cette ressource existe déjà', 409);
+  if (error.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Token expired',
+      error: error.message,
+    });
   }
 
-  // Handle JWT errors
-  if (err.name === 'JsonWebTokenError') {
-    return sendError(res, 'Token invalide', 401);
+  // Custom API errors
+  if (error.statusCode) {
+    return res.status(error.statusCode).json({
+      success: false,
+      message: error.message || 'An error occurred',
+      error: error.message,
+    });
   }
 
-  if (err.name === 'TokenExpiredError') {
-    return sendError(res, 'Token expiré', 401);
-  }
-
-  // Default error response
-  return sendError(
-    res,
-    process.env.NODE_ENV === 'production' 
-      ? 'Une erreur est survenue' 
-      : err.message,
-    500
-  );
+  // Default error
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
+  });
 };
 
 /**
- * 404 Not Found handler
+ * Not found handler
  */
 export const notFoundHandler = (req: Request, res: Response) => {
-  return sendError(res, `Route non trouvée: ${req.originalUrl}`, 404);
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    path: req.originalUrl,
+  });
 };
 
 /**
- * Async error wrapper
- * Wraps async route handlers to catch errors automatically
+ * Async handler wrapper to catch errors in async route handlers
  */
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
