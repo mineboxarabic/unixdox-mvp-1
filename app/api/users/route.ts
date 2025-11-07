@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { userService } from '../../../src/features/users/service';
+import { usersController } from '@/src/features/users';
 
 export async function GET() {
-  const users = await userService.getAllUsers();
-  return NextResponse.json({ success: true, data: users, count: users.length });
+  const { status, body } = await usersController.list();
+  return NextResponse.json(body, { status });
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  try {
-    const user = await userService.createUser(body);
-    return NextResponse.json({ success: true, message: 'User created successfully', data: user }, { status: 201 });
-  } catch (e: any) {
-    return NextResponse.json({ success: false, message: e.message }, { status: 500 });
-  }
+  const { status, body } = await usersController.create(req);
+  return NextResponse.json(body, { status });
 }

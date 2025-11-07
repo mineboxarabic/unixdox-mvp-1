@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dossierService } from '../../../../src/features/dossiers/service';
+import { dossiersController } from '@/src/features/dossiers';
 
 export async function GET(req: NextRequest) {
-  const userId = new URL(req.url).searchParams.get('userId');
-  if (!userId) return NextResponse.json({ success: false, message: 'userId is required' }, { status: 400 });
-  const stats = await dossierService.getDossierStats(userId);
-  return NextResponse.json({ success: true, data: stats });
+  const { status, body } = await dossiersController.stats(req);
+  return NextResponse.json(body, { status });
 }
