@@ -1,4 +1,4 @@
-import { prisma } from '../config/prisma';
+import { prisma } from '../../config/prisma';
 import { User, Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -55,7 +55,6 @@ export class UserService {
    * Create new user
    */
   async createUser(data: Prisma.UserCreateInput): Promise<SafeUser> {
-    // Hash password if provided
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);
     }
@@ -79,7 +78,6 @@ export class UserService {
    * Update user
    */
   async updateUser(id: string, data: Prisma.UserUpdateInput): Promise<SafeUser> {
-    // Hash password if being updated
     if (data.password && typeof data.password === 'string') {
       data.password = await bcrypt.hash(data.password, 10);
     }

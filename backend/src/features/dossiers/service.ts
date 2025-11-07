@@ -1,4 +1,4 @@
-import { prisma } from '../config/prisma';
+import { prisma } from '../../config/prisma';
 import { Dossier, Prisma } from '@prisma/client';
 
 export class DossierService {
@@ -27,9 +27,9 @@ export class DossierService {
    * Get dossier by ID
    */
   async getDossierById(id: string, userId?: string): Promise<Dossier | null> {
-    const where: Prisma.DossierWhereInput = { id };
+    const where: Prisma.DossierWhereInput = { id } as any;
     if (userId) {
-      where.idProprietaire = userId;
+      (where as any).idProprietaire = userId;
     }
 
     return prisma.dossier.findFirst({
@@ -67,7 +67,7 @@ export class DossierService {
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data,
       include: {
         documents: true,
@@ -83,7 +83,7 @@ export class DossierService {
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
     });
   }
 
@@ -94,13 +94,13 @@ export class DossierService {
     const dossier = await this.getDossierById(id, userId);
     if (!dossier) throw new Error('Dossier not found');
 
-    const updatedDocumentIds = [...new Set([...dossier.idsDocuments, ...documentIds])];
+    const updatedDocumentIds = Array.from(new Set([...(dossier.idsDocuments || []), ...documentIds]));
 
     return prisma.dossier.update({
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data: { 
         idsDocuments: updatedDocumentIds,
         documents: {
@@ -120,13 +120,13 @@ export class DossierService {
     const dossier = await this.getDossierById(id, userId);
     if (!dossier) throw new Error('Dossier not found');
 
-    const updatedDocumentIds = dossier.idsDocuments.filter(docId => !documentIds.includes(docId));
+    const updatedDocumentIds = (dossier.idsDocuments || []).filter(docId => !documentIds.includes(docId));
 
     return prisma.dossier.update({
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data: { 
         idsDocuments: updatedDocumentIds,
         documents: {
@@ -156,7 +156,7 @@ export class DossierService {
 
     return dossiers.map(dossier => ({
       ...dossier,
-      documentCount: dossier._count.documents,
+      documentCount: (dossier as any)._count.documents,
     }));
   }
 }

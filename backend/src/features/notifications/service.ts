@@ -1,4 +1,4 @@
-import { prisma } from '../config/prisma';
+import { prisma } from '../../config/prisma';
 import { Notification, Prisma, NotificationType, NotificationPriorite } from '@prisma/client';
 
 export class NotificationService {
@@ -6,10 +6,10 @@ export class NotificationService {
    * Get all notifications for a user
    */
   async getUserNotifications(userId: string, unreadOnly: boolean = false): Promise<Notification[]> {
-    const where: Prisma.NotificationWhereInput = { idUser: userId };
+    const where: Prisma.NotificationWhereInput = { idUser: userId } as any;
     
     if (unreadOnly) {
-      where.lu = false;
+      (where as any).lu = false;
     }
 
     return prisma.notification.findMany({
@@ -34,9 +34,9 @@ export class NotificationService {
    * Get notification by ID
    */
   async getNotificationById(id: string, userId?: string): Promise<Notification | null> {
-    const where: Prisma.NotificationWhereInput = { id };
+    const where: Prisma.NotificationWhereInput = { id } as any;
     if (userId) {
-      where.idUser = userId;
+      (where as any).idUser = userId;
     }
 
     return prisma.notification.findFirst({
@@ -70,7 +70,7 @@ export class NotificationService {
       where: { 
         id,
         idUser: userId,
-      },
+      } as any,
       data: { lu: true },
     });
   }
@@ -96,7 +96,7 @@ export class NotificationService {
       where: { 
         id,
         idUser: userId,
-      },
+      } as any,
     });
   }
 

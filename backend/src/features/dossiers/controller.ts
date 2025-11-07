@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { dossierService } from '../services/dossier.service';
+import { dossierService } from './service';
 
 export class DossierController {
   /**

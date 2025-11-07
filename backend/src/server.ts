@@ -4,7 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { connectDatabase, disconnectDatabase } from './config/prisma';
-import apiRoutes from './routes';
+import apiRoutes from './features';
 import { errorHandler, notFoundHandler } from './middleware';
 
 dotenv.config();

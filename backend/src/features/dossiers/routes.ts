@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { dossierController } from '../controllers/dossier.controller';
+import { dossierController } from './controller';
 
 const router = Router();
 

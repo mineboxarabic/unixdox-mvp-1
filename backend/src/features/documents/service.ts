@@ -1,4 +1,4 @@
-import { prisma } from '../config/prisma';
+import { prisma } from '../../config/prisma';
 import { Document, Prisma, DocumentType, DocumentStatut } from '@prisma/client';
 
 export class DocumentService {
@@ -18,7 +18,7 @@ export class DocumentService {
   async getDocumentById(id: string, userId?: string): Promise<Document | null> {
     const where: Prisma.DocumentWhereInput = { id };
     if (userId) {
-      where.idProprietaire = userId;
+      (where as any).idProprietaire = userId;
     }
 
     return prisma.document.findFirst({
@@ -61,7 +61,7 @@ export class DocumentService {
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data,
     });
   }
@@ -74,7 +74,7 @@ export class DocumentService {
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
     });
   }
 
@@ -92,27 +92,27 @@ export class DocumentService {
   ): Promise<Document[]> {
     const where: Prisma.DocumentWhereInput = {
       idProprietaire: userId,
-    };
+    } as any;
 
     if (filters.type) {
-      where.type = filters.type;
+      (where as any).type = filters.type;
     }
 
     if (filters.statut) {
-      where.statut = filters.statut;
+      (where as any).statut = filters.statut;
     }
 
     if (filters.tags && filters.tags.length > 0) {
-      where.tags = {
+      (where as any).tags = {
         hasSome: filters.tags,
-      };
+      } as any;
     }
 
     if (filters.search) {
-      where.nomFichier = {
+      (where as any).nomFichier = {
         contains: filters.search,
         mode: 'insensitive',
-      };
+      } as any;
     }
 
     return prisma.document.findMany({
@@ -155,7 +155,7 @@ export class DocumentService {
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data: { statut },
     });
   }
@@ -167,13 +167,13 @@ export class DocumentService {
     const document = await this.getDocumentById(id, userId);
     if (!document) throw new Error('Document not found');
 
-    const updatedTags = [...new Set([...document.tags, ...tags])];
+    const updatedTags = [...new Set([...(document.tags || []), ...tags])];
 
     return prisma.document.update({
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data: { tags: updatedTags },
     });
   }
@@ -185,13 +185,14 @@ export class DocumentService {
     const document = await this.getDocumentById(id, userId);
     if (!document) throw new Error('Document not found');
 
-    const updatedTags = document.tags.filter(tag => !tags.includes(tag));
+    const current = document.tags || [];
+    const updatedTags = current.filter(tag => !tags.includes(tag));
 
     return prisma.document.update({
       where: { 
         id,
         idProprietaire: userId,
-      },
+      } as any,
       data: { tags: updatedTags },
     });
   }

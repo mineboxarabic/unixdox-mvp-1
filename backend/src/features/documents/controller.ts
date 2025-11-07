@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { documentService } from '../services/document.service';
+import { documentService } from './service';
 import { DocumentType, DocumentStatut } from '@prisma/client';
 
 export class DocumentController {

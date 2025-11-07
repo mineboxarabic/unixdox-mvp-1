@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { notificationService } from '../services/notification.service';
+import { notificationService } from './service';
 import { NotificationType, NotificationPriorite } from '@prisma/client';
 
 export class NotificationController {
