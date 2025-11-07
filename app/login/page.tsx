@@ -1,5 +1,4 @@
 "use client"
-import { _SignIn } from "@/features/auth"
 export default function SignInPage() {
-  return <_SignIn />
+  return <h1>Sign In</h1>
 }

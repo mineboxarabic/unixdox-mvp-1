@@ -93,7 +93,6 @@ model Document {
   idProprietaire    String              @db.ObjectId
   nomFichier        String
   urlStockage       String?
-  idGridFs          String?             @db.ObjectId
   type              DocumentType
   statut            DocumentStatut      @default(EN_ATTENTE)
   tags              String[]
