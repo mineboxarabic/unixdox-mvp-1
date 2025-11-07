@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { usersController } from '@/src/features/users';
+import { usersController } from '@/features/users';
 
 export async function GET() {
   const { status, body } = await usersController.list();

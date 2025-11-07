@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentService } from '../../../../src/features/documents/service';
+import { documentService } from '../../../../features/documents/service';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;

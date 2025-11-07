@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsController } from '@/src/features/documents';
+import { documentsController } from '@/features/documents';
 
 export async function GET(req: NextRequest) {
   const { status, body } = await documentsController.list(req);

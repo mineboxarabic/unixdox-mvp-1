@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { notificationsController } from '@/src/features/notifications';
+import { notificationsController } from '@/features/notifications';
 
 export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
   const { status, body } = await notificationsController.get(req, ctx.params);

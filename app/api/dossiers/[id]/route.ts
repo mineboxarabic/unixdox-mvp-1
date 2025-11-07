@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dossiersController } from '@/src/features/dossiers';
+import { dossiersController } from '@/features/dossiers';
 
 export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
   const { status, body } = await dossiersController.get(req, ctx.params);

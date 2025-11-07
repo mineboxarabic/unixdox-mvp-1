@@ -1,5 +1,5 @@
 
-import { useColorModeValue } from '@/src/components/ui/color-mode'
+import { useColorModeValue } from '@/components/ui/color-mode'
 import { 
   Box,
   Flex,
@@ -10,7 +10,7 @@ import {
   Icon
 } from '@chakra-ui/react'
 import { useEffect, useRef } from 'react'
-import { toaster } from '@/src/components/ui/toaster'
+import { toaster } from '@/components/ui/toaster'
  
 const GoogleIcon = (props: any) => (
   <Icon viewBox="0 0 24 24" boxSize="5" {...props}>
