@@ -67,9 +67,11 @@ enum DemarcheCategorie {
 
 model User {
   id                     String                  @id @default(auto()) @map("_id") @db.ObjectId
-  email                  String                  @unique
-  nom                    String
-  urlAvatar              String?
+  // NextAuth standard fields (added)
+  name                   String?
+  image                  String?
+  email                  String?                 @unique
+  emailVerified          DateTime?
   googleId               String?                 @unique
   password               String?
   dateInscription        DateTime                @default(now())
@@ -80,6 +82,9 @@ model User {
   dossiers               Dossier[]
   demarchesUtilisateur   DemarcheUtilisateur[]
   notifications          Notification[]
+  // Relations required by NextAuth (added)
+  accounts               Account[]
+  sessions               Session[]
   @@map("users")
 }
 
@@ -186,4 +191,47 @@ model Notification {
   @@index([idUser, dateCreation])
   @@index([idUser, type, lu])
   @@map("notifications")
+}
+
+// NextAuth models for Prisma Adapter (MongoDB)
+
+model Account {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
