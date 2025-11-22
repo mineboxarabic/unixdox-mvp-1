@@ -8,11 +8,10 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 123123
       MONGO_INITDB_DATABASE: unidox_backend_db
     volumes:
       - mongo-data:/data/db
+    command: ["--replSet", "rs0", "--bind_ip_all"]
 
 volumes:
   mongo-data:

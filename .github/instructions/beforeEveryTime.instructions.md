@@ -1,7 +1,8 @@
 ---
 applyTo: '**'
 ---
-Use DRY principle to avoid code duplication across the codebase.
+Use DRY principle 
+Use SOLID Principles
 
 Use standard naming conventions for files
 Use standard project structure for backend code.
