@@ -1,4 +1,5 @@
-import { VStack, Heading, Text, Button, HStack } from '@chakra-ui/react';
+import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 import { StepComponentProps } from './types';
 
 // Google Drive Icon SVG component
@@ -55,23 +56,13 @@ export function GoogleDriveLinkStep({ onNext }: StepComponentProps) {
 
       <Button
         w="full"
-        h="40px"
-        minW="40px"
-        px={4}
-        py={0.5}
-        bg="neutral.800"
-        color="neutral.0"
-        borderRadius="full"
-        _hover={{ bg: 'neutral.700' }}
-        _active={{ bg: 'neutral.900' }}
+        size="md"
+        variant="solid"
+        colorPalette="gray"
         onClick={handleGoogleDriveLink}
+        leftIcon={<GoogleDriveIcon />}
       >
-        <HStack gap={2}>
-          <GoogleDriveIcon />
-          <Text fontSize="sm" fontWeight="normal">
-            Lier votre google Drive
-          </Text>
-        </HStack>
+        Lier votre google Drive
       </Button>
     </VStack>
   );

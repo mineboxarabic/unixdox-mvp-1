@@ -1,4 +1,5 @@
-import { VStack, HStack, Box, Text, Input, Button } from '@chakra-ui/react';
+import { VStack, HStack, Box, Text, Input } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 
 interface PaymentFormProps {
   onContinue: () => void;
@@ -102,14 +103,9 @@ export function PaymentForm({ onContinue }: PaymentFormProps) {
       <Button
         type="submit"
         w="full"
-        h="40px"
-        bg="neutral.800"
-        color="neutral.0"
-        borderRadius="full"
-        fontSize="sm"
-        fontWeight="normal"
-        _hover={{ bg: 'neutral.700' }}
-        _active={{ bg: 'neutral.900' }}
+        size="md"
+        variant="solid"
+        colorPalette="gray"
         mt={2}
       >
         Continuer

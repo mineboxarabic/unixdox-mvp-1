@@ -1,4 +1,5 @@
-import { VStack, Heading, Text, Button, HStack } from '@chakra-ui/react';
+import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 import { StepComponentProps } from './types';
 
 // Google Icon SVG component
@@ -51,23 +52,13 @@ export function InitialLoginStep({ onNext }: StepComponentProps) {
 
       <Button
         w="full"
-        h="40px"
-        minW="40px"
-        px={4}
-        py={0.5}
-        bg="neutral.800"
-        color="neutral.0"
-        borderRadius="full"
-        _hover={{ bg: 'neutral.700' }}
-        _active={{ bg: 'neutral.900' }}
+        size="md"
+        variant="solid"
+        colorPalette="gray"
         onClick={handleGoogleSignIn}
+        leftIcon={<GoogleIcon />}
       >
-        <HStack gap={2}>
-          <GoogleIcon />
-          <Text fontSize="sm" fontWeight="normal">
-            S&apos;inscrire avec Google
-          </Text>
-        </HStack>
+        S&apos;inscrire avec Google
       </Button>
     </VStack>
   );

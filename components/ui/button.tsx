@@ -253,22 +253,22 @@ const variantStyles: Record<ButtonVariant, Record<ButtonColorPalette, {
     gray: {
       bg: 'transparent',
       color: 'gray.600',
-      _hover: { bg: 'transparent', color: 'gray.800' },
+      _hover: { bg: 'transparent' },
     },
     red: {
       bg: 'transparent',
       color: 'red.600',
-      _hover: { bg: 'transparent', color: 'red.700' },
+      _hover: { bg: 'transparent' },
     },
     blue: {
       bg: 'transparent',
       color: 'blue.600',
-      _hover: { bg: 'transparent', color: 'blue.700' },
+      _hover: { bg: 'transparent' },
     },
     green: {
       bg: 'transparent',
       color: 'green.600',
-      _hover: { bg: 'transparent', color: 'green.700' },
+      _hover: { bg: 'transparent' },
     },
   },
 };
@@ -318,20 +318,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Clone icons with proper size
     const clonedLeftIcon = leftIcon && React.cloneElement(leftIcon, {
-      style: {
-        width: sizeConfig.iconSize,
-        height: sizeConfig.iconSize,
-        flexShrink: 0,
-      },
-    });
+      width: sizeConfig.iconSize,
+      height: sizeConfig.iconSize,
+    } as any);
 
     const clonedRightIcon = rightIcon && React.cloneElement(rightIcon, {
-      style: {
-        width: sizeConfig.iconSize,
-        height: sizeConfig.iconSize,
-        flexShrink: 0,
-      },
-    });
+      width: sizeConfig.iconSize,
+      height: sizeConfig.iconSize,
+    } as any);
 
     return (
       <ChakraButton
