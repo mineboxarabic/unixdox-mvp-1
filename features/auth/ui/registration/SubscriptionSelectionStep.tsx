@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { VStack, HStack, Box, Text, Icon } from '@chakra-ui/react';
+import { VStack, HStack, Box, Text, Separator } from '@chakra-ui/react';
 import { StepComponentProps, PricingPlan, EngagementType } from './types';
 import { PricingCard } from './PricingCard';
+import { PaymentForm } from './PaymentForm';
 
 // Graduation Cap Icon
 function GraduationIcon() {
@@ -77,12 +78,13 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
       align="center"
       gap={6}
       overflow="hidden"
+      px={4}
     >
-      <VStack gap={4} align="center">
+      <VStack gap={4} align="center" w="full" maxW="500px">
         {/* Engagement Toggle */}
         <Box
-          bg="gray.100"
-          borderRadius="12px"
+          bg="bg.muted"
+          borderRadius="lg"
           p={1}
           display="inline-flex"
         >
@@ -90,9 +92,9 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
             <Box
               px={3}
               py={1}
-              borderRadius="8px"
-              bg={engagement === '1-year' ? 'white' : 'transparent'}
-              boxShadow={engagement === '1-year' ? '0px 1px 2px rgba(24, 24, 27, 0.10)' : 'none'}
+              borderRadius="md"
+              bg={engagement === '1-year' ? 'bg.surface' : 'transparent'}
+              boxShadow={engagement === '1-year' ? 'sm' : 'none'}
               cursor="pointer"
               onClick={() => setEngagement('1-year')}
               transition="all 0.2s"
@@ -100,7 +102,7 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
               <Text
                 fontSize="sm"
                 fontWeight="normal"
-                color={engagement === '1-year' ? 'gray.900' : 'gray.600'}
+                color={engagement === '1-year' ? 'neutral.900' : 'text.fg.muted'}
               >
                 Engagement 1 an
               </Text>
@@ -108,9 +110,9 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
             <Box
               px={3}
               py={1}
-              borderRadius="8px"
-              bg={engagement === 'no-commitment' ? 'white' : 'transparent'}
-              boxShadow={engagement === 'no-commitment' ? '0px 1px 2px rgba(24, 24, 27, 0.10)' : 'none'}
+              borderRadius="md"
+              bg={engagement === 'no-commitment' ? 'bg.surface' : 'transparent'}
+              boxShadow={engagement === 'no-commitment' ? 'sm' : 'none'}
               cursor="pointer"
               onClick={() => setEngagement('no-commitment')}
               transition="all 0.2s"
@@ -118,7 +120,7 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
               <Text
                 fontSize="sm"
                 fontWeight="normal"
-                color={engagement === 'no-commitment' ? 'gray.900' : 'gray.600'}
+                color={engagement === 'no-commitment' ? 'neutral.900' : 'text.fg.muted'}
               >
                 Sans engagement
               </Text>
@@ -140,16 +142,27 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
 
         {/* Student Link */}
         <HStack gap={1} justify="center">
-          <Box w="20px" h="20px" color="gray.700">
+          <Box w="20px" h="20px" color="text.fg">
             <GraduationIcon />
           </Box>
-          <Text fontSize="sm" fontWeight="normal" color="gray.700" textAlign="center">
+          <Text fontSize="sm" fontWeight="normal" color="text.fg" textAlign="center">
             Vous êtes étudiant ?{' '}
             <Text as="span" textDecoration="underline" cursor="pointer">
               Cliquez ici
             </Text>
           </Text>
         </HStack>
+
+        {/* Payment Form - Show when plan is selected */}
+        {selectedPlan && (
+          <VStack w="full" gap={4} pt={2}>
+            {/* Divider */}
+            <Separator w="full" borderColor="border.default" />
+
+            {/* Payment Form */}
+            <PaymentForm onContinue={onNext} />
+          </VStack>
+        )}
       </VStack>
     </VStack>
   );

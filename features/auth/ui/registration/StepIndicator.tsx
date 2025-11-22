@@ -28,15 +28,15 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                bg={isActive ? 'blue.100' : 'transparent'}
+                bg={isActive ? 'primary.100' : 'transparent'}
                 border="2px solid"
-                borderColor={isActive ? 'blue.600' : isCompleted ? 'blue.600' : 'gray.300'}
+                borderColor={isActive ? 'primary.600' : isCompleted ? 'primary.600' : 'neutral.300'}
                 overflow="hidden"
               >
                 <Text
                   fontSize="xs"
                   fontWeight="medium"
-                  color={isActive || isCompleted ? 'gray.900' : 'gray.500'}
+                  color={isActive || isCompleted ? 'neutral.900' : 'neutral.500'}
                 >
                   {stepNumber}
                 </Text>
@@ -46,7 +46,7 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
                 <Text
                   fontSize="sm"
                   fontWeight="semibold"
-                  color="gray.700"
+                  color="text.fg"
                   lineHeight="1.25"
                   whiteSpace="pre-line"
                 >

@@ -57,30 +57,30 @@ interface PricingCardProps {
 export function PricingCard({ plan, isSelected, onSelect }: PricingCardProps) {
   return (
     <Box
-      bg="white"
-      borderRadius="16px"
+      bg="bg.surface"
+      borderRadius="xl"
       border="1px solid"
-      borderColor={isSelected ? 'blue.500' : 'gray.200'}
+      borderColor={isSelected ? 'primary.500' : 'border.default'}
       overflow="hidden"
       position="relative"
       cursor="pointer"
       onClick={onSelect}
       transition="all 0.2s"
-      _hover={{ borderColor: isSelected ? 'blue.600' : 'gray.300' }}
+      _hover={{ borderColor: isSelected ? 'primary.600' : 'neutral.300' }}
     >
       <Box p={4} position="relative">
         <VStack gap={2} align="center">
           {/* Icon */}
-          <Box w="24px" h="24px" color="gray.700">
+          <Box w="24px" h="24px" color="text.fg">
             {plan.icon === 'standard' ? <StandardIcon /> : <PremiumIcon />}
           </Box>
 
           {/* Title and Price */}
           <VStack gap={0} align="center">
-            <Text fontSize="lg" fontWeight="normal" color="gray.700" textAlign="center">
+            <Text fontSize="lg" fontWeight="normal" color="text.fg" textAlign="center">
               {plan.name}
             </Text>
-            <Text fontSize="lg" fontWeight="medium" color="gray.700" textAlign="center">
+            <Text fontSize="lg" fontWeight="medium" color="text.fg" textAlign="center">
               {plan.price.toFixed(2)}€/mois
             </Text>
           </VStack>
@@ -89,10 +89,10 @@ export function PricingCard({ plan, isSelected, onSelect }: PricingCardProps) {
           <VStack gap={1.5} align="flex-start" pt={2}>
             {plan.features.map((feature, index) => (
               <HStack key={index} gap={1} align="flex-start">
-                <Box w="16px" h="16px" color="gray.600" flexShrink={0} mt={0.5}>
+                <Box w="16px" h="16px" color="text.fg.muted" flexShrink={0} mt={0.5}>
                   <CheckIcon />
                 </Box>
-                <Text fontSize="sm" fontWeight="normal" color="gray.600" lineHeight="1.4">
+                <Text fontSize="sm" fontWeight="normal" color="text.fg.muted" lineHeight="1.4">
                   {feature}
                 </Text>
               </HStack>
@@ -105,10 +105,10 @@ export function PricingCard({ plan, isSelected, onSelect }: PricingCardProps) {
           <Box
             w="16px"
             h="16px"
-            borderRadius="4px"
+            borderRadius="sm"
             border="1px solid"
-            borderColor={isSelected ? 'blue.600' : 'gray.300'}
-            bg={isSelected ? 'blue.600' : 'white'}
+            borderColor={isSelected ? 'primary.600' : 'neutral.300'}
+            bg={isSelected ? 'primary.600' : 'bg.surface'}
             display="flex"
             alignItems="center"
             justifyContent="center"

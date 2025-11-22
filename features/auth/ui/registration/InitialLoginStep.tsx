@@ -13,7 +13,7 @@ function GoogleIcon() {
   );
 }
 
-export function GoogleSignInStep({ onNext }: StepComponentProps) {
+export function InitialLoginStep({ onNext }: StepComponentProps) {
   const handleGoogleSignIn = () => {
     // TODO: Implement Google OAuth sign-in
     console.log('Google sign-in clicked');
@@ -34,7 +34,7 @@ export function GoogleSignInStep({ onNext }: StepComponentProps) {
           as="h1"
           fontSize="2xl"
           fontWeight="normal"
-          color="gray.500"
+          color="text.fg.muted"
           lineHeight="8"
         >
           Inscription
@@ -42,7 +42,7 @@ export function GoogleSignInStep({ onNext }: StepComponentProps) {
         <Text
           fontSize="xl"
           fontWeight="normal"
-          color="gray.700"
+          color="text.fg"
           lineHeight="1.5"
         >
           Découvrez votre assistant administratif personnel
@@ -55,11 +55,11 @@ export function GoogleSignInStep({ onNext }: StepComponentProps) {
         minW="40px"
         px={4}
         py={0.5}
-        bg="gray.800"
-        color="white"
+        bg="neutral.800"
+        color="neutral.0"
         borderRadius="full"
-        _hover={{ bg: 'gray.700' }}
-        _active={{ bg: 'gray.900' }}
+        _hover={{ bg: 'neutral.700' }}
+        _active={{ bg: 'neutral.900' }}
         onClick={handleGoogleSignIn}
       >
         <HStack gap={2}>
