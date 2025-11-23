@@ -1,3 +1,3 @@
-export { dossierService } from './service';
-export * as dossiersSchemas from './model/schema.zod';
+export { dossierService } from './services/dossier.service';
+export * as dossiersSchemas from './types/schemas';
 export * as dossiersActions from './actions';

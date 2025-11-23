@@ -1,3 +1,3 @@
-export { notificationService } from './service';
-export * as notificationsSchemas from './model/schema.zod';
+export { notificationService } from './services/notification.service';
+export * as notificationsSchemas from './types/schemas';
 export * as notificationsActions from './actions';

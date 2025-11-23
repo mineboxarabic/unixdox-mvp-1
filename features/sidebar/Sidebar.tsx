@@ -3,13 +3,6 @@
 import { useState } from 'react';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 import { 
-  LuHouse, 
-  LuFolderOpen, 
-  LuFileText, 
-  LuClock,
-  LuLogOut,
-  LuSettings,
-  LuCircleHelp,
   LuChevronLeft,
   LuChevronRight
 } from 'react-icons/lu';
@@ -21,8 +14,9 @@ import {
   Separator,
   PromoCard,
   StorageIndicator,
-} from './components';
+} from './ui';
 import type { NavItem, UserAccount as UserAccountType, StorageInfo } from './types';
+import { mainNavItems, bottomNavItems, storageInfo } from './config';
 
 interface SidebarProps {
   user?: UserAccountType;
@@ -30,59 +24,6 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const mainNavItems: NavItem[] = [
-    {
-      label: 'Accueil',
-      icon: LuHouse,
-      href: '/',
-      isActive: true,
-    },
-    {
-      label: 'Démarches',
-      icon: LuFolderOpen,
-      href: '/demarches',
-      badge: 2,
-    },
-    {
-      label: 'Mes documents',
-      icon: LuFileText,
-      href: '/documents',
-      badge: 2,
-    },
-    {
-      label: 'Echéances',
-      icon: LuClock,
-      href: '/echeances',
-      isPremium: true,
-      isDisabled: true,
-      badge: 2,
-    },
-  ];
-
-  const bottomNavItems: NavItem[] = [
-    {
-      label: 'Déconnexion',
-      icon: LuLogOut,
-      href: '#',
-    },
-    {
-      label: 'Paramètres',
-      icon: LuSettings,
-      href: '/settings',
-    },
-    {
-      label: 'Aide',
-      icon: LuCircleHelp,
-      href: '/help',
-    },
-  ];
-
-  const storageInfo: StorageInfo = {
-    used: 1.5,
-    total: 6,
-    unit: 'Go',
-  };
 
   const defaultUser: UserAccountType = {
     name: user?.name || 'Segun Adebayo',
@@ -154,8 +95,7 @@ export function Sidebar({ user }: SidebarProps) {
         </Flex>
 
         {/* Promo Card */}
-        {!isCollapsed && <PromoCard isCollapsed={isCollapsed} />}
-        {isCollapsed && <PromoCard isCollapsed={isCollapsed} />}
+        <PromoCard isCollapsed={isCollapsed} />
 
         {/* Bottom Section */}
         <Flex direction="column" gap={4}>

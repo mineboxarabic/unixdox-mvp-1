@@ -1,3 +1,2 @@
-export { documentsController } from './api/controller';
-export * as documentsSchemas from './model/schema.zod';
+export * as documentsSchemas from './types/schemas';
 export * as documentsActions from './actions';

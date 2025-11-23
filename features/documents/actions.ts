@@ -1,8 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { documentService } from './service';
-import { CreateDocumentSchema, UpdateDocumentStatusSchema } from './model/schema.zod';
+import { documentService } from './services/document.service';
+import { CreateDocumentSchema, UpdateDocumentStatusSchema } from './types/schemas';
 import { ActionResult } from '@/types/actions';
 import { requireAuth } from '@/features/auth/server';
 import { Document, DocumentStatut, DocumentType } from '@prisma/client';

@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { prisma } from '@/config/prisma';
 import { Notification, Prisma, NotificationType, NotificationPriorite } from '@prisma/client';
 
 class NotificationService {

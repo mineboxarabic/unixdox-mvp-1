@@ -1,8 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { userService } from './service';
-import { UserUpdateSchema } from './model/schema.zod';
+import { userService } from './services/user.service';
+import { UserUpdateSchema } from './types/schemas';
 import { ActionResult } from '@/types/actions';
 import { requireAuth } from '@/features/auth/server';
 import { User, SubscriptionPlan } from '@prisma/client';
