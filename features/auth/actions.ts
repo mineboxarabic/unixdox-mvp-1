@@ -3,6 +3,10 @@
 import { signIn, auth } from '@/auth';
 import { prisma } from '@/config/prisma';
 
+export async function login() {
+  await signIn('google', { redirectTo: '/' });
+}
+
 export async function loginWithGoogle() {
   await signIn('google', { redirectTo: '/register' });
 }
