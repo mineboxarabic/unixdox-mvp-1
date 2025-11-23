@@ -1,6 +1,7 @@
 import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
 import { StepComponentProps } from './types';
+import { linkGoogleAccount } from '@/features/auth/actions';
 
 // Google Drive Icon SVG component
 function GoogleDriveIcon() {
@@ -17,10 +18,8 @@ function GoogleDriveIcon() {
 }
 
 export function GoogleDriveLinkStep({ onNext }: StepComponentProps) {
-  const handleGoogleDriveLink = () => {
-    // TODO: Implement Google Drive linking
-    console.log('Google Drive link clicked');
-    onNext();
+  const handleGoogleDriveLink = async () => {
+    await linkGoogleAccount();
   };
 
   return (

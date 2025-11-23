@@ -3,6 +3,9 @@ import { VStack, HStack, Box, Text, Separator } from '@chakra-ui/react';
 import { StepComponentProps, PricingPlan, EngagementType } from './types';
 import { PricingCard } from './PricingCard';
 import { PaymentForm } from './PaymentForm';
+import { updateUserSubscription } from '@/features/users/actions';
+import { SubscriptionPlan } from '@prisma/client';
+import { toaster } from '@/components/ui/toaster';
 
 // Graduation Cap Icon
 function GraduationIcon() {
@@ -68,6 +71,33 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
     setSelectedPlan(planId);
     // Auto-advance after selection or require explicit next button
     // For now, just select
+  };
+
+  const handleContinue = async () => {
+    if (!selectedPlan) return;
+
+    let plan: SubscriptionPlan = SubscriptionPlan.FREE;
+    if (selectedPlan === 'standard') plan = SubscriptionPlan.BASIC;
+    if (selectedPlan === 'premium') plan = SubscriptionPlan.PREMIUM;
+
+    try {
+      const result = await updateUserSubscription(plan);
+      if (result.success) {
+        onNext();
+      } else {
+        toaster.create({
+          title: 'Erreur',
+          description: result.error || 'Une erreur est survenue',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      toaster.create({
+        title: 'Erreur',
+        description: 'Une erreur est survenue',
+        type: 'error',
+      });
+    }
   };
 
   return (
@@ -160,7 +190,7 @@ export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps
             <Separator w="full" borderColor="border.default" />
 
             {/* Payment Form */}
-            <PaymentForm onContinue={onNext} />
+            <PaymentForm onContinue={handleContinue} />
           </VStack>
         )}
       </VStack>

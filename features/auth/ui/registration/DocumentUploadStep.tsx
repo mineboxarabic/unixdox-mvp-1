@@ -1,9 +1,12 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { VStack, Heading, Text, Box, HStack } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
 import { StepComponentProps } from './types';
+import { uploadDocumentFile } from '@/features/documents/actions';
+import { toaster } from '@/components/ui/toaster';
 
 // Upload Icon SVG component
 function UploadIcon() {
@@ -27,7 +30,8 @@ function UploadIcon() {
   );
 }
 
-export function DocumentUploadStep({ onNext }: StepComponentProps) {
+export function DocumentUploadStep({ onNext, onBack }: StepComponentProps) {
+  const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -66,11 +70,30 @@ export function DocumentUploadStep({ onNext }: StepComponentProps) {
     onNext();
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (uploadedFile) {
-      // TODO: Implement file upload
-      console.log('Upload file:', uploadedFile.name);
-      onNext();
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+
+      try {
+        const result = await uploadDocumentFile(formData);
+        if (result.success) {
+          // Redirect to main page after successful upload
+          router.push('/');
+        } else {
+          toaster.create({
+            title: 'Erreur',
+            description: result.error || "Erreur lors de l'upload",
+            type: 'error',
+          });
+        }
+      } catch (error) {
+        toaster.create({
+          title: 'Erreur',
+          description: "Erreur lors de l'upload",
+          type: 'error',
+        });
+      }
     }
   };
 
@@ -177,6 +200,16 @@ export function DocumentUploadStep({ onNext }: StepComponentProps) {
 
       {/* Action Buttons */}
       <HStack w="full" gap={3} justify="space-between">
+        <Button
+          size="md"
+          variant="outline"
+          colorPalette="gray"
+          flex="1"
+          onClick={onBack}
+        >
+          Retour
+        </Button>
+
         <Button
           size="md"
           variant="outline"

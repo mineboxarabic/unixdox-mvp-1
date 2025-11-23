@@ -10,7 +10,7 @@ import type { Prisma } from '@prisma/client';
 // ENUMS
 /////////////////////////////////////////
 
-export const UserScalarFieldEnumSchema = z.enum(['id','name','image','email','emailVerified','googleId','password','dateInscription','createdAt','updatedAt']);
+export const UserScalarFieldEnumSchema = z.enum(['id','name','image','email','emailVerified','googleId','password','plan','onboardingCompleted','dateInscription','createdAt','updatedAt']);
 
 export const DocumentScalarFieldEnumSchema = z.enum(['id','idProprietaire','nomFichier','urlStockage','type','statut','tags','dateUpload','size','createdAt','updatedAt','dossierIds']);
 
@@ -31,6 +31,10 @@ export const VerificationTokenScalarFieldEnumSchema = z.enum(['id','identifier',
 export const SortOrderSchema = z.enum(['asc','desc']);
 
 export const QueryModeSchema = z.enum(['default','insensitive']);
+
+export const SubscriptionPlanSchema = z.enum(['FREE','BASIC','PREMIUM','ENTERPRISE']);
+
+export type SubscriptionPlanType = `${z.infer<typeof SubscriptionPlanSchema>}`
 
 export const DocumentTypeSchema = z.enum(['FACTURE','CONTRAT','CARTE_IDENTITE','PASSEPORT','JUSTIFICATIF_DOMICILE','ACTE_NAISSANCE','ACTE_MARIAGE','DIPLOME','ATTESTATION_TRAVAIL','FICHE_PAIE','RELEVE_BANCAIRE','ASSURANCE','PERMIS_CONDUIRE','CARTE_VITALE','AUTRE']);
 
@@ -65,6 +69,7 @@ export type DemarcheCategorieType = `${z.infer<typeof DemarcheCategorieSchema>}`
 /////////////////////////////////////////
 
 export const UserSchema = z.object({
+  plan: SubscriptionPlanSchema,
   id: z.string(),
   name: z.string().nullable(),
   image: z.string().nullable(),
@@ -72,6 +77,7 @@ export const UserSchema = z.object({
   emailVerified: z.coerce.date().nullable(),
   googleId: z.string().nullable(),
   password: z.string().nullable(),
+  onboardingCompleted: z.boolean(),
   dateInscription: z.coerce.date(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -274,6 +280,8 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   emailVerified: z.boolean().optional(),
   googleId: z.boolean().optional(),
   password: z.boolean().optional(),
+  plan: z.boolean().optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.boolean().optional(),
   preferences: z.union([z.boolean(),z.lazy(() => UserPreferencesArgsSchema)]).optional(),
   createdAt: z.boolean().optional(),
@@ -532,6 +540,8 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.strictOb
   emailVerified: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   googleId: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   password: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => EnumSubscriptionPlanFilterSchema), z.lazy(() => SubscriptionPlanSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
   dateInscription: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCompositeFilterSchema), z.lazy(() => UserPreferencesObjectEqualityInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
@@ -552,6 +562,8 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   googleId: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
+  plan: z.lazy(() => SortOrderSchema).optional(),
+  onboardingCompleted: z.lazy(() => SortOrderSchema).optional(),
   dateInscription: z.lazy(() => SortOrderSchema).optional(),
   preferences: z.lazy(() => UserPreferencesOrderByInputSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
@@ -603,6 +615,8 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   image: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   emailVerified: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   password: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => EnumSubscriptionPlanFilterSchema), z.lazy(() => SubscriptionPlanSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
   dateInscription: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCompositeFilterSchema), z.lazy(() => UserPreferencesObjectEqualityInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
@@ -623,6 +637,8 @@ export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderBy
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   googleId: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
+  plan: z.lazy(() => SortOrderSchema).optional(),
+  onboardingCompleted: z.lazy(() => SortOrderSchema).optional(),
   dateInscription: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
@@ -642,6 +658,8 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   emailVerified: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema), z.coerce.date() ]).optional().nullable(),
   googleId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
   password: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => EnumSubscriptionPlanWithAggregatesFilterSchema), z.lazy(() => SubscriptionPlanSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema), z.boolean() ]).optional(),
   dateInscription: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
@@ -1336,6 +1354,8 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.strict
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -1356,6 +1376,8 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -1375,6 +1397,8 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.strict
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -1394,6 +1418,8 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -1414,6 +1440,8 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -1427,6 +1455,8 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -1440,6 +1470,8 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2110,6 +2142,18 @@ export const DateTimeNullableFilterSchema: z.ZodType<Prisma.DateTimeNullableFilt
   isSet: z.boolean().optional(),
 });
 
+export const EnumSubscriptionPlanFilterSchema: z.ZodType<Prisma.EnumSubscriptionPlanFilter> = z.strictObject({
+  equals: z.lazy(() => SubscriptionPlanSchema).optional(),
+  in: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  notIn: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  not: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => NestedEnumSubscriptionPlanFilterSchema) ]).optional(),
+});
+
+export const BoolFilterSchema: z.ZodType<Prisma.BoolFilter> = z.strictObject({
+  equals: z.boolean().optional(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolFilterSchema) ]).optional(),
+});
+
 export const DateTimeFilterSchema: z.ZodType<Prisma.DateTimeFilter> = z.strictObject({
   equals: z.coerce.date().optional(),
   in: z.coerce.date().array().optional(),
@@ -2206,6 +2250,8 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   googleId: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
+  plan: z.lazy(() => SortOrderSchema).optional(),
+  onboardingCompleted: z.lazy(() => SortOrderSchema).optional(),
   dateInscription: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
@@ -2219,6 +2265,8 @@ export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderBy
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   googleId: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
+  plan: z.lazy(() => SortOrderSchema).optional(),
+  onboardingCompleted: z.lazy(() => SortOrderSchema).optional(),
   dateInscription: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
@@ -2232,6 +2280,8 @@ export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderBy
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   googleId: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
+  plan: z.lazy(() => SortOrderSchema).optional(),
+  onboardingCompleted: z.lazy(() => SortOrderSchema).optional(),
   dateInscription: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
@@ -2287,6 +2337,24 @@ export const DateTimeNullableWithAggregatesFilterSchema: z.ZodType<Prisma.DateTi
   _min: z.lazy(() => NestedDateTimeNullableFilterSchema).optional(),
   _max: z.lazy(() => NestedDateTimeNullableFilterSchema).optional(),
   isSet: z.boolean().optional(),
+});
+
+export const EnumSubscriptionPlanWithAggregatesFilterSchema: z.ZodType<Prisma.EnumSubscriptionPlanWithAggregatesFilter> = z.strictObject({
+  equals: z.lazy(() => SubscriptionPlanSchema).optional(),
+  in: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  notIn: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  not: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => NestedEnumSubscriptionPlanWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumSubscriptionPlanFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumSubscriptionPlanFilterSchema).optional(),
+});
+
+export const BoolWithAggregatesFilterSchema: z.ZodType<Prisma.BoolWithAggregatesFilter> = z.strictObject({
+  equals: z.boolean().optional(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedBoolFilterSchema).optional(),
+  _max: z.lazy(() => NestedBoolFilterSchema).optional(),
 });
 
 export const DateTimeWithAggregatesFilterSchema: z.ZodType<Prisma.DateTimeWithAggregatesFilter> = z.strictObject({
@@ -2464,11 +2532,6 @@ export const EnumDemarcheCategorieFilterSchema: z.ZodType<Prisma.EnumDemarcheCat
   not: z.union([ z.lazy(() => DemarcheCategorieSchema), z.lazy(() => NestedEnumDemarcheCategorieFilterSchema) ]).optional(),
 });
 
-export const BoolFilterSchema: z.ZodType<Prisma.BoolFilter> = z.strictObject({
-  equals: z.boolean().optional(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolFilterSchema) ]).optional(),
-});
-
 export const ModeleDemarcheCountOrderByAggregateInputSchema: z.ZodType<Prisma.ModeleDemarcheCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   titre: z.lazy(() => SortOrderSchema).optional(),
@@ -2519,14 +2582,6 @@ export const EnumDemarcheCategorieWithAggregatesFilterSchema: z.ZodType<Prisma.E
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedEnumDemarcheCategorieFilterSchema).optional(),
   _max: z.lazy(() => NestedEnumDemarcheCategorieFilterSchema).optional(),
-});
-
-export const BoolWithAggregatesFilterSchema: z.ZodType<Prisma.BoolWithAggregatesFilter> = z.strictObject({
-  equals: z.boolean().optional(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolWithAggregatesFilterSchema) ]).optional(),
-  _count: z.lazy(() => NestedIntFilterSchema).optional(),
-  _min: z.lazy(() => NestedBoolFilterSchema).optional(),
-  _max: z.lazy(() => NestedBoolFilterSchema).optional(),
 });
 
 export const EnumDemarcheStatutFilterSchema: z.ZodType<Prisma.EnumDemarcheStatutFilter> = z.strictObject({
@@ -2903,6 +2958,14 @@ export const NullableStringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.Nu
 export const NullableDateTimeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableDateTimeFieldUpdateOperationsInput> = z.strictObject({
   set: z.coerce.date().optional().nullable(),
   unset: z.boolean().optional(),
+});
+
+export const EnumSubscriptionPlanFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumSubscriptionPlanFieldUpdateOperationsInput> = z.strictObject({
+  set: z.lazy(() => SubscriptionPlanSchema).optional(),
+});
+
+export const BoolFieldUpdateOperationsInputSchema: z.ZodType<Prisma.BoolFieldUpdateOperationsInput> = z.strictObject({
+  set: z.boolean().optional(),
 });
 
 export const DateTimeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.DateTimeFieldUpdateOperationsInput> = z.strictObject({
@@ -3303,10 +3366,6 @@ export const EnumDemarcheCategorieFieldUpdateOperationsInputSchema: z.ZodType<Pr
   set: z.lazy(() => DemarcheCategorieSchema).optional(),
 });
 
-export const BoolFieldUpdateOperationsInputSchema: z.ZodType<Prisma.BoolFieldUpdateOperationsInput> = z.strictObject({
-  set: z.boolean().optional(),
-});
-
 export const DemarcheUtilisateurUpdateManyWithoutModeleNestedInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUpdateManyWithoutModeleNestedInput> = z.strictObject({
   create: z.union([ z.lazy(() => DemarcheUtilisateurCreateWithoutModeleInputSchema), z.lazy(() => DemarcheUtilisateurCreateWithoutModeleInputSchema).array(), z.lazy(() => DemarcheUtilisateurUncheckedCreateWithoutModeleInputSchema), z.lazy(() => DemarcheUtilisateurUncheckedCreateWithoutModeleInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => DemarcheUtilisateurCreateOrConnectWithoutModeleInputSchema), z.lazy(() => DemarcheUtilisateurCreateOrConnectWithoutModeleInputSchema).array() ]).optional(),
@@ -3483,6 +3542,18 @@ export const NestedDateTimeNullableFilterSchema: z.ZodType<Prisma.NestedDateTime
   isSet: z.boolean().optional(),
 });
 
+export const NestedEnumSubscriptionPlanFilterSchema: z.ZodType<Prisma.NestedEnumSubscriptionPlanFilter> = z.strictObject({
+  equals: z.lazy(() => SubscriptionPlanSchema).optional(),
+  in: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  notIn: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  not: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => NestedEnumSubscriptionPlanFilterSchema) ]).optional(),
+});
+
+export const NestedBoolFilterSchema: z.ZodType<Prisma.NestedBoolFilter> = z.strictObject({
+  equals: z.boolean().optional(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolFilterSchema) ]).optional(),
+});
+
 export const NestedDateTimeFilterSchema: z.ZodType<Prisma.NestedDateTimeFilter> = z.strictObject({
   equals: z.coerce.date().optional(),
   in: z.coerce.date().array().optional(),
@@ -3575,6 +3646,24 @@ export const NestedDateTimeNullableWithAggregatesFilterSchema: z.ZodType<Prisma.
   isSet: z.boolean().optional(),
 });
 
+export const NestedEnumSubscriptionPlanWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumSubscriptionPlanWithAggregatesFilter> = z.strictObject({
+  equals: z.lazy(() => SubscriptionPlanSchema).optional(),
+  in: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  notIn: z.lazy(() => SubscriptionPlanSchema).array().optional(),
+  not: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => NestedEnumSubscriptionPlanWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumSubscriptionPlanFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumSubscriptionPlanFilterSchema).optional(),
+});
+
+export const NestedBoolWithAggregatesFilterSchema: z.ZodType<Prisma.NestedBoolWithAggregatesFilter> = z.strictObject({
+  equals: z.boolean().optional(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedBoolFilterSchema).optional(),
+  _max: z.lazy(() => NestedBoolFilterSchema).optional(),
+});
+
 export const NestedDateTimeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedDateTimeWithAggregatesFilter> = z.strictObject({
   equals: z.coerce.date().optional(),
   in: z.coerce.date().array().optional(),
@@ -3657,11 +3746,6 @@ export const NestedEnumDemarcheCategorieFilterSchema: z.ZodType<Prisma.NestedEnu
   not: z.union([ z.lazy(() => DemarcheCategorieSchema), z.lazy(() => NestedEnumDemarcheCategorieFilterSchema) ]).optional(),
 });
 
-export const NestedBoolFilterSchema: z.ZodType<Prisma.NestedBoolFilter> = z.strictObject({
-  equals: z.boolean().optional(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolFilterSchema) ]).optional(),
-});
-
 export const NestedEnumDemarcheCategorieWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumDemarcheCategorieWithAggregatesFilter> = z.strictObject({
   equals: z.lazy(() => DemarcheCategorieSchema).optional(),
   in: z.lazy(() => DemarcheCategorieSchema).array().optional(),
@@ -3670,14 +3754,6 @@ export const NestedEnumDemarcheCategorieWithAggregatesFilterSchema: z.ZodType<Pr
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedEnumDemarcheCategorieFilterSchema).optional(),
   _max: z.lazy(() => NestedEnumDemarcheCategorieFilterSchema).optional(),
-});
-
-export const NestedBoolWithAggregatesFilterSchema: z.ZodType<Prisma.NestedBoolWithAggregatesFilter> = z.strictObject({
-  equals: z.boolean().optional(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolWithAggregatesFilterSchema) ]).optional(),
-  _count: z.lazy(() => NestedIntFilterSchema).optional(),
-  _min: z.lazy(() => NestedBoolFilterSchema).optional(),
-  _max: z.lazy(() => NestedBoolFilterSchema).optional(),
 });
 
 export const NestedEnumDemarcheStatutFilterSchema: z.ZodType<Prisma.NestedEnumDemarcheStatutFilter> = z.strictObject({
@@ -4155,6 +4231,8 @@ export const UserCreateWithoutDocumentsInputSchema: z.ZodType<Prisma.UserCreateW
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4174,6 +4252,8 @@ export const UserUncheckedCreateWithoutDocumentsInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4267,6 +4347,8 @@ export const UserUpdateWithoutDocumentsInputSchema: z.ZodType<Prisma.UserUpdateW
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4285,6 +4367,8 @@ export const UserUncheckedUpdateWithoutDocumentsInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4336,6 +4420,8 @@ export const UserCreateWithoutDossiersInputSchema: z.ZodType<Prisma.UserCreateWi
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4355,6 +4441,8 @@ export const UserUncheckedCreateWithoutDossiersInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4425,6 +4513,8 @@ export const UserUpdateWithoutDossiersInputSchema: z.ZodType<Prisma.UserUpdateWi
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4443,6 +4533,8 @@ export const UserUncheckedUpdateWithoutDossiersInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4527,6 +4619,8 @@ export const UserCreateWithoutDemarchesUtilisateurInputSchema: z.ZodType<Prisma.
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4546,6 +4640,8 @@ export const UserUncheckedCreateWithoutDemarchesUtilisateurInputSchema: z.ZodTyp
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4609,6 +4705,8 @@ export const UserUpdateWithoutDemarchesUtilisateurInputSchema: z.ZodType<Prisma.
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4627,6 +4725,8 @@ export const UserUncheckedUpdateWithoutDemarchesUtilisateurInputSchema: z.ZodTyp
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4679,6 +4779,8 @@ export const UserCreateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserCre
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4698,6 +4800,8 @@ export const UserUncheckedCreateWithoutNotificationsInputSchema: z.ZodType<Prism
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4768,6 +4872,8 @@ export const UserUpdateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserUpd
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4786,6 +4892,8 @@ export const UserUncheckedUpdateWithoutNotificationsInputSchema: z.ZodType<Prism
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4845,6 +4953,8 @@ export const UserCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateWi
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4864,6 +4974,8 @@ export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4898,6 +5010,8 @@ export const UserUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUpdateWi
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4916,6 +5030,8 @@ export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4935,6 +5051,8 @@ export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWi
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4954,6 +5072,8 @@ export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.coerce.date().optional().nullable(),
   googleId: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
+  plan: z.lazy(() => SubscriptionPlanSchema).optional(),
+  onboardingCompleted: z.boolean().optional(),
   dateInscription: z.coerce.date().optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableCreateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.coerce.date().optional(),
@@ -4988,6 +5108,8 @@ export const UserUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUpdateWi
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -5006,6 +5128,8 @@ export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   googleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  plan: z.union([ z.lazy(() => SubscriptionPlanSchema), z.lazy(() => EnumSubscriptionPlanFieldUpdateOperationsInputSchema) ]).optional(),
+  onboardingCompleted: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateInscription: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   preferences: z.union([ z.lazy(() => UserPreferencesNullableUpdateEnvelopeInputSchema), z.lazy(() => UserPreferencesCreateInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),

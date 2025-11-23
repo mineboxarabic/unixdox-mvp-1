@@ -15,7 +15,7 @@ class DocumentService {
 		return prisma.document.findFirst({
 			where,
 			include: {
-				proprietaire: { select: { id: true, nom: true, email: true } },
+				proprietaire: { select: { id: true, name: true, email: true } },
 			},
 		});
 	}
@@ -23,7 +23,7 @@ class DocumentService {
 	async createDocument(data: Prisma.DocumentCreateInput): Promise<Document> {
 		return prisma.document.create({
 			data,
-			include: { proprietaire: { select: { id: true, nom: true, email: true } } },
+			include: { proprietaire: { select: { id: true, name: true, email: true } } },
 		});
 	}
 

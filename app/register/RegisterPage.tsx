@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Box, Flex, VStack, Image } from '@chakra-ui/react';
 import { BackgroundGradients } from '@/features/auth/ui/registration/BackgroundGradients';
 import { StepIndicator } from '@/features/auth/ui/registration/StepIndicator';
@@ -29,9 +30,30 @@ const registrationSteps: RegistrationStep[] = [
   }
 ];
 
-export default function RegisterPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+interface RegisterPageProps {
+  isAuthenticated?: boolean;
+}
+
+export default function RegisterPage({ isAuthenticated = false }: RegisterPageProps) {
+  const searchParams = useSearchParams();
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
   const [currentStep, setCurrentStep] = useState(1);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setIsLoggedIn(true);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const step = parseInt(stepParam, 10);
+      if (!isNaN(step) && step >= 1 && step <= registrationSteps.length) {
+        setCurrentStep(step);
+      }
+    }
+  }, [searchParams]);
 
   const handleLogin = () => {
     setIsLoggedIn(true);

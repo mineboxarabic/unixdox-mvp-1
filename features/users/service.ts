@@ -10,14 +10,14 @@ class UserService {
       select: {
         id: true,
         email: true,
-        nom: true,
-        urlAvatar: true,
+        name: true,
+        image: true,
         dateInscription: true,
         createdAt: true,
         updatedAt: true,
         preferences: true,
       },
-    }) as Promise<SafeUser[]>;
+    }) as unknown as Promise<SafeUser[]>;
   }
 
   async getUserById(id: string): Promise<SafeUser | null> {
@@ -26,14 +26,15 @@ class UserService {
       select: {
         id: true,
         email: true,
-        nom: true,
-        urlAvatar: true,
+        name: true,
+        image: true,
         dateInscription: true,
         createdAt: true,
         updatedAt: true,
         preferences: true,
+        onboardingCompleted: true,
       },
-    }) as Promise<SafeUser | null>;
+    }) as unknown as Promise<SafeUser | null>;
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
@@ -50,14 +51,14 @@ class UserService {
       select: {
         id: true,
         email: true,
-        nom: true,
-        urlAvatar: true,
+        name: true,
+        image: true,
         dateInscription: true,
         createdAt: true,
         updatedAt: true,
         preferences: true,
       },
-    }) as Promise<SafeUser>;
+    }) as unknown as Promise<SafeUser>;
   }
 
   async updateUser(id: string, data: Prisma.UserUpdateInput): Promise<SafeUser> {
@@ -71,14 +72,14 @@ class UserService {
       select: {
         id: true,
         email: true,
-        nom: true,
-        urlAvatar: true,
+        name: true,
+        image: true,
         dateInscription: true,
         createdAt: true,
         updatedAt: true,
         preferences: true,
       },
-    }) as Promise<SafeUser>;
+    }) as unknown as Promise<SafeUser>;
   }
 
   async deleteUser(id: string): Promise<SafeUser> {
@@ -87,14 +88,14 @@ class UserService {
       select: {
         id: true,
         email: true,
-        nom: true,
-        urlAvatar: true,
+        name: true,
+        image: true,
         dateInscription: true,
         createdAt: true,
         updatedAt: true,
         preferences: true,
       },
-    }) as Promise<SafeUser>;
+    }) as unknown as Promise<SafeUser>;
   }
 
   async getUserWithDocuments(id: string) {

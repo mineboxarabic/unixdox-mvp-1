@@ -5,7 +5,7 @@ import { userService } from './service';
 import { UserUpdateSchema } from './model/schema.zod';
 import { ActionResult } from '@/types/actions';
 import { requireAuth } from '@/features/auth/server';
-import { User } from '@prisma/client';
+import { User, SubscriptionPlan } from '@prisma/client';
 
 // Define SafeUser type locally or import if exported from service
 type SafeUser = Omit<User, 'password' | 'googleId'>;
@@ -53,5 +53,22 @@ export async function deleteCurrentUser(): Promise<ActionResult<void>> {
     return { success: true, data: undefined };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete user' };
+  }
+}
+
+export async function updateUserSubscription(plan: SubscriptionPlan): Promise<ActionResult<SafeUser>> {
+  const session = await requireAuth();
+  const userId = session.user?.id;
+
+  if (!userId) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  try {
+    const updated = await userService.updateUser(userId, { plan });
+    revalidatePath('/profile');
+    return { success: true, data: updated };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update subscription' };
   }
 }

@@ -13,6 +13,14 @@ datasource db {
 }
 
 // Enums
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+
 enum DocumentType {
   FACTURE
   CONTRAT
@@ -74,6 +82,8 @@ model User {
   emailVerified          DateTime?
   googleId               String?                 @unique
   password               String?
+  plan                   SubscriptionPlan        @default(FREE)
+  onboardingCompleted    Boolean                 @default(false)
   dateInscription        DateTime                @default(now())
   preferences            UserPreferences?
   createdAt              DateTime                @default(now())
