@@ -15,7 +15,7 @@ function UploadIcon() {
       <path 
         d="M12 15V3M12 3L8 7M12 3L16 7" 
         stroke="currentColor" 
-        strokeWidth="2" 
+        strokeWidth="2"
         strokeLinecap="round" 
         strokeLinejoin="round"
       />
