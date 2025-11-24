@@ -8,7 +8,11 @@ export interface NavItem {
   isDisabled?: boolean;
 }
 
-
+export interface UserAccount {
+  name: string;
+  email: string;
+  avatarUrl?: string | null;
+}
 
 export interface StorageInfo {
   used: number;
