@@ -11,3 +11,5 @@ you can delete files and folders if needed to follow standard project structure.
 
 we will use feature folder strucutre
 
+use the theme provided in config/theme.js for styling
+
