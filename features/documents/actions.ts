@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { documentService } from './services/document.service';
 import { CreateDocumentSchema, UpdateDocumentStatusSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
-import { requireAuth } from '@/features/auth/server';
+import { requireAuth } from '@/shared/auth/server';
 import { Document, DocumentStatut, DocumentType } from '@prisma/client';
 import { google } from 'googleapis';
 import { prisma } from '@/shared/config/prisma';

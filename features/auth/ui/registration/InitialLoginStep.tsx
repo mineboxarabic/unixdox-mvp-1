@@ -1,7 +1,7 @@
 import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
-import { loginWithGoogle } from '@/features/auth/actions';
+import { loginWithGoogle } from '@/shared/auth/actions';
 
 // Google Icon SVG component
 function GoogleIcon() {

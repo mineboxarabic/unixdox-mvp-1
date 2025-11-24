@@ -2,8 +2,8 @@
 
 import { Box, Flex, VStack, Image, Heading, Text } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
-import { BackgroundGradients } from '@/features/auth/ui/registration/BackgroundGradients';
-import { login } from '@/features/auth/actions';
+import { BackgroundGradients } from '@/shared/auth/components/BackgroundGradients';
+import { login } from '@/shared/auth/actions';
 
 // Google Icon SVG component
 function GoogleIcon() {

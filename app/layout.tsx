@@ -4,7 +4,7 @@ import "./globals.css";
 import { Provider } from "@/shared/components/ui/provider";
 import { auth } from '@/auth';
 import { LayoutWrapper } from '@/shared/components/LayoutWrapper';
-
+import { Sidebar } from "@/features/sidebar";
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -27,7 +27,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`} style={{ fontFamily: 'var(--font-inter)' }}>
         <Provider>
-          <LayoutWrapper authenticated={!!session?.user} user={session?.user}>
+          <LayoutWrapper SideBar={Sidebar} authenticated={!!session?.user} user={session?.user}>
             {children}
           </LayoutWrapper>
         </Provider>

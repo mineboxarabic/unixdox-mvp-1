@@ -1,7 +1,7 @@
 import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
-import { linkGoogleAccount } from '@/features/auth/actions';
+import { linkGoogleAccount } from '@/shared/auth/actions';
 
 // Google Drive Icon SVG component
 function GoogleDriveIcon() {

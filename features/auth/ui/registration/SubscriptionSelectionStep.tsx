@@ -3,7 +3,6 @@ import { VStack, HStack, Box, Text, Separator } from '@chakra-ui/react';
 import { StepComponentProps, PricingPlan, EngagementType } from './types';
 import { PricingCard } from './PricingCard';
 import { PaymentForm } from './PaymentForm';
-import { updateUserSubscription } from '@/features/users/actions';
 import { SubscriptionPlan } from '@prisma/client';
 import { toaster } from '@/shared/components/ui/toaster';
 
@@ -63,7 +62,7 @@ const pricingPlans: PricingPlan[] = [
   }
 ];
 
-export function SubscriptionSelectionStep({ onNext, onBack }: StepComponentProps) {
+export function SubscriptionSelectionStep({ onNext, onBack, updateUserSubscription }: StepComponentProps) {
   const [engagement, setEngagement] = useState<EngagementType>('1-year');
   const [selectedPlan, setSelectedPlan] = useState<string>('');
 

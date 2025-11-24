@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Box, Flex, VStack, Image } from '@chakra-ui/react';
-import { BackgroundGradients } from '@/features/auth/ui/registration/BackgroundGradients';
+import { BackgroundGradients } from '@/shared/auth/components/BackgroundGradients';
 import { StepIndicator } from '@/features/auth/ui/registration/StepIndicator';
 import { InitialLoginStep } from '@/features/auth/ui/registration/InitialLoginStep';
 import { SubscriptionSelectionStep } from '@/features/auth/ui/registration/SubscriptionSelectionStep';
 import { GoogleDriveLinkStep } from '@/features/auth/ui/registration/GoogleDriveLinkStep';
 import { DocumentUploadStep } from '@/features/auth/ui/registration/DocumentUploadStep';
 import { RegistrationStep } from '@/features/auth/ui/registration/types';
+import { updateUserSubscription } from '@/features/users/actions';
+import { uploadDocumentFile } from '@/features/documents/actions';
 
 // Define the registration steps (after initial login)
 const registrationSteps: RegistrationStep[] = [
@@ -96,6 +98,8 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
                 onBack={() => {}}
                 isFirstStep={true}
                 isLastStep={false}
+                updateUserSubscription={updateUserSubscription}
+                uploadDocumentFile={uploadDocumentFile}
               />
             </VStack>
           </Flex>
@@ -159,6 +163,8 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
                 onBack={handleBack}
                 isFirstStep={isFirstStep}
                 isLastStep={isLastStep}
+                updateUserSubscription={updateUserSubscription}
+                uploadDocumentFile={uploadDocumentFile}
               />
             </VStack>
           </VStack>

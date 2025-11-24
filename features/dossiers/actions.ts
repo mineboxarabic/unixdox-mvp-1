@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { dossierService } from './services/dossier.service';
 import { CreateDossierSchema, DossierUpdateSchema, DossierAddRemoveDocumentsSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
-import { requireAuth } from '@/features/auth/server';
+import { requireAuth } from '@/shared/auth/server';
 import { Dossier } from '@prisma/client';
 
 export async function createNewDossier(input: unknown): Promise<ActionResult<Dossier>> {

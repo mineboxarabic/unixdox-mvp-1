@@ -15,8 +15,10 @@ import {
   PromoCard,
   StorageIndicator,
 } from './ui';
-import type { NavItem, UserAccount as UserAccountType, StorageInfo } from './types';
+import type { NavItem, StorageInfo } from './types';
 import { mainNavItems, bottomNavItems, storageInfo } from './config';
+
+import {UserAccount as UserAccountType} from '@/shared/components';
 
 interface SidebarProps {
   user?: UserAccountType;

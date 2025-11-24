@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import { Box, Flex } from '@chakra-ui/react';
-import { Sidebar } from '@/features/sidebar';
 import { Toaster } from '@/shared/components/ui/toaster';
 
 interface LayoutWrapperProps {
@@ -13,19 +12,20 @@ interface LayoutWrapperProps {
     email?: string | null;
     image?: string | null;
   };
+  SideBar?: React.ComponentType<any>;
 }
 
-export function LayoutWrapper({ children, authenticated, user }: LayoutWrapperProps) {
+export function LayoutWrapper({SideBar,  children, authenticated, user }: LayoutWrapperProps) {
   const pathname = usePathname();
   
   // Hide sidebar on auth pages
   const isAuthPage = pathname === '/login' || pathname === '/register';
-  const showSidebar = authenticated && !isAuthPage;
+  const showSidebar = authenticated && !isAuthPage && SideBar;
 
   return (
     <Flex h="100vh" overflow="hidden">
       {showSidebar && (
-        <Sidebar
+        <SideBar
           user={
             user
               ? {

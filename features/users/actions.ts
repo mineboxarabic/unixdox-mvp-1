@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { userService } from './services/user.service';
 import { UserUpdateSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
-import { requireAuth } from '@/features/auth/server';
+import { requireAuth } from '@/shared/auth/server';
 import { User, SubscriptionPlan } from '@prisma/client';
 
 // Define SafeUser type locally or import if exported from service

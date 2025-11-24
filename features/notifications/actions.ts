@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { notificationService } from './services/notification.service';
 import { ActionResult } from '@/shared/types/actions';
-import { requireAuth } from '@/features/auth/server';
+import { requireAuth } from '@/shared/auth/server';
 import { Notification } from '@prisma/client';
 
 export async function markNotificationAsRead(id: string): Promise<ActionResult<Notification>> {

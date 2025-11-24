@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { VStack, Heading, Text, Box, HStack } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
-import { uploadDocumentFile } from '@/features/documents/actions';
 import { toaster } from '@/shared/components/ui/toaster';
 
 // Upload Icon SVG component
@@ -30,7 +29,7 @@ function UploadIcon() {
   );
 }
 
-export function DocumentUploadStep({ onNext, onBack }: StepComponentProps) {
+export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile}: StepComponentProps) {
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
