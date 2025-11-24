@@ -3,7 +3,7 @@
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { LuChevronDown } from 'react-icons/lu';
 import type { UserAccount as UserAccountType } from '../types';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar } from '@/shared/components/ui/avatar';
 
 interface UserAccountProps {
   user: UserAccountType;

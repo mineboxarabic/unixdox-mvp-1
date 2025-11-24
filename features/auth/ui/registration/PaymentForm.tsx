@@ -1,5 +1,5 @@
 import { VStack, HStack, Box, Text, Input } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 
 interface PaymentFormProps {
   onContinue: () => void;

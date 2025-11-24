@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { VStack, Heading, Text, Box, HStack } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
 import { uploadDocumentFile } from '@/features/documents/actions';
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/shared/components/ui/toaster';
 
 // Upload Icon SVG component
 function UploadIcon() {

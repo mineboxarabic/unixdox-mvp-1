@@ -13,3 +13,7 @@ we will use feature folder strucutre
 
 use the theme provided in config/theme.js for styling
 
+
+in the feature folder structure you can import only from the feature folder or from shared folder
+
+so feature can't import from other feature folders directly

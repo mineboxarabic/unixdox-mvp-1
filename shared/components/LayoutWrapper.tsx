@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Box, Flex } from '@chakra-ui/react';
 import { Sidebar } from '@/features/sidebar';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/shared/components/ui/toaster';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;

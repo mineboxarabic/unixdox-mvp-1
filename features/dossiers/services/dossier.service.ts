@@ -1,4 +1,4 @@
-import { prisma } from '@/config/prisma';
+import { prisma } from '@/shared/config/prisma';
 import { Dossier, Prisma } from '@prisma/client';
 
 class DossierService {
@@ -13,14 +13,14 @@ class DossierService {
   }
 
   async getDossierById(id: string, userId?: string): Promise<Dossier | null> {
-    const where: Prisma.DossierWhereInput = { id } as any;
-    if (userId) (where as any).idProprietaire = userId;
+    const where: Prisma.DossierWhereInput = { id } ;
+    if (userId) where.idProprietaire = userId;
 
     return prisma.dossier.findFirst({
       where,
       include: {
         documents: true,
-        proprietaire: { select: { id: true, nom: true, email: true } },
+        proprietaire: { select: { id: true, name: true, email: true } },
       },
     });
   }
@@ -31,14 +31,14 @@ class DossierService {
 
   async updateDossier(id: string, userId: string, data: Prisma.DossierUpdateInput): Promise<Dossier> {
     return prisma.dossier.update({
-      where: { id, idProprietaire: userId } as any,
+      where: { id, idProprietaire: userId } ,
       data,
       include: { documents: true },
     });
   }
 
   async deleteDossier(id: string, userId: string): Promise<Dossier> {
-    return prisma.dossier.delete({ where: { id, idProprietaire: userId } as any });
+    return prisma.dossier.delete({ where: { id, idProprietaire: userId }  });
   }
 
   async addDocuments(id: string, userId: string, documentIds: string[]): Promise<Dossier> {
@@ -48,7 +48,7 @@ class DossierService {
     const updatedDocumentIds = Array.from(new Set([...(dossier.idsDocuments || []), ...documentIds]));
 
     return prisma.dossier.update({
-      where: { id, idProprietaire: userId } as any,
+      where: { id, idProprietaire: userId } ,
       data: {
         idsDocuments: updatedDocumentIds,
         documents: { connect: documentIds.map((docId) => ({ id: docId })) },
@@ -64,7 +64,7 @@ class DossierService {
     const updatedDocumentIds = (dossier.idsDocuments || []).filter((docId: string) => !documentIds.includes(docId));
 
     return prisma.dossier.update({
-      where: { id, idProprietaire: userId } as any,
+      where: { id, idProprietaire: userId },
       data: {
         idsDocuments: updatedDocumentIds,
         documents: { disconnect: documentIds.map((docId) => ({ id: docId })) },

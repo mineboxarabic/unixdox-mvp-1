@@ -5,7 +5,7 @@ import { PricingCard } from './PricingCard';
 import { PaymentForm } from './PaymentForm';
 import { updateUserSubscription } from '@/features/users/actions';
 import { SubscriptionPlan } from '@prisma/client';
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/shared/components/ui/toaster';
 
 // Graduation Cap Icon
 function GraduationIcon() {

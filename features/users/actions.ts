@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { userService } from './services/user.service';
 import { UserUpdateSchema } from './types/schemas';
-import { ActionResult } from '@/types/actions';
+import { ActionResult } from '@/shared/types/actions';
 import { requireAuth } from '@/features/auth/server';
 import { User, SubscriptionPlan } from '@prisma/client';
 
@@ -31,7 +31,7 @@ export async function updateCurrentUser(input: unknown): Promise<ActionResult<Sa
   }
 
   try {
-    const updated = await userService.updateUser(userId, parsed.data as any);
+    const updated = await userService.updateUser(userId, parsed.data);
     revalidatePath('/profile');
     return { success: true, data: updated };
   } catch (error: any) {

@@ -5,7 +5,7 @@ import {
   ColorModeProvider,
   type ColorModeProviderProps,
 } from "./color-mode"
-import { system } from "@/config/theme"
+import { system } from "@/shared/config/theme"
 
 export function Provider(props: ColorModeProviderProps) {
   return (

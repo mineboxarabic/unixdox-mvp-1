@@ -1,7 +1,7 @@
 'use server';
 
 import { signIn, auth } from '@/auth';
-import { prisma } from '@/config/prisma';
+import { prisma } from '@/shared/config/prisma';
 
 export async function login() {
   await signIn('google', { redirectTo: '/' });

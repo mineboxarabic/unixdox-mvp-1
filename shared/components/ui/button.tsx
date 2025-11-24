@@ -317,15 +317,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const variantConfig = variantStyles[variant][colorPalette];
 
     // Clone icons with proper size
-    const clonedLeftIcon = leftIcon && React.cloneElement(leftIcon, {
+    const clonedLeftIcon = leftIcon && React.cloneElement(leftIcon as React.ReactElement<{ width: string; height: string }>, {
       width: sizeConfig.iconSize,
       height: sizeConfig.iconSize,
-    } as any);
+    } );
 
-    const clonedRightIcon = rightIcon && React.cloneElement(rightIcon, {
+    const clonedRightIcon = rightIcon && React.cloneElement(rightIcon as React.ReactElement<{ width: string; height: string }>, {
       width: sizeConfig.iconSize,
       height: sizeConfig.iconSize,
-    } as any);
+    } );
 
     return (
       <ChakraButton

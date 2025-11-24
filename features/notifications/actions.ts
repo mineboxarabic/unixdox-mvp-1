@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { notificationService } from './services/notification.service';
-import { ActionResult } from '@/types/actions';
+import { ActionResult } from '@/shared/types/actions';
 import { requireAuth } from '@/features/auth/server';
 import { Notification } from '@prisma/client';
 

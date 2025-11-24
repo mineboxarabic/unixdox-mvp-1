@@ -1,10 +1,10 @@
-import { prisma } from '@/config/prisma';
+import { prisma } from '@/shared/config/prisma';
 import { Notification, Prisma, NotificationType, NotificationPriorite } from '@prisma/client';
 
 class NotificationService {
   async getUserNotifications(userId: string, unreadOnly: boolean = false): Promise<Notification[]> {
-    const where: Prisma.NotificationWhereInput = { idUser: userId } as any;
-    if (unreadOnly) (where as any).lu = false;
+    const where: Prisma.NotificationWhereInput = { idUser: userId };
+    if (unreadOnly) where.lu = false;
 
     return prisma.notification.findMany({
       where,
@@ -16,8 +16,8 @@ class NotificationService {
   }
 
   async getNotificationById(id: string, userId?: string): Promise<Notification | null> {
-    const where: Prisma.NotificationWhereInput = { id } as any;
-    if (userId) (where as any).idUser = userId;
+    const where: Prisma.NotificationWhereInput = { id };
+    if (userId) where.idUser = userId;
 
     return prisma.notification.findFirst({
       where,
@@ -32,7 +32,7 @@ class NotificationService {
   }
 
   async markAsRead(id: string, userId: string): Promise<Notification> {
-    return prisma.notification.update({ where: { id, idUser: userId } as any, data: { lu: true } });
+    return prisma.notification.update({ where: { id, idUser: userId }, data: { lu: true } });
   }
 
   async markAllAsRead(userId: string): Promise<Prisma.BatchPayload> {
@@ -40,7 +40,7 @@ class NotificationService {
   }
 
   async deleteNotification(id: string, userId: string): Promise<Notification> {
-    return prisma.notification.delete({ where: { id, idUser: userId } as any });
+    return prisma.notification.delete({ where: { id, idUser: userId } });
   }
 
   async deleteReadNotifications(userId: string): Promise<Prisma.BatchPayload> {

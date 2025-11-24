@@ -1,5 +1,5 @@
 import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
 import { loginWithGoogle } from '@/features/auth/actions';
 

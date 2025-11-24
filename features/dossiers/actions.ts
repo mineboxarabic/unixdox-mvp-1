@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { dossierService } from './services/dossier.service';
 import { CreateDossierSchema, DossierUpdateSchema, DossierAddRemoveDocumentsSchema } from './types/schemas';
-import { ActionResult } from '@/types/actions';
+import { ActionResult } from '@/shared/types/actions';
 import { requireAuth } from '@/features/auth/server';
 import { Dossier } from '@prisma/client';
 
