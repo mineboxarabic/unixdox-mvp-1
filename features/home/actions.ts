@@ -34,6 +34,7 @@ export async function getHomeData(): Promise<HomeData> {
     status: doc.statut,
     tags: doc.tags,
     expirationDate: doc.dateExpiration,
+    url: doc.urlStockage || undefined,
   }));
 
   return {

@@ -22,6 +22,7 @@ export interface Document {
   status: string;
   tags: string[];
   expirationDate?: Date | null;
+  url?: string;
 }
 
 export interface HomeData {

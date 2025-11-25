@@ -100,6 +100,12 @@ export function RecentDocumentsCard({
     </Box>
   );
 
+  const handleRowClick = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
   const renderDocumentsTable = () => (
     <Table>
       <TableHeader>
@@ -114,7 +120,12 @@ export function RecentDocumentsCard({
       </TableHeader>
       <TableBody>
         {documents.map((document) => (
-          <TableRow key={document.id}>
+          <TableRow 
+            key={document.id} 
+            onClick={() => handleRowClick(document.url)}
+            style={{ cursor: document.url ? 'pointer' : 'default' }}
+            _hover={{ bg: "bg.subtle" }}
+          >
             <TableCell>
               <Box color="fg.muted">
                 {getDocumentIcon(document.type)}

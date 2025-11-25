@@ -1,6 +1,6 @@
 import { getModeleDemarches } from "@/features/admin/actions";
 import { Button } from "@/shared/components/ui/button";
-import { Card, CardHeader, CardBody } from "@/shared/components/ui/card";
+import { Card, CardBody } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { 
   Box, 
@@ -10,11 +10,11 @@ import {
   Container,
   Flex,
   Table,
-  HStack,
-  IconButton
+  HStack
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
+import { ModeleActions } from "@/features/admin/ui/ModeleActions";
 
 export default async function ModeleDemarcheListPage() {
   const result = await getModeleDemarches();
@@ -73,21 +73,7 @@ export default async function ModeleDemarcheListPage() {
                     </Table.Cell>
                     <Table.Cell textAlign="end">
                       <HStack justify="end" gap={2}>
-                        <IconButton 
-                          aria-label="Edit model" 
-                          variant="ghost" 
-                          size="sm"
-                        >
-                          <FiEdit />
-                        </IconButton>
-                        <IconButton 
-                          aria-label="Delete model" 
-                          variant="ghost" 
-                          colorPalette="red" 
-                          size="sm"
-                        >
-                          <FiTrash2 />
-                        </IconButton>
+                        <ModeleActions modeleId={modele.id} />
                       </HStack>
                     </Table.Cell>
                   </Table.Row>
