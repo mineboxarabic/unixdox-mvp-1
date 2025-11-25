@@ -1,9 +1,53 @@
 import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
 /////////////////////////////////////////
+
+// JSON
+//------------------------------------------------------
+
+export type NullableJsonInput = Prisma.JsonValue | null | 'JsonNull' | 'DbNull' | Prisma.NullTypes.DbNull | Prisma.NullTypes.JsonNull;
+
+export const transformJsonNull = (v?: NullableJsonInput) => {
+  if (!v || v === 'DbNull') return Prisma.NullTypes.DbNull;
+  if (v === 'JsonNull') return Prisma.NullTypes.JsonNull;
+  return v;
+};
+
+export const JsonValueSchema: z.ZodType<Prisma.JsonValue> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.literal(null),
+    z.record(z.string(), z.lazy(() => JsonValueSchema.optional())),
+    z.array(z.lazy(() => JsonValueSchema)),
+  ])
+);
+
+export type JsonValueType = z.infer<typeof JsonValueSchema>;
+
+export const NullableJsonValue = z
+  .union([JsonValueSchema, z.literal('DbNull'), z.literal('JsonNull')])
+  .nullable()
+  .transform((v) => transformJsonNull(v));
+
+export type NullableJsonValueType = z.infer<typeof NullableJsonValue>;
+
+export const InputJsonValueSchema: z.ZodType<Prisma.InputJsonValue> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.object({ toJSON: z.any() }),
+    z.record(z.string(), z.lazy(() => z.union([InputJsonValueSchema, z.literal(null)]))),
+    z.array(z.lazy(() => z.union([InputJsonValueSchema, z.literal(null)]))),
+  ])
+);
+
+export type InputJsonValueType = z.infer<typeof InputJsonValueSchema>;
 
 
 /////////////////////////////////////////
@@ -12,7 +56,7 @@ import type { Prisma } from '@prisma/client';
 
 export const UserScalarFieldEnumSchema = z.enum(['id','name','image','email','emailVerified','googleId','password','plan','role','onboardingCompleted','dateInscription','createdAt','updatedAt']);
 
-export const DocumentScalarFieldEnumSchema = z.enum(['id','idProprietaire','nomFichier','urlStockage','type','statut','tags','dateUpload','dateExpiration','size','createdAt','updatedAt','dossierIds']);
+export const DocumentScalarFieldEnumSchema = z.enum(['id','idProprietaire','nomFichier','urlStockage','type','statut','tags','dateUpload','dateExpiration','size','metadata','extractionStatus','extractionError','createdAt','updatedAt','dossierIds']);
 
 export const DossierScalarFieldEnumSchema = z.enum(['id','idProprietaire','nom','idsDocuments','couleur','icone','createdAt','updatedAt']);
 
@@ -56,6 +100,10 @@ export const NotificationPrioriteSchema = z.enum(['BASSE','NORMALE','HAUTE']);
 
 export type NotificationPrioriteType = `${z.infer<typeof NotificationPrioriteSchema>}`
 
+export const ExtractionStatusSchema = z.enum(['PENDING','COMPLETED','FAILED']);
+
+export type ExtractionStatusType = `${z.infer<typeof ExtractionStatusSchema>}`
+
 export const DemarcheStatutSchema = z.enum(['EN_COURS','COMPLETE','ABANDONNEE']);
 
 export type DemarcheStatutType = `${z.infer<typeof DemarcheStatutSchema>}`
@@ -97,6 +145,7 @@ export type User = z.infer<typeof UserSchema>
 export const DocumentSchema = z.object({
   type: DocumentTypeSchema,
   statut: DocumentStatutSchema,
+  extractionStatus: ExtractionStatusSchema,
   id: z.string(),
   idProprietaire: z.string(),
   nomFichier: z.string(),
@@ -105,6 +154,8 @@ export const DocumentSchema = z.object({
   dateUpload: z.coerce.date(),
   dateExpiration: z.coerce.date().nullable(),
   size: z.number().int(),
+  metadata: JsonValueSchema.nullable(),
+  extractionError: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   dossierIds: z.string().array(),
@@ -336,6 +387,9 @@ export const DocumentSelectSchema: z.ZodType<Prisma.DocumentSelect> = z.object({
   dateUpload: z.boolean().optional(),
   dateExpiration: z.boolean().optional(),
   size: z.boolean().optional(),
+  metadata: z.boolean().optional(),
+  extractionStatus: z.boolean().optional(),
+  extractionError: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   dossierIds: z.boolean().optional(),
@@ -700,6 +754,9 @@ export const DocumentWhereInputSchema: z.ZodType<Prisma.DocumentWhereInput> = z.
   dateUpload: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dateExpiration: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   size: z.union([ z.lazy(() => IntFilterSchema), z.number() ]).optional(),
+  metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
+  extractionStatus: z.union([ z.lazy(() => EnumExtractionStatusFilterSchema), z.lazy(() => ExtractionStatusSchema) ]).optional(),
+  extractionError: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dossierIds: z.lazy(() => StringNullableListFilterSchema).optional(),
@@ -719,6 +776,9 @@ export const DocumentOrderByWithRelationInputSchema: z.ZodType<Prisma.DocumentOr
   dateUpload: z.lazy(() => SortOrderSchema).optional(),
   dateExpiration: z.lazy(() => SortOrderSchema).optional(),
   size: z.lazy(() => SortOrderSchema).optional(),
+  metadata: z.lazy(() => SortOrderSchema).optional(),
+  extractionStatus: z.lazy(() => SortOrderSchema).optional(),
+  extractionError: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   dossierIds: z.lazy(() => SortOrderSchema).optional(),
@@ -744,6 +804,9 @@ export const DocumentWhereUniqueInputSchema: z.ZodType<Prisma.DocumentWhereUniqu
   dateUpload: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dateExpiration: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   size: z.union([ z.lazy(() => IntFilterSchema), z.number().int() ]).optional(),
+  metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
+  extractionStatus: z.union([ z.lazy(() => EnumExtractionStatusFilterSchema), z.lazy(() => ExtractionStatusSchema) ]).optional(),
+  extractionError: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dossierIds: z.lazy(() => StringNullableListFilterSchema).optional(),
@@ -763,6 +826,9 @@ export const DocumentOrderByWithAggregationInputSchema: z.ZodType<Prisma.Documen
   dateUpload: z.lazy(() => SortOrderSchema).optional(),
   dateExpiration: z.lazy(() => SortOrderSchema).optional(),
   size: z.lazy(() => SortOrderSchema).optional(),
+  metadata: z.lazy(() => SortOrderSchema).optional(),
+  extractionStatus: z.lazy(() => SortOrderSchema).optional(),
+  extractionError: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   dossierIds: z.lazy(() => SortOrderSchema).optional(),
@@ -787,6 +853,9 @@ export const DocumentScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Docu
   dateUpload: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   dateExpiration: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema), z.coerce.date() ]).optional().nullable(),
   size: z.union([ z.lazy(() => IntWithAggregatesFilterSchema), z.number() ]).optional(),
+  metadata: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional(),
+  extractionStatus: z.union([ z.lazy(() => EnumExtractionStatusWithAggregatesFilterSchema), z.lazy(() => ExtractionStatusSchema) ]).optional(),
+  extractionError: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   dossierIds: z.lazy(() => StringNullableListFilterSchema).optional(),
@@ -1533,6 +1602,9 @@ export const DocumentCreateInputSchema: z.ZodType<Prisma.DocumentCreateInput> = 
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   proprietaire: z.lazy(() => UserCreateNestedOneWithoutDocumentsInputSchema),
@@ -1551,6 +1623,9 @@ export const DocumentUncheckedCreateInputSchema: z.ZodType<Prisma.DocumentUnchec
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossierIds: z.union([ z.lazy(() => DocumentCreatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -1567,6 +1642,9 @@ export const DocumentUpdateInputSchema: z.ZodType<Prisma.DocumentUpdateInput> = 
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   proprietaire: z.lazy(() => UserUpdateOneRequiredWithoutDocumentsNestedInputSchema).optional(),
@@ -1584,6 +1662,9 @@ export const DocumentUncheckedUpdateInputSchema: z.ZodType<Prisma.DocumentUnchec
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -1602,6 +1683,9 @@ export const DocumentCreateManyInputSchema: z.ZodType<Prisma.DocumentCreateManyI
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossierIds: z.union([ z.lazy(() => DocumentCreatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -1616,6 +1700,9 @@ export const DocumentUpdateManyMutationInputSchema: z.ZodType<Prisma.DocumentUpd
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -1630,6 +1717,9 @@ export const DocumentUncheckedUpdateManyInputSchema: z.ZodType<Prisma.DocumentUn
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -2492,6 +2582,19 @@ export const IntFilterSchema: z.ZodType<Prisma.IntFilter> = z.strictObject({
   not: z.union([ z.number(),z.lazy(() => NestedIntFilterSchema) ]).optional(),
 });
 
+export const JsonNullableFilterSchema: z.ZodType<Prisma.JsonNullableFilter> = z.strictObject({
+  equals: InputJsonValueSchema.optional().nullable(),
+  not: InputJsonValueSchema.optional().nullable(),
+  isSet: z.boolean().optional(),
+});
+
+export const EnumExtractionStatusFilterSchema: z.ZodType<Prisma.EnumExtractionStatusFilter> = z.strictObject({
+  equals: z.lazy(() => ExtractionStatusSchema).optional(),
+  in: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  notIn: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => NestedEnumExtractionStatusFilterSchema) ]).optional(),
+});
+
 export const UserRelationFilterSchema: z.ZodType<Prisma.UserRelationFilter> = z.strictObject({
   is: z.lazy(() => UserWhereInputSchema).optional(),
   isNot: z.lazy(() => UserWhereInputSchema).optional(),
@@ -2508,6 +2611,9 @@ export const DocumentCountOrderByAggregateInputSchema: z.ZodType<Prisma.Document
   dateUpload: z.lazy(() => SortOrderSchema).optional(),
   dateExpiration: z.lazy(() => SortOrderSchema).optional(),
   size: z.lazy(() => SortOrderSchema).optional(),
+  metadata: z.lazy(() => SortOrderSchema).optional(),
+  extractionStatus: z.lazy(() => SortOrderSchema).optional(),
+  extractionError: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   dossierIds: z.lazy(() => SortOrderSchema).optional(),
@@ -2527,6 +2633,8 @@ export const DocumentMaxOrderByAggregateInputSchema: z.ZodType<Prisma.DocumentMa
   dateUpload: z.lazy(() => SortOrderSchema).optional(),
   dateExpiration: z.lazy(() => SortOrderSchema).optional(),
   size: z.lazy(() => SortOrderSchema).optional(),
+  extractionStatus: z.lazy(() => SortOrderSchema).optional(),
+  extractionError: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
 });
@@ -2541,6 +2649,8 @@ export const DocumentMinOrderByAggregateInputSchema: z.ZodType<Prisma.DocumentMi
   dateUpload: z.lazy(() => SortOrderSchema).optional(),
   dateExpiration: z.lazy(() => SortOrderSchema).optional(),
   size: z.lazy(() => SortOrderSchema).optional(),
+  extractionStatus: z.lazy(() => SortOrderSchema).optional(),
+  extractionError: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
 });
@@ -2583,6 +2693,25 @@ export const IntWithAggregatesFilterSchema: z.ZodType<Prisma.IntWithAggregatesFi
   _sum: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedIntFilterSchema).optional(),
   _max: z.lazy(() => NestedIntFilterSchema).optional(),
+});
+
+export const JsonNullableWithAggregatesFilterSchema: z.ZodType<Prisma.JsonNullableWithAggregatesFilter> = z.strictObject({
+  equals: InputJsonValueSchema.optional().nullable(),
+  not: InputJsonValueSchema.optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedJsonNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedJsonNullableFilterSchema).optional(),
+  isSet: z.boolean().optional(),
+});
+
+export const EnumExtractionStatusWithAggregatesFilterSchema: z.ZodType<Prisma.EnumExtractionStatusWithAggregatesFilter> = z.strictObject({
+  equals: z.lazy(() => ExtractionStatusSchema).optional(),
+  in: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  notIn: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => NestedEnumExtractionStatusWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumExtractionStatusFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumExtractionStatusFilterSchema).optional(),
 });
 
 export const DossierCountOrderByAggregateInputSchema: z.ZodType<Prisma.DossierCountOrderByAggregateInput> = z.strictObject({
@@ -3356,6 +3485,10 @@ export const IntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.IntFieldUpdat
   divide: z.number().optional(),
 });
 
+export const EnumExtractionStatusFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumExtractionStatusFieldUpdateOperationsInput> = z.strictObject({
+  set: z.lazy(() => ExtractionStatusSchema).optional(),
+});
+
 export const UserUpdateOneRequiredWithoutDocumentsNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutDocumentsNestedInput> = z.strictObject({
   create: z.union([ z.lazy(() => UserCreateWithoutDocumentsInputSchema), z.lazy(() => UserUncheckedCreateWithoutDocumentsInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutDocumentsInputSchema).optional(),
@@ -3870,6 +4003,13 @@ export const NestedEnumDocumentStatutFilterSchema: z.ZodType<Prisma.NestedEnumDo
   not: z.union([ z.lazy(() => DocumentStatutSchema), z.lazy(() => NestedEnumDocumentStatutFilterSchema) ]).optional(),
 });
 
+export const NestedEnumExtractionStatusFilterSchema: z.ZodType<Prisma.NestedEnumExtractionStatusFilter> = z.strictObject({
+  equals: z.lazy(() => ExtractionStatusSchema).optional(),
+  in: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  notIn: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => NestedEnumExtractionStatusFilterSchema) ]).optional(),
+});
+
 export const NestedEnumDocumentTypeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumDocumentTypeWithAggregatesFilter> = z.strictObject({
   equals: z.lazy(() => DocumentTypeSchema).optional(),
   in: z.lazy(() => DocumentTypeSchema).array().optional(),
@@ -3915,6 +4055,22 @@ export const NestedFloatFilterSchema: z.ZodType<Prisma.NestedFloatFilter> = z.st
   gt: z.number().optional(),
   gte: z.number().optional(),
   not: z.union([ z.number(),z.lazy(() => NestedFloatFilterSchema) ]).optional(),
+});
+
+export const NestedJsonNullableFilterSchema: z.ZodType<Prisma.NestedJsonNullableFilter> = z.strictObject({
+  equals: InputJsonValueSchema.optional().nullable(),
+  not: InputJsonValueSchema.optional().nullable(),
+  isSet: z.boolean().optional(),
+});
+
+export const NestedEnumExtractionStatusWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumExtractionStatusWithAggregatesFilter> = z.strictObject({
+  equals: z.lazy(() => ExtractionStatusSchema).optional(),
+  in: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  notIn: z.lazy(() => ExtractionStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => NestedEnumExtractionStatusWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumExtractionStatusFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumExtractionStatusFilterSchema).optional(),
 });
 
 export const NestedEnumDemarcheCategorieFilterSchema: z.ZodType<Prisma.NestedEnumDemarcheCategorieFilter> = z.strictObject({
@@ -4024,6 +4180,9 @@ export const DocumentCreateWithoutProprietaireInputSchema: z.ZodType<Prisma.Docu
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossiers: z.lazy(() => DossierCreateNestedManyWithoutDocumentsInputSchema).optional(),
@@ -4040,6 +4199,9 @@ export const DocumentUncheckedCreateWithoutProprietaireInputSchema: z.ZodType<Pr
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossierIds: z.union([ z.lazy(() => DocumentCreatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -4280,6 +4442,9 @@ export const DocumentScalarWhereInputSchema: z.ZodType<Prisma.DocumentScalarWher
   dateUpload: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dateExpiration: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   size: z.union([ z.lazy(() => IntFilterSchema), z.number() ]).optional(),
+  metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
+  extractionStatus: z.union([ z.lazy(() => EnumExtractionStatusFilterSchema), z.lazy(() => ExtractionStatusSchema) ]).optional(),
+  extractionError: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dossierIds: z.lazy(() => StringNullableListFilterSchema).optional(),
@@ -4729,6 +4894,9 @@ export const DocumentCreateWithoutDossiersInputSchema: z.ZodType<Prisma.Document
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   proprietaire: z.lazy(() => UserCreateNestedOneWithoutDocumentsInputSchema),
@@ -4746,6 +4914,9 @@ export const DocumentUncheckedCreateWithoutDossiersInputSchema: z.ZodType<Prisma
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossierIds: z.union([ z.lazy(() => DocumentCreatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5216,6 +5387,9 @@ export const DocumentCreateWithoutNotificationsInputSchema: z.ZodType<Prisma.Doc
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   proprietaire: z.lazy(() => UserCreateNestedOneWithoutDocumentsInputSchema),
@@ -5233,6 +5407,9 @@ export const DocumentUncheckedCreateWithoutNotificationsInputSchema: z.ZodType<P
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossierIds: z.union([ z.lazy(() => DocumentCreatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5319,6 +5496,9 @@ export const DocumentUpdateWithoutNotificationsInputSchema: z.ZodType<Prisma.Doc
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   proprietaire: z.lazy(() => UserUpdateOneRequiredWithoutDocumentsNestedInputSchema).optional(),
@@ -5335,6 +5515,9 @@ export const DocumentUncheckedUpdateWithoutNotificationsInputSchema: z.ZodType<P
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5563,6 +5746,9 @@ export const DocumentCreateManyProprietaireInputSchema: z.ZodType<Prisma.Documen
   dateUpload: z.coerce.date().optional(),
   dateExpiration: z.coerce.date().optional().nullable(),
   size: z.number().int(),
+  metadata: InputJsonValueSchema.optional().nullable(),
+  extractionStatus: z.lazy(() => ExtractionStatusSchema).optional(),
+  extractionError: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   dossierIds: z.union([ z.lazy(() => DocumentCreatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5648,6 +5834,9 @@ export const DocumentUpdateWithoutProprietaireInputSchema: z.ZodType<Prisma.Docu
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossiers: z.lazy(() => DossierUpdateManyWithoutDocumentsNestedInputSchema).optional(),
@@ -5663,6 +5852,9 @@ export const DocumentUncheckedUpdateWithoutProprietaireInputSchema: z.ZodType<Pr
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5679,6 +5871,9 @@ export const DocumentUncheckedUpdateManyWithoutProprietaireInputSchema: z.ZodTyp
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5950,6 +6145,9 @@ export const DocumentUpdateWithoutDossiersInputSchema: z.ZodType<Prisma.Document
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   proprietaire: z.lazy(() => UserUpdateOneRequiredWithoutDocumentsNestedInputSchema).optional(),
@@ -5966,6 +6164,9 @@ export const DocumentUncheckedUpdateWithoutDossiersInputSchema: z.ZodType<Prisma
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),
@@ -5982,6 +6183,9 @@ export const DocumentUncheckedUpdateManyWithoutDossiersInputSchema: z.ZodType<Pr
   dateUpload: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateExpiration: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   size: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  metadata: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
+  extractionStatus: z.union([ z.lazy(() => ExtractionStatusSchema), z.lazy(() => EnumExtractionStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  extractionError: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dossierIds: z.union([ z.lazy(() => DocumentUpdatedossierIdsInputSchema), z.string().array() ]).optional(),

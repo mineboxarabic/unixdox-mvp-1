@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, DialogBody, DialogContent, DialogRoot, Flex, Grid, Text } from "@chakra-ui/react";
 import { Input } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
 import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus, LuShield } from "react-icons/lu";
@@ -9,6 +9,8 @@ import { UpcomingDeadlinesCard } from "../components/UpcomingDeadlinesCard";
 import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
 import type { HomeData } from "../../types";
 import Link from "next/link";
+import { useRef, useState } from "react";
+import { ProcessingState } from "@/features/documents/ui/components/ProcessingState";
 
 export interface HomePageProps {
   data: HomeData;
@@ -23,8 +25,6 @@ export interface HomePageProps {
   uploadDocumentsAction?: (formData: FormData) => Promise<void>;
 }
 
-import { useRef } from "react";
-
 export function HomePage({
   data,
   userRole,
@@ -38,17 +38,23 @@ export function HomePage({
   uploadDocumentsAction,
 }: HomePageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileUpload = async (files: File[]) => {
-    if (onFileUpload) {
-      onFileUpload(files);
-      return;
-    }
+    setIsProcessing(true);
+    try {
+      if (onFileUpload) {
+        onFileUpload(files);
+        return;
+      }
 
-    if (uploadDocumentsAction) {
-      const formData = new FormData();
-      files.forEach((file) => formData.append("files", file));
-      await uploadDocumentsAction(formData);
+      if (uploadDocumentsAction) {
+        const formData = new FormData();
+        files.forEach((file) => formData.append("files", file));
+        await uploadDocumentsAction(formData);
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -66,6 +72,14 @@ export function HomePage({
 
   return (
     <Box minH="100vh" bg="bg.canvas" p="6">
+      <DialogRoot open={isProcessing} onOpenChange={(e: { open: boolean }) => setIsProcessing(e.open)} placement="center" motionPreset="slide-in-bottom">
+        <DialogContent>
+          <DialogBody>
+            <ProcessingState />
+          </DialogBody>
+        </DialogContent>
+      </DialogRoot>
+
       <input
         type="file"
         ref={fileInputRef}

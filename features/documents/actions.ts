@@ -5,10 +5,11 @@ import { documentService } from './services/document.service';
 import { CreateDocumentSchema, UpdateDocumentStatusSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
 import { requireAuth } from '@/shared/auth/server';
-import { Document, DocumentStatut, DocumentType } from '@prisma/client';
+import { Document, DocumentStatut, DocumentType, ExtractionStatus } from '@prisma/client';
 import { google } from 'googleapis';
 import { prisma } from '@/shared/config/prisma';
 import { Readable } from 'stream';
+import { aiService } from './services/ai.service';
 
 export async function uploadDocumentFile(formData: FormData): Promise<ActionResult<Document>> {
   const session = await requireAuth();
@@ -128,15 +129,50 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
     }
 
     // 4. Save metadata to DB
-    const doc = await documentService.createDocument({
+    let doc = await documentService.createDocument({
       nomFichier: file.name,
       type: DocumentType.AUTRE,
       urlStockage: webViewLink, // Store the Drive Link
       size: file.size,
       proprietaire: { connect: { id: userId } },
+      extractionStatus: ExtractionStatus.PENDING,
     });
 
-    // 5. Mark onboarding as completed
+    // 5. AI Extraction
+    try {
+      console.log('Starting AI extraction for file:', file.name);
+      const extractionResult = await aiService.extractDocumentMetadata(
+        buffer,
+        file.type,
+        DocumentType.AUTRE
+      );
+      console.log('AI Extraction Result:', extractionResult);
+
+      doc = await prisma.document.update({
+        where: { id: doc.id },
+        data: {
+          extractionStatus: ExtractionStatus.COMPLETED,
+          metadata: extractionResult.metadata || {},
+          dateExpiration: extractionResult.dateExpiration,
+          tags: extractionResult.tags,
+          type: extractionResult.type || DocumentType.AUTRE,
+          statut: DocumentStatut.VERIFIE, // Auto-verify if AI succeeds
+        },
+        include: { proprietaire: { select: { id: true, name: true, email: true } } },
+      });
+    } catch (aiError: any) {
+      console.error('AI Extraction failed:', aiError);
+      doc = await prisma.document.update({
+        where: { id: doc.id },
+        data: {
+          extractionStatus: ExtractionStatus.FAILED,
+          extractionError: aiError.message || 'Unknown error',
+        },
+        include: { proprietaire: { select: { id: true, name: true, email: true } } },
+      });
+    }
+
+    // 6. Mark onboarding as completed
     await prisma.user.update({
       where: { id: userId },
       data: { onboardingCompleted: true },

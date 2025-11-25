@@ -65,6 +65,12 @@ enum NotificationPriorite {
   HAUTE
 }
 
+enum ExtractionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
 enum DemarcheStatut {
   EN_COURS
   COMPLETE
@@ -122,6 +128,9 @@ model Document {
   dateUpload        DateTime            @default(now())
   dateExpiration    DateTime?
   size              Int
+  metadata          Json?
+  extractionStatus  ExtractionStatus    @default(PENDING)
+  extractionError   String?
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   proprietaire      User                @relation(fields: [idProprietaire], references: [id], onDelete: Cascade)
