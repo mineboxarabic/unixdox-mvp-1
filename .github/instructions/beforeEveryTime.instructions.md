@@ -7,13 +7,16 @@ Use SOLID Principles
 Use standard naming conventions for files
 Use standard project structure for backend code.
 
-you can delete files and folders if needed to follow standard project structure.
+You can delete files and folders if needed to follow standard project structure.
 
-we will use feature folder strucutre
+We will use feature folder structure.
 
-use the theme provided in config/theme.js for styling
+Use the theme provided in config/theme.js for styling
 
 
-in the feature folder structure you can import only from the feature folder or from shared folder
+In the feature folder structure you can import only from the feature folder or from shared folder
 
-so feature can't import from other feature folders directly
+So feature can't import from other feature folders directly
+
+
+Before creating new function check in the features if the function already exists

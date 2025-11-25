@@ -19,6 +19,9 @@ export interface Document {
   type: string;
   uploadedAt: Date;
   size?: number;
+  status: string;
+  tags: string[];
+  expirationDate?: Date | null;
 }
 
 export interface HomeData {

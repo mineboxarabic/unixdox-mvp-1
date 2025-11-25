@@ -66,8 +66,8 @@ export function UpcomingDeadlinesCard({
   const renderEmptyState = () => (
     <EmptyState
       icon={<LuClock color="var(--chakra-colors-neutral-400)" />}
-      title="Aucune échéance"
-      description="Vous n'avez pas d'échéances à venir pour le moment"
+      title=""
+      description="Aucune échéance à venir"
     />
   );
 
@@ -136,8 +136,8 @@ export function UpcomingDeadlinesCard({
         {!isPremiumUser
           ? renderPremiumUpgrade()
           : deadlines.length === 0
-          ? renderEmptyState()
-          : renderDeadlinesList()}
+            ? renderEmptyState()
+            : renderDeadlinesList()}
       </CardBody>
       {isPremiumUser && deadlines.length > 0 && (
         <CardFooter>

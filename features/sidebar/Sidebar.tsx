@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Flex, IconButton } from '@chakra-ui/react';
-import { 
+import { Box, Flex, IconButton, Text } from '@chakra-ui/react';
+import {
   LuChevronLeft,
-  LuChevronRight
+  LuChevronRight,
+  LuShield,
+  LuPlus
 } from 'react-icons/lu';
 import { signOut } from 'next-auth/react';
 import {
@@ -18,7 +20,7 @@ import {
 import type { NavItem, StorageInfo } from './types';
 import { mainNavItems, bottomNavItems, storageInfo } from './config';
 
-import {UserAccount as UserAccountType} from '@/shared/components';
+import { UserAccount as UserAccountType } from '@/shared/components';
 
 interface SidebarProps {
   user?: UserAccountType;
@@ -31,6 +33,7 @@ export function Sidebar({ user }: SidebarProps) {
     name: user?.name || 'Segun Adebayo',
     email: user?.email || 'segunadebayo@example.com',
     avatarUrl: user?.avatarUrl,
+    role: user?.role,
   };
 
   const handleLogout = async () => {
@@ -94,6 +97,36 @@ export function Sidebar({ user }: SidebarProps) {
           {mainNavItems.map((item) => (
             <NavButton key={item.label} item={item} isCollapsed={isCollapsed} />
           ))}
+
+          {/* Admin Section */}
+          {(user?.role === 'ADMIN' || user?.role === 'MANAGER') && (
+            <>
+              <Separator variant="dashed" />
+              <Box px={2} py={1}>
+                <Text fontSize="xs" fontWeight="bold" color="fg.muted" textTransform="uppercase" letterSpacing="wider" mb={1} display={isCollapsed ? 'none' : 'block'}>
+                  Admin
+                </Text>
+                <NavButton
+                  item={{
+                    label: 'All Models',
+                    icon: LuShield,
+                    href: '/admin/modele-demarche',
+                    isActive: false,
+                  }}
+                  isCollapsed={isCollapsed}
+                />
+                <NavButton
+                  item={{
+                    label: 'Create Model',
+                    icon: LuPlus,
+                    href: '/admin/modele-demarche/create',
+                    isActive: false,
+                  }}
+                  isCollapsed={isCollapsed}
+                />
+              </Box>
+            </>
+          )}
         </Flex>
 
         {/* Promo Card */}

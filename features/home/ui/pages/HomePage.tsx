@@ -3,14 +3,16 @@
 import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { Input } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
-import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus } from "react-icons/lu";
+import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus, LuShield } from "react-icons/lu";
 import { RecentProceduresCard } from "../components/RecentProceduresCard";
 import { UpcomingDeadlinesCard } from "../components/UpcomingDeadlinesCard";
 import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
 import type { HomeData } from "../../types";
+import Link from "next/link";
 
 export interface HomePageProps {
   data: HomeData;
+  userRole?: string;
   onCreateProcedure?: () => void;
   onCreateDossier?: () => void;
   onViewAllProcedures?: () => void;
@@ -18,10 +20,14 @@ export interface HomePageProps {
   onViewAllDocuments?: () => void;
   onUpgradeToPremium?: () => void;
   onFileUpload?: (files: File[]) => void;
+  uploadDocumentsAction?: (formData: FormData) => Promise<void>;
 }
+
+import { useRef } from "react";
 
 export function HomePage({
   data,
+  userRole,
   onCreateProcedure,
   onCreateDossier,
   onViewAllProcedures,
@@ -29,9 +35,44 @@ export function HomePage({
   onViewAllDocuments,
   onUpgradeToPremium,
   onFileUpload,
+  uploadDocumentsAction,
 }: HomePageProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (files: File[]) => {
+    if (onFileUpload) {
+      onFileUpload(files);
+      return;
+    }
+
+    if (uploadDocumentsAction) {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("files", file));
+      await uploadDocumentsAction(formData);
+    }
+  };
+
+  const onHeaderUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onHeaderFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileUpload(Array.from(e.target.files));
+      // Reset input so same file can be selected again if needed
+      e.target.value = "";
+    }
+  };
+
   return (
     <Box minH="100vh" bg="bg.canvas" p="6">
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={onHeaderFileChange}
+        multiple
+      />
       <Box maxW="1400px" mx="auto">
         {/* Header */}
         <Flex
@@ -58,10 +99,11 @@ export function HomePage({
               <LuSearch size={18} />
             </Box>
             <Input
-              placeholder="Rechercher un fichier, une démarche..."
+              placeholder="Recherchez un fichier, une démarche..."
               style={{ paddingLeft: "2.5rem", backgroundColor: "var(--chakra-colors-bg-surface)" }}
               size="lg"
               width="full"
+              borderRadius="full"
             />
           </Box>
 
@@ -72,7 +114,7 @@ export function HomePage({
               bg="primary.50"
               color="primary.600"
               _hover={{ bg: "primary.100" }}
-              onClick={onFileUpload ? () => onFileUpload([]) : undefined} // Trigger file upload if available
+              onClick={onHeaderUploadClick}
               leftIcon={<LuFilePlus size={18} />}
             >
               Ajouter un document
@@ -87,6 +129,20 @@ export function HomePage({
             >
               Commencer une démarche
             </Button>
+
+            {(userRole === "ADMIN" || userRole === "MANAGER") && (
+              <Link href="/admin/modele-demarche">
+                <Button
+                  size="md"
+                  bg="purple.50"
+                  color="purple.600"
+                  _hover={{ bg: "purple.100" }}
+                  leftIcon={<LuShield size={18} />}
+                >
+                  Admin Panel
+                </Button>
+              </Link>
+            )}
           </Flex>
         </Flex>
 
@@ -114,7 +170,7 @@ export function HomePage({
             <RecentDocumentsCard
               documents={data.recentDocuments}
               onViewAll={onViewAllDocuments}
-              onFileUpload={onFileUpload}
+              onFileUpload={handleFileUpload}
             />
           </Box>
         </Grid>

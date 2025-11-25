@@ -6,7 +6,8 @@ This document outlines the steps to implement a role system with Admin, Manager,
 **File:** `prisma/schema.prisma`
 
 *   **Define Role Enum:** Create a new enum `UserRole` with values `USER`, `MANAGER`, `ADMIN`.
-*   **Update User Model:** Add a `role` field to the `User` model with a default value of `USER`.
+*   **Update User Model:** Add a `role` field.
+*   **Update ModeleDemarche:** Add a relation to track who created the model.
 
 ```prisma
 enum UserRole {
@@ -17,7 +18,14 @@ enum UserRole {
 
 model User {
   // ... existing fields
-  role UserRole @default(USER)
+  role             UserRole         @default(USER)
+  createdDemarches ModeleDemarche[] @relation("CreatedDemarches")
+}
+
+model ModeleDemarche {
+  // ... existing fields
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation("CreatedDemarches", fields: [createdById], references: [id])
 }
 ```
 

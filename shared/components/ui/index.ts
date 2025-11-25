@@ -10,3 +10,4 @@ export * from "./provider";
 export * from "./separator";
 export * from "./toaster";
 export * from "./tooltip";
+export * from "./table";

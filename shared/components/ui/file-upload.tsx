@@ -2,7 +2,7 @@
 
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { useCallback, useState } from "react";
-import { LuCloudUpload } from "react-icons/lu";
+import { LuUpload } from "react-icons/lu";
 import { Button } from "./button";
 
 export interface FileUploadProps {
@@ -80,20 +80,29 @@ export function FileUpload({
         gap="4"
         px="4"
       >
-        <Box color="primary.100" fontSize="5xl">
-          <LuCloudUpload />
+        <Box color="text.fg.subtle" fontSize="5xl">
+          <LuUpload />
         </Box>
-        <Flex direction="column" align="center" gap="3">
+        <Flex direction="column" align="center" gap="1">
           <Text fontSize="sm" color="text.fg.muted" textAlign="center">
-            Glissez des documents ici ou
+            Glissez des documents ici
+          </Text>
+          <Text fontSize="sm" color="text.fg.muted" textAlign="center">
+            ou
           </Text>
           <Button
             size="md"
             variant="solid"
             colorScheme="primary"
+            bg="primary.600"
+            color="white"
+            _hover={{ bg: "primary.700" }}
             onClick={() => document.getElementById("file-input")?.click()}
+            mt="2"
+            borderRadius="full"
+            px="6"
           >
-            Parcourir les fichiers
+            Cliquez ici pour importer un document
           </Button>
         </Flex>
       </Flex>

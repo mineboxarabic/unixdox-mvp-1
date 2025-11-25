@@ -15,9 +15,9 @@ interface LayoutWrapperProps {
   SideBar?: React.ComponentType<any>;
 }
 
-export function LayoutWrapper({SideBar,  children, authenticated, user }: LayoutWrapperProps) {
+export function LayoutWrapper({ SideBar, children, authenticated, user }: LayoutWrapperProps) {
   const pathname = usePathname();
-  
+
   // Hide sidebar on auth pages
   const isAuthPage = pathname === '/login' || pathname === '/register';
   const showSidebar = authenticated && !isAuthPage && SideBar;
@@ -29,10 +29,11 @@ export function LayoutWrapper({SideBar,  children, authenticated, user }: Layout
           user={
             user
               ? {
-                  name: user.name || 'User',
-                  email: user.email || '',
-                  avatarUrl: user.image || undefined,
-                }
+                name: user.name || 'User',
+                email: user.email || '',
+                avatarUrl: user.image || undefined,
+                role: (user as any).role,
+              }
               : undefined
           }
         />

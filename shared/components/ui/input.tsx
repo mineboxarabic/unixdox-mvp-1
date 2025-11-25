@@ -1,9 +1,9 @@
 "use client";
 
-import { Input as ChakraInput } from "@chakra-ui/react";
+import { Input as ChakraInput, InputProps as ChakraInputProps } from "@chakra-ui/react";
 import { forwardRef } from "react";
 
-export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+export interface InputProps extends Omit<ChakraInputProps, "variant" | "size"> {
   variant?: "outline" | "filled";
   size?: "sm" | "md" | "lg";
 }

@@ -20,6 +20,12 @@ enum SubscriptionPlan {
   ENTERPRISE
 }
 
+enum UserRole {
+  USER
+  MANAGER
+  ADMIN
+}
+
 
 enum DocumentType {
   FACTURE
@@ -83,6 +89,7 @@ model User {
   googleId               String?                 @unique
   password               String?
   plan                   SubscriptionPlan        @default(FREE)
+  role                   UserRole                @default(USER)
   onboardingCompleted    Boolean                 @default(false)
   dateInscription        DateTime                @default(now())
   preferences            UserPreferences?
@@ -91,6 +98,7 @@ model User {
   documents              Document[]
   dossiers               Dossier[]
   demarchesUtilisateur   DemarcheUtilisateur[]
+  createdDemarches       ModeleDemarche[]        @relation("CreatedDemarches")
   notifications          Notification[]
   // Relations required by NextAuth (added)
   accounts               Account[]
@@ -112,6 +120,7 @@ model Document {
   statut            DocumentStatut      @default(EN_ATTENTE)
   tags              String[]
   dateUpload        DateTime            @default(now())
+  dateExpiration    DateTime?
   size              Int
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -152,6 +161,8 @@ model ModeleDemarche {
   categorie             DemarcheCategorie       @default(AUTRE)
   actif                 Boolean                 @default(true)
   ordre                 Int                     @default(0)
+  createdById           String?                 @db.ObjectId
+  createdBy             User?                   @relation("CreatedDemarches", fields: [createdById], references: [id])
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
   demarchesUtilisateur  DemarcheUtilisateur[]

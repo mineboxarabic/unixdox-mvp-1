@@ -95,7 +95,7 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
             <VStack w="full" flex="1" justify="center" align="center">
               <InitialLoginStep
                 onNext={handleLogin}
-                onBack={() => {}}
+                onBack={() => { }}
                 isFirstStep={true}
                 isLastStep={false}
                 updateUserSubscription={updateUserSubscription}

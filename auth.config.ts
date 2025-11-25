@@ -23,9 +23,18 @@ export const authConfig = {
     signIn: '/login',
   },
   callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      return token;
+    },
     session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+      }
+      if (session.user && token.role) {
+        session.user.role = token.role;
       }
       return session;
     },
@@ -33,6 +42,15 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const isLoginPage = nextUrl.pathname === '/login';
       const isRegisterPage = nextUrl.pathname === '/register';
+      const isAdminPage = nextUrl.pathname.startsWith('/admin');
+
+      if (isAdminPage) {
+        if (!isLoggedIn) return false;
+        if (auth.user.role !== 'ADMIN' && auth.user.role !== 'MANAGER') {
+          return Response.redirect(new URL('/', nextUrl));
+        }
+        return true;
+      }
       
       if (isLoginPage) {
         if (isLoggedIn) return Response.redirect(new URL('/', nextUrl));
