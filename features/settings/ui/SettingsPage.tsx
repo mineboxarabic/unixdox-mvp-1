@@ -26,6 +26,7 @@ export function SettingsPage({ preferences }: SettingsPageProps) {
     setCurrentPreferences(preferences);
   }, [preferences]);
 
+
   const isDirty = useMemo(
     () => JSON.stringify(initialPreferences) !== JSON.stringify(currentPreferences),
     [initialPreferences, currentPreferences],
