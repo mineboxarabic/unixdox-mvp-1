@@ -1,4 +1,4 @@
-import { DocumentType, DocumentStatut } from "@prisma/client";
+import { DocumentType, DocumentStatut, DemarcheStatut } from "@prisma/client";
 
 export interface Procedure {
   id: string;
@@ -30,9 +30,28 @@ export interface Document {
   dateExpiration?: Date | null;
 }
 
+export interface Demarche {
+  id: string;
+  idUtilisateur: string;
+  idModele: string;
+  complete: boolean;
+  dateDebut: Date;
+  dateCompletion: Date | null;
+  statut: DemarcheStatut;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  modele: {
+    titre: string;
+  };
+}
+
 export interface HomeData {
   recentProcedures: Procedure[];
   upcomingDeadlines: Deadline[];
   recentDocuments: Document[];
+  recentDemarches: Demarche[];
   isPremiumUser: boolean;
+  automaticDemarchesCount?: number;
+  automaticDemarchesTotal?: number;
 }

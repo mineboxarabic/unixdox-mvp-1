@@ -7,6 +7,7 @@ import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus, LuShield } from "react-icon
 import { RecentProceduresCard } from "../components/RecentProceduresCard";
 import { UpcomingDeadlinesCard } from "../components/UpcomingDeadlinesCard";
 import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
+import { RecentDemarchesCard } from "../components/RecentDemarchesCard";
 import type { HomeData } from "../../types";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
@@ -238,10 +239,13 @@ export function HomePage({
           }}
           gap="6"
         >
-          <RecentProceduresCard
-            procedures={data.recentProcedures}
+          <RecentDemarchesCard
+            demarches={data.recentDemarches}
+            automaticDemarchesCount={data.automaticDemarchesCount}
+            automaticDemarchesTotal={data.automaticDemarchesTotal}
             onViewAll={onViewAllProcedures}
-            onCreateProcedure={onCreateProcedure}
+            onCreateDemarche={onCreateProcedure}
+            onViewDetail={(id) => router.push(`/demarches/${id}`)}
           />
 
           <UpcomingDeadlinesCard
