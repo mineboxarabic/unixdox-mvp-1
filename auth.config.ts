@@ -17,7 +17,7 @@ export const authConfig = {
       allowDangerousEmailAccountLinking: true,
     }),
   ],
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
   pages: {
     signIn: '/login',
