@@ -66,10 +66,11 @@ export function Sidebar({ user }: SidebarProps) {
           bg="bg.surface"
           border="1px solid"
           borderColor="border.default"
+          color="fg.default"
           onClick={() => setIsCollapsed(!isCollapsed)}
           _hover={{ bg: 'bg.muted' }}
         >
-          {isCollapsed ? <LuChevronRight /> : <LuChevronLeft />}
+          {isCollapsed ? <LuChevronRight size={16} /> : <LuChevronLeft size={16} />}
         </IconButton>
       </Box>
 
