@@ -20,6 +20,14 @@ export const CreateDocumentSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
+export const UpdateDocumentDetailsSchema = z.object({
+  nomFichier: z.string().min(1, 'Le nom du fichier est requis').optional(),
+  type: z.nativeEnum(DocumentType).optional(),
+  tags: z.array(z.string()).optional(),
+  dateExpiration: z.date().nullable().optional(),
+});
+
 export type ListDocumentsQuery = z.infer<typeof ListDocumentsQuerySchema>;
 export type UpdateDocumentStatusInput = z.infer<typeof UpdateDocumentStatusSchema>;
 export type CreateDocumentInput = z.infer<typeof CreateDocumentSchema>;
+export type UpdateDocumentDetailsInput = z.infer<typeof UpdateDocumentDetailsSchema>;

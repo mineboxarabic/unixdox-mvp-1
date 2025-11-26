@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, DialogBody, DialogContent, DialogRoot, Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { Input } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
 import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus, LuShield } from "react-icons/lu";
@@ -10,7 +10,7 @@ import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
 import type { HomeData } from "../../types";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { ProcessingState } from "@/features/documents/ui/components/ProcessingState";
+import { ProcessingState } from "@/shared/components/documents/ProcessingState";
 
 export interface HomePageProps {
   data: HomeData;
@@ -72,13 +72,7 @@ export function HomePage({
 
   return (
     <Box minH="100vh" bg="bg.canvas" p="6">
-      <DialogRoot open={isProcessing} onOpenChange={(e: { open: boolean }) => setIsProcessing(e.open)} placement="center" motionPreset="slide-in-bottom">
-        <DialogContent>
-          <DialogBody>
-            <ProcessingState />
-          </DialogBody>
-        </DialogContent>
-      </DialogRoot>
+      <ProcessingState isOpen={isProcessing} onOpenChange={(e) => setIsProcessing(e.open)} />
 
       <input
         type="file"

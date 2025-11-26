@@ -13,6 +13,8 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { LuFolder } from "react-icons/lu";
 import type { Procedure } from "../../types";
+import { ProcedureStatusBadge } from "@/shared/components/procedures/ProcedureStatusBadge";
+import { formatDate } from "@/shared/utils/date";
 
 export interface RecentProceduresCardProps {
   procedures: Procedure[];
@@ -23,25 +25,6 @@ export function RecentProceduresCard({
   procedures,
   onViewAll,
 }: RecentProceduresCardProps) {
-  const getStatusBadgeProps = (status: Procedure["status"]) => {
-    switch (status) {
-      case "en-cours":
-        return { colorScheme: "primary" as const, label: "En cours" };
-      case "terminée":
-        return { colorScheme: "success" as const, label: "Terminée" };
-      case "en-attente":
-        return { colorScheme: "warning" as const, label: "En attente" };
-    }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -70,7 +53,6 @@ export function RecentProceduresCard({
         ) : (
           <Flex direction="column" gap="0">
             {procedures.map((procedure, index) => {
-              const statusProps = getStatusBadgeProps(procedure.status);
               return (
                 <Box key={procedure.id}>
                   <Flex
@@ -87,13 +69,7 @@ export function RecentProceduresCard({
                         {formatDate(procedure.date)}
                       </Text>
                     </Flex>
-                    <Badge
-                      colorScheme={statusProps.colorScheme}
-                      variant="subtle"
-                      size="sm"
-                    >
-                      {statusProps.label}
-                    </Badge>
+                    <ProcedureStatusBadge status={procedure.status} />
                   </Flex>
                   {index < procedures.length - 1 && <Separator />}
                 </Box>

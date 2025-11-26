@@ -2,14 +2,43 @@
 
 import { revalidatePath } from 'next/cache';
 import { documentService } from './services/document.service';
-import { CreateDocumentSchema, UpdateDocumentStatusSchema } from './types/schemas';
+import { storageService } from './services/storage.service';
+import { CreateDocumentSchema, UpdateDocumentStatusSchema, UpdateDocumentDetailsSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
 import { requireAuth } from '@/shared/auth/server';
 import { Document, DocumentStatut, DocumentType, ExtractionStatus } from '@prisma/client';
 import { google } from 'googleapis';
 import { prisma } from '@/shared/config/prisma';
-import { Readable } from 'stream';
 import { aiService } from './services/ai.service';
+
+export async function updateDocumentDetails(
+  documentId: string,
+  data: unknown
+): Promise<ActionResult<Document>> {
+  const session = await requireAuth();
+  const userId = session.user?.id;
+
+  if (!userId) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  const parsed = UpdateDocumentDetailsSchema.safeParse(data);
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: 'Validation failed',
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const doc = await documentService.updateDocument(documentId, userId, parsed.data);
+    revalidatePath('/documents');
+    return { success: true, data: doc };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update document details' };
+  }
+}
 
 export async function uploadDocumentFile(formData: FormData): Promise<ActionResult<Document>> {
   const session = await requireAuth();
@@ -69,64 +98,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
     auth.setCredentials(credentials);
 
     // 3. Upload to Drive
-    const drive = google.drive({ version: 'v3', auth });
-    
-    // 3a. Check for "Unidox" folder
-    let folderId: string | undefined;
-    
-    try {
-      console.log('Searching for Unidox folder...');
-      const folderSearch = await drive.files.list({
-        q: "mimeType='application/vnd.google-apps.folder' and name='Unidox' and trashed=false",
-        fields: 'files(id, name)',
-        spaces: 'drive',
-      });
-
-      console.log('Folder search result:', folderSearch.data.files);
-
-      if (folderSearch.data.files && folderSearch.data.files.length > 0) {
-        folderId = folderSearch.data.files[0].id!;
-        console.log('Found existing folder:', folderId);
-      } else {
-        console.log('Folder not found, creating...');
-        // Create folder if it doesn't exist
-        const folderMetadata = {
-          name: 'Unidox',
-          mimeType: 'application/vnd.google-apps.folder',
-        };
-        const folder = await drive.files.create({
-          requestBody: folderMetadata,
-          fields: 'id',
-        });
-        folderId = folder.data.id!;
-        console.log('Created new folder:', folderId);
-      }
-    } catch (folderError) {
-      console.error('Error finding/creating folder:', folderError);
-      // Fallback to root if folder creation fails
-    }
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const stream = Readable.from(buffer);
-
-    const driveResponse = await drive.files.create({
-      requestBody: {
-        name: file.name,
-        mimeType: file.type,
-        parents: folderId ? [folderId] : undefined,
-      },
-      media: {
-        mimeType: file.type,
-        body: stream,
-      },
-      fields: 'id, webViewLink, webContentLink',
-    });
-
-    const { id, webViewLink } = driveResponse.data;
-
-    if (!id || !webViewLink) {
-      throw new Error('Failed to get file info from Google Drive');
-    }
+    const { webViewLink } = await storageService.uploadFile(auth, file);
 
     // 4. Save metadata to DB
     let doc = await documentService.createDocument({
@@ -140,6 +112,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
 
     // 5. AI Extraction
     try {
+      const buffer = Buffer.from(await file.arrayBuffer());
       console.log('Starting AI extraction for file:', file.name);
       const extractionResult = await aiService.extractDocumentMetadata(
         buffer,

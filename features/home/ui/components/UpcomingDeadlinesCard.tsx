@@ -13,6 +13,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { LuClock, LuCrown, LuArrowUpRight } from "react-icons/lu";
 import type { Deadline } from "../../types";
+import { formatDate } from "@/shared/utils/date";
 
 export interface UpcomingDeadlinesCardProps {
   deadlines: Deadline[];
@@ -27,13 +28,6 @@ export function UpcomingDeadlinesCard({
   onViewAll,
   onUpgrade,
 }: UpcomingDeadlinesCardProps) {
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "2-digit",
-      month: "short",
-    }).format(date);
-  };
-
   const getStatusBadgeProps = (status: Deadline["status"]) => {
     switch (status) {
       case "À venir":
@@ -75,6 +69,7 @@ export function UpcomingDeadlinesCard({
     <Flex direction="column" gap="0">
       {deadlines.map((deadline, index) => {
         const statusProps = getStatusBadgeProps(deadline.status);
+        const formattedDate = formatDate(deadline.date, { day: "2-digit", month: "short" });
         return (
           <Box key={deadline.id}>
             <Flex py="3" alignItems="center" gap="4">
@@ -88,10 +83,10 @@ export function UpcomingDeadlinesCard({
                 borderRadius="md"
               >
                 <Text fontSize="lg" fontWeight="bold" color="primary.600">
-                  {formatDate(deadline.date).split(" ")[0]}
+                  {formattedDate.split(" ")[0]}
                 </Text>
                 <Text fontSize="xs" color="primary.600" textTransform="uppercase">
-                  {formatDate(deadline.date).split(" ")[1]}
+                  {formattedDate.split(" ")[1]}
                 </Text>
               </Flex>
               <Flex direction="column" gap="1" flex="1">

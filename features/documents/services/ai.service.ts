@@ -51,12 +51,13 @@ export class AIService {
   }
 
   private getPromptForType(type: DocumentType): string {
+    const documentTypes = Object.values(DocumentType).join(', ');
     const basePrompt = `
       Analyze this document image. Extract relevant information in JSON format.
       
       Return a JSON object with the following structure:
       {
-        "suggestedType": "One of the following: FACTURE, CONTRAT, CARTE_IDENTITE, PASSEPORT, JUSTIFICATIF_DOMICILE, ACTE_NAISSANCE, ACTE_MARIAGE, DIPLOME, ATTESTATION_TRAVAIL, FICHE_PAIE, RELEVE_BANCAIRE, ASSURANCE, PERMIS_CONDUIRE, CARTE_VITALE, AUTRE",
+        "suggestedType": "One of the following: ${documentTypes}",
         "dateExpiration": "YYYY-MM-DD (if applicable, e.g. for ID, Passport, Insurance)",
         "tags": ["array", "of", "relevant", "keywords", "max 5"],
         "metadata": {
