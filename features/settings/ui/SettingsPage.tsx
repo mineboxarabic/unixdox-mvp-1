@@ -11,7 +11,7 @@ interface SettingsPageProps {
   preferences: UserPreferences;
 }
 
-const languageOptions = [
+const languageOptions: { label: string; value: UserPreferences['language'] }[] = [
   { label: 'Français', value: 'fr' },
   { label: 'English', value: 'en' },
 ];
@@ -36,7 +36,7 @@ export function SettingsPage({ preferences }: SettingsPageProps) {
     setCurrentPreferences((prev) => ({ ...prev, notifications: checked }));
   };
 
-  const setLanguage = (value: string) => {
+  const setLanguage = (value: UserPreferences['language']) => {
     setCurrentPreferences((prev) => ({ ...prev, language: value }));
   };
 
