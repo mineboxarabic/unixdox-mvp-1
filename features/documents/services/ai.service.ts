@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { DocumentType } from '@prisma/client';
+import { prisma } from '@/shared/config/prisma';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -20,12 +21,16 @@ export class AIService {
   ): Promise<ExtractedMetadata> {
     let lastError;
 
+    // Fetch available tags
+    const availableTags = await prisma.tag.findMany({ select: { name: true } });
+    const tagList = availableTags.map(t => t.name);
+
     for (const modelName of this.models) {
       try {
         console.log(`Attempting AI extraction with model: ${modelName}`);
         const model = genAI.getGenerativeModel({ model: modelName });
         
-        const prompt = this.getPromptForType(currentType);
+        const prompt = this.getPromptForType(currentType, tagList);
         const imagePart = {
           inlineData: {
             data: fileBuffer.toString('base64'),
@@ -50,8 +55,12 @@ export class AIService {
     throw lastError;
   }
 
-  private getPromptForType(type: DocumentType): string {
+  private getPromptForType(type: DocumentType, availableTags: string[]): string {
     const documentTypes = Object.values(DocumentType).join(', ');
+    const tagsInstruction = availableTags.length > 0 
+      ? `Choose tags ONLY from this list: [${availableTags.join(', ')}]. Do not invent new tags.`
+      : `Suggest relevant tags (max 5).`;
+
     const basePrompt = `
       Analyze this document image. Extract relevant information in JSON format.
       
@@ -64,6 +73,8 @@ export class AIService {
           // Specific fields based on document type
         }
       }
+
+      ${tagsInstruction}
     `;
 
     let specificInstructions = '';

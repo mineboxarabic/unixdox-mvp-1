@@ -24,7 +24,11 @@ export const UpdateDocumentDetailsSchema = z.object({
   nomFichier: z.string().min(1, 'Le nom du fichier est requis').optional(),
   type: z.nativeEnum(DocumentType).optional(),
   tags: z.array(z.string()).optional(),
-  dateExpiration: z.date().nullable().optional(),
+  dateExpiration: z.union([
+    z.string().transform((str) => new Date(str)),
+    z.date(),
+    z.null()
+  ]).optional(),
 });
 
 export type ListDocumentsQuery = z.infer<typeof ListDocumentsQuerySchema>;

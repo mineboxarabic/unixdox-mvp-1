@@ -32,6 +32,18 @@ export async function updateDocumentDetails(
   }
 
   try {
+    if (parsed.data.tags && parsed.data.tags.length > 0) {
+      await Promise.all(
+        parsed.data.tags.map((tagName) =>
+          prisma.tag.upsert({
+            where: { name: tagName },
+            update: {},
+            create: { name: tagName },
+          })
+        )
+      );
+    }
+
     const doc = await documentService.updateDocument(documentId, userId, parsed.data);
     revalidatePath('/documents');
     return { success: true, data: doc };
@@ -237,4 +249,12 @@ export async function removeDocument(documentId: string): Promise<ActionResult<D
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete document' };
   }
+}
+
+export async function getTags(): Promise<string[]> {
+  const tags = await prisma.tag.findMany({
+    select: { name: true },
+    orderBy: { name: 'asc' },
+  });
+  return tags.map((t) => t.name);
 }
