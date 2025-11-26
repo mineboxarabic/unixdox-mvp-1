@@ -17,13 +17,14 @@ import {
   TableCell,
 } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
-import { LuFiles, LuEye, LuPencil } from "react-icons/lu";
+import { LuFiles, LuEye, LuPencil, LuTrash } from "react-icons/lu";
 import type { Document } from "../../types";
 import { DocumentIcon } from "@/shared/components/documents/DocumentIcon";
 import { DocumentStatusBadge } from "@/shared/components/documents/DocumentStatusBadge";
 import { formatDate } from "@/shared/utils/date";
 import { useState } from "react";
 import { EditDocumentDialog } from "@/features/documents/ui/components/EditDocumentDialog";
+import { DeleteDocumentDialog } from "@/features/documents/ui/components/DeleteDocumentDialog";
 
 export interface RecentDocumentsCardProps {
   documents: Document[];
@@ -37,6 +38,7 @@ export function RecentDocumentsCard({
   onFileUpload,
 }: RecentDocumentsCardProps) {
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
+  const [deletingDocument, setDeletingDocument] = useState<Document | null>(null);
 
   const formatSize = (bytes?: number) => {
     if (!bytes) return "--";
@@ -68,6 +70,10 @@ export function RecentDocumentsCard({
 
   const handleEditClick = (document: Document) => {
     setEditingDocument(document);
+  };
+
+  const handleDeleteClick = (document: Document) => {
+    setDeletingDocument(document);
   };
 
   const renderDocumentsTable = () => (
@@ -136,6 +142,15 @@ export function RecentDocumentsCard({
                 >
                   <LuPencil />
                 </IconButton>
+                <IconButton
+                  aria-label="Supprimer le document"
+                  variant="ghost"
+                  size="sm"
+                  colorPalette="red"
+                  onClick={() => handleDeleteClick(document)}
+                >
+                  <LuTrash />
+                </IconButton>
               </HStack>
             </TableCell>
           </TableRow>
@@ -174,6 +189,15 @@ export function RecentDocumentsCard({
           isOpen={!!editingDocument} 
           onClose={() => setEditingDocument(null)} 
           document={editingDocument} 
+        />
+      )}
+
+      {deletingDocument && (
+        <DeleteDocumentDialog
+          isOpen={!!deletingDocument}
+          onClose={() => setDeletingDocument(null)}
+          documentId={deletingDocument.id}
+          documentName={deletingDocument.name || deletingDocument.nomFichier || "Document"}
         />
       )}
     </>

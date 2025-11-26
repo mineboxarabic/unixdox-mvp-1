@@ -58,33 +58,60 @@ export function FileUpload({
   );
 
   return (
-    <Box
-      position="relative"
-      width="full"
-      height="223px"
-      border="2px dashed"
-      borderColor={isDragging ? "primary.500" : "border.default"}
-      borderRadius="lg"
-      bg={isDragging ? "primary.50" : "bg.surface"}
-      transition="all 0.2s"
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <Flex
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        height="full"
-        gap="4"
-        px="4"
+    <>
+      <style>
+        {`
+          @keyframes bounce-upload {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+          }
+        `}
+      </style>
+      <Box
+        position="relative"
+        width="full"
+        height="223px"
+        border="2px dashed"
+        borderColor={isDragging ? "primary.500" : "border.default"}
+        borderRadius="lg"
+        bg={isDragging ? "primary.50" : "bg.surface"}
+        transition="all 0.3s ease"
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        cursor="pointer"
+        onClick={() => document.getElementById("file-input")?.click()}
+        _hover={{
+          borderColor: "primary.400",
+          bg: "primary.25",
+          transform: "scale(1.01)",
+        }}
       >
-        <Box color="text.fg.subtle" fontSize="5xl">
-          <LuUpload />
-        </Box>
+        <Flex
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          height="full"
+          gap="4"
+          px="4"
+        >
+          <Box
+            color={isDragging ? "primary.600" : "text.fg.subtle"}
+            fontSize="5xl"
+            transition="all 0.3s ease"
+            css={isDragging ? { animation: "bounce-upload 0.6s ease infinite" } : undefined}
+          >
+            <LuUpload />
+          </Box>
         <Flex direction="column" align="center" gap="1">
-          <Text fontSize="sm" color="text.fg.muted" textAlign="center">
+          <Text
+            fontSize="sm"
+            color={isDragging ? "primary.700" : "text.fg.muted"}
+            textAlign="center"
+            fontWeight={isDragging ? "semibold" : "normal"}
+            transition="all 0.3s ease"
+          >
             Glissez des documents ici
           </Text>
           <Text fontSize="sm" color="text.fg.muted" textAlign="center">
@@ -97,7 +124,10 @@ export function FileUpload({
             bg="primary.600"
             color="white"
             _hover={{ bg: "primary.700" }}
-            onClick={() => document.getElementById("file-input")?.click()}
+            onClick={(e) => {
+              e.stopPropagation();
+              document.getElementById("file-input")?.click();
+            }}
             mt="2"
             borderRadius="full"
             px="6"
@@ -122,5 +152,6 @@ export function FileUpload({
         }}
       />
     </Box>
+    </>
   );
 }

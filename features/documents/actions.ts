@@ -110,13 +110,14 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
     auth.setCredentials(credentials);
 
     // 3. Upload to Drive
-    const { webViewLink } = await storageService.uploadFile(auth, file);
+    const { id: storageId, webViewLink } = await storageService.uploadFile(auth, file);
 
     // 4. Save metadata to DB
     let doc = await documentService.createDocument({
       nomFichier: file.name,
       type: DocumentType.AUTRE,
       urlStockage: webViewLink, // Store the Drive Link
+      storageId: storageId,
       size: file.size,
       proprietaire: { connect: { id: userId } },
       extractionStatus: ExtractionStatus.PENDING,
@@ -234,7 +235,7 @@ export async function changeDocumentStatus(
   }
 }
 
-export async function removeDocument(documentId: string): Promise<ActionResult<Document>> {
+export async function removeDocument(documentId: string, deleteFromDrive: boolean = false): Promise<ActionResult<Document>> {
   const session = await requireAuth();
   const userId = session.user?.id;
 
@@ -243,6 +244,45 @@ export async function removeDocument(documentId: string): Promise<ActionResult<D
   }
 
   try {
+    if (deleteFromDrive) {
+      const docToDelete = await documentService.getDocumentById(documentId, userId);
+
+      if (docToDelete?.storageId) {
+        // 1. Get the user's Google Account tokens
+        const account = await prisma.account.findFirst({
+          where: {
+            userId,
+            provider: 'google',
+          },
+        });
+
+        if (account && account.access_token) {
+          // 2. Setup Google Auth
+          const auth = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET
+          );
+
+          const credentials: any = {
+            access_token: account.access_token,
+          };
+
+          if (account.refresh_token) {
+            credentials.refresh_token = account.refresh_token;
+          }
+
+          if (account.expires_at && account.refresh_token) {
+            credentials.expiry_date = account.expires_at * 1000;
+          }
+
+          auth.setCredentials(credentials);
+
+          // 3. Delete from Drive
+          await storageService.deleteFile(auth, docToDelete.storageId);
+        }
+      }
+    }
+
     const doc = await documentService.deleteDocument(documentId, userId);
     revalidatePath('/documents');
     return { success: true, data: doc };

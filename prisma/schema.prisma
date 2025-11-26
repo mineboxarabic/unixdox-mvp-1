@@ -122,6 +122,7 @@ model Document {
   idProprietaire    String              @db.ObjectId
   nomFichier        String
   urlStockage       String?
+  storageId         String?
   type              DocumentType
   statut            DocumentStatut      @default(EN_ATTENTE)
   tags              String[]

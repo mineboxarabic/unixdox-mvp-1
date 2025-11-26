@@ -39,6 +39,18 @@ export class StorageService {
     return { id, webViewLink, webContentLink: webContentLink || undefined };
   }
 
+  async deleteFile(auth: OAuth2Client, fileId: string): Promise<void> {
+    const drive = google.drive({ version: 'v3', auth });
+    try {
+      await drive.files.delete({
+        fileId: fileId,
+      });
+    } catch (error) {
+      console.error('Error deleting file from Drive:', error);
+      throw new Error('Failed to delete file from Google Drive');
+    }
+  }
+
   private async getOrCreateFolder(drive: any, folderName: string): Promise<string | undefined> {
     try {
       console.log(`Searching for ${folderName} folder...`);
