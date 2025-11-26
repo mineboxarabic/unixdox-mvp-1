@@ -1,13 +1,16 @@
 'use client';
 
-import { Box, SimpleGrid, Text, VStack, HStack, IconButton, MenuRoot, MenuTrigger, MenuContent, MenuItem, useDisclosure, Flex } from '@chakra-ui/react';
-import { Document, DocumentStatut } from '@prisma/client';
-import { LuEllipsisVertical, LuEye, LuPencil, LuTrash2, LuFileText } from 'react-icons/lu';
+import { Box, SimpleGrid, Text, VStack, IconButton, MenuRoot, MenuTrigger, MenuContent, MenuItem, useDisclosure, Flex } from '@chakra-ui/react';
+import { Document } from '@prisma/client';
+import { LuEllipsisVertical, LuPencil, LuTrash2, LuFileText } from 'react-icons/lu';
 import { useState } from 'react';
 import { EditDocumentDialog } from './EditDocumentDialog';
 import { DeleteDocumentDialog } from './DeleteDocumentDialog';
 import { DocumentDetailsDialog } from './DocumentDetailsDialog';
 import { Badge } from '@/shared/components/ui/badge';
+import { getDrivePreviewUrl } from '../../utils';
+import { DocumentsEmptyState } from './DocumentsEmptyState';
+import { DocumentStatusBadge } from '@/shared/components/documents/DocumentStatusBadge';
 
 interface DocumentsListProps {
     documents: Document[];
@@ -44,67 +47,8 @@ export function DocumentsList({ documents }: DocumentsListProps) {
         onDeleteOpen();
     };
 
-    // Generate Google Drive preview URL for iframe
-    const getDrivePreviewUrl = (url: string | null) => {
-        if (!url) return null;
-        // Convert Google Drive view URL to preview URL for iframe embedding
-        if (url.includes("drive.google.com") && url.includes("/view")) {
-            // Add parameters to reduce Google Drive UI controls
-            const previewUrl = url.replace("/view", "/preview");
-            const params = previewUrl.includes('?') ? '&' : '?';
-            return `${previewUrl}${params}rm=minimal&embedded=true`;
-        }
-        return null;
-    };
-
     if (documents.length === 0) {
-        return (
-            <Box position="relative" overflow="hidden" minH="400px" mx="auto" maxW="600px">
-                {/* Gradient Background */}
-                <Box
-                    position="absolute"
-                    left="50%"
-                    bottom="0"
-                    transform="translateX(-50%)"
-                    width="500px"
-                    height="300px"
-                    bgGradient="radial-gradient(ellipse 500px 300px at 50% 100%, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.12) 30%, rgba(59, 130, 246, 0.06) 50%, transparent 75%)"
-                    filter="blur(50px)"
-                    pointerEvents="none"
-                    zIndex="0"
-                />
-
-                <Box position="relative" zIndex="1">
-                    <Box
-                        bg="bg.surface"
-                        borderRadius="xl"
-                        border="1px solid"
-                        borderColor="border.muted"
-                        p={8}
-                        boxShadow="sm"
-                    >
-                        <VStack gap={6}>
-                            <Box
-                                p={5}
-                                bg="primary.50"
-                                borderRadius="full"
-                                color="primary.600"
-                            >
-                                <LuFileText size={48} />
-                            </Box>
-                            <VStack gap={2}>
-                                <Text fontSize="lg" fontWeight="semibold" color="text.fg">
-                                    Aucun document trouvé
-                                </Text>
-                                <Text fontSize="sm" color="text.fg.muted" textAlign="center">
-                                    Commencez par ajouter votre premier document
-                                </Text>
-                            </VStack>
-                        </VStack>
-                    </Box>
-                </Box>
-            </Box>
-        );
+        return <DocumentsEmptyState />;
     }
 
     return (
@@ -167,9 +111,7 @@ export function DocumentsList({ documents }: DocumentsListProps) {
                                     left={3}
                                     zIndex={2}
                                 >
-                                    <Badge colorScheme={getStatusColor(doc.statut)} size="sm">
-                                        {doc.statut}
-                                    </Badge>
+                                    <DocumentStatusBadge status={doc.statut} />
                                 </Box>
 
                                 <Box position="absolute" top={2} right={2} zIndex={10} onClick={(e) => e.stopPropagation()}>
@@ -274,19 +216,4 @@ export function DocumentsList({ documents }: DocumentsListProps) {
             }
         </>
     );
-}
-
-function getStatusColor(status: DocumentStatut) {
-    switch (status) {
-        case 'VERIFIE':
-            return 'success';
-        case 'EN_ATTENTE':
-            return 'warning';
-        case 'REFUSE':
-            return 'danger';
-        case 'EXPIRE':
-            return 'neutral';
-        default:
-            return 'neutral';
-    }
 }

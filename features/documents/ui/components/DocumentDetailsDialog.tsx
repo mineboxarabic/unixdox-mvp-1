@@ -1,6 +1,5 @@
 import {
   Box,
-  Flex,
   Grid,
   HStack,
   Text,
@@ -23,6 +22,8 @@ import { LuExternalLink, LuPencil, LuTrash, LuFile, LuCalendar, LuHardDrive, LuT
 import { DocumentIcon } from "@/shared/components/documents/DocumentIcon";
 import { DocumentStatusBadge } from "@/shared/components/documents/DocumentStatusBadge";
 import { formatDate } from "@/shared/utils/date";
+import { formatSize } from "@/shared/utils/format";
+import { getDrivePreviewUrl } from "../../utils";
 
 interface DocumentDetails {
   id: string;
@@ -53,24 +54,7 @@ export function DocumentDetailsDialog({
 }: DocumentDetailsDialogProps) {
   if (!document) return null;
 
-  const formatSize = (bytes?: number) => {
-    if (!bytes) return "--";
-    const sizes = ['Bytes', 'Kb', 'Mb', 'Gb', 'Tb'];
-    if (bytes === 0) return '0 Byte';
-    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString());
-    return Math.round(bytes / Math.pow(1024, i)) + '' + sizes[i];
-  };
-
-  const getPreviewUrl = (url?: string) => {
-    if (!url) return null;
-    // Convert Google Drive view URL to preview URL if necessary
-    if (url.includes("drive.google.com") && url.includes("/view")) {
-      return url.replace("/view", "/preview");
-    }
-    return url;
-  };
-
-  const previewUrl = getPreviewUrl(document.url);
+  const previewUrl = getDrivePreviewUrl(document.url);
   const displayName = document.name || document.nomFichier || "Document sans nom";
 
   return (
