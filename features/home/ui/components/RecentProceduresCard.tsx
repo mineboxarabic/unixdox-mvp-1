@@ -11,7 +11,7 @@ import {
   Separator,
 } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
-import { LuFolder } from "react-icons/lu";
+import { LuFolder, LuFolderPlus } from "react-icons/lu";
 import type { Procedure } from "../../types";
 import { ProcedureStatusBadge } from "@/shared/components/procedures/ProcedureStatusBadge";
 import { formatDate } from "@/shared/utils/date";
@@ -19,11 +19,13 @@ import { formatDate } from "@/shared/utils/date";
 export interface RecentProceduresCardProps {
   procedures: Procedure[];
   onViewAll?: () => void;
+  onCreateProcedure?: () => void;
 }
 
 export function RecentProceduresCard({
   procedures,
   onViewAll,
+  onCreateProcedure,
 }: RecentProceduresCardProps) {
   return (
     <Card>
@@ -46,9 +48,18 @@ export function RecentProceduresCard({
       <CardBody>
         {procedures.length === 0 ? (
           <EmptyState
-            icon={<LuFolder color="var(--chakra-colors-neutral-400)" />}
-            title=""
-            description="Aucun dossier de démarches pour le moment"
+            icon={<LuFolder size={64} />}
+            description="Aucun dossier pour le moment"
+            action={
+              <Button
+                size="lg"
+                colorPalette="blue"
+                onClick={onCreateProcedure}
+              >
+                <LuFolderPlus size={18} />
+                Commencez une démarche
+              </Button>
+            }
           />
         ) : (
           <Flex direction="column" gap="0">

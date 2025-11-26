@@ -9,8 +9,12 @@ import { UpcomingDeadlinesCard } from "../components/UpcomingDeadlinesCard";
 import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
 import type { HomeData } from "../../types";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ProcessingState } from "@/shared/components/documents/ProcessingState";
+import { SearchDropdown } from "@/features/search";
+import { getSearchData } from "@/features/search/actions";
+import type { SearchData } from "@/features/search/types";
+import { useRouter } from "next/navigation";
 
 export interface HomePageProps {
   data: HomeData;
@@ -38,7 +42,12 @@ export function HomePage({
   uploadDocumentsAction,
 }: HomePageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchData, setSearchData] = useState<SearchData | null>(null);
+  const [searchPosition, setSearchPosition] = useState({ top: 0, left: 0, width: 0 });
+  const router = useRouter();
 
   const handleFileUpload = async (files: File[]) => {
     setIsProcessing(true);
@@ -69,6 +78,60 @@ export function HomePage({
       e.target.value = "";
     }
   };
+
+  const handleSearchFocus = async () => {
+    if (searchInputRef.current) {
+      const rect = searchInputRef.current.getBoundingClientRect();
+      setSearchPosition({
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+
+    if (!searchData) {
+      const data = await getSearchData();
+      setSearchData(data);
+    }
+
+    setSearchOpen(true);
+  };
+
+  const handleSearchBlur = () => {
+    // Delay to allow click events on dropdown items
+    setTimeout(() => {
+      setSearchOpen(false);
+    }, 200);
+  };
+
+  const handleDocumentClick = (documentId: string) => {
+    setSearchOpen(false);
+    // Navigate to document (adjust route as needed)
+    router.push(`/documents?id=${documentId}`);
+  };
+
+  const handleDemarcheClick = (demarcheId: string) => {
+    setSearchOpen(false);
+    // Navigate to demarche (adjust route as needed)
+    router.push(`/demarches/${demarcheId}`);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target as Node) &&
+        searchOpen
+      ) {
+        setSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchOpen]);
 
   return (
     <Box minH="100vh" bg="bg.canvas" p="6">
@@ -107,13 +170,26 @@ export function HomePage({
               <LuSearch size={18} />
             </Box>
             <Input
+              ref={searchInputRef}
               placeholder="Recherchez un fichier, une démarche..."
               style={{ paddingLeft: "2.5rem", backgroundColor: "var(--chakra-colors-bg-surface)" }}
               size="lg"
               width="full"
               borderRadius="full"
+              onFocus={handleSearchFocus}
+              onBlur={handleSearchBlur}
             />
           </Box>
+
+          {/* Search Dropdown */}
+          <SearchDropdown
+            isOpen={searchOpen}
+            documents={searchData?.documents || []}
+            demarches={searchData?.demarches || []}
+            onDocumentClick={handleDocumentClick}
+            onDemarcheClick={handleDemarcheClick}
+            position={searchPosition}
+          />
 
           {/* Action Buttons */}
           <Flex gap="4">
@@ -165,6 +241,7 @@ export function HomePage({
           <RecentProceduresCard
             procedures={data.recentProcedures}
             onViewAll={onViewAllProcedures}
+            onCreateProcedure={onCreateProcedure}
           />
 
           <UpcomingDeadlinesCard
