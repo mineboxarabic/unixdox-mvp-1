@@ -25,6 +25,7 @@ import { formatDate } from "@/shared/utils/date";
 import { useState } from "react";
 import { EditDocumentDialog } from "@/features/documents/ui/components/EditDocumentDialog";
 import { DeleteDocumentDialog } from "@/features/documents/ui/components/DeleteDocumentDialog";
+import { DocumentDetailsDialog } from "@/features/documents/ui/components/DocumentDetailsDialog";
 
 export interface RecentDocumentsCardProps {
   documents: Document[];
@@ -39,6 +40,7 @@ export function RecentDocumentsCard({
 }: RecentDocumentsCardProps) {
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
   const [deletingDocument, setDeletingDocument] = useState<Document | null>(null);
+  const [viewingDocument, setViewingDocument] = useState<Document | null>(null);
 
   const formatSize = (bytes?: number) => {
     if (!bytes) return "--";
@@ -62,10 +64,8 @@ export function RecentDocumentsCard({
     </Box>
   );
 
-  const handleViewClick = (url?: string) => {
-    if (url) {
-      window.open(url, '_blank');
-    }
+  const handleViewClick = (document: Document) => {
+    setViewingDocument(document);
   };
 
   const handleEditClick = (document: Document) => {
@@ -129,8 +129,7 @@ export function RecentDocumentsCard({
                   aria-label="Voir le document"
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleViewClick(document.url)}
-                  disabled={!document.url}
+                  onClick={() => handleViewClick(document)}
                 >
                   <LuEye />
                 </IconButton>
@@ -183,6 +182,22 @@ export function RecentDocumentsCard({
           </CardFooter>
         )}
       </Card>
+      
+      {viewingDocument && (
+        <DocumentDetailsDialog
+          isOpen={!!viewingDocument}
+          onClose={() => setViewingDocument(null)}
+          document={viewingDocument}
+          onEdit={() => {
+            setViewingDocument(null);
+            setEditingDocument(viewingDocument);
+          }}
+          onDelete={() => {
+            setViewingDocument(null);
+            setDeletingDocument(viewingDocument);
+          }}
+        />
+      )}
       
       {editingDocument && (
         <EditDocumentDialog 
