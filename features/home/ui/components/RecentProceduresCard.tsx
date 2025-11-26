@@ -47,20 +47,37 @@ export function RecentProceduresCard({
       </CardHeader>
       <CardBody>
         {procedures.length === 0 ? (
-          <EmptyState
-            icon={<LuFolder size={64} />}
-            description="Aucun dossier pour le moment"
-            action={
-              <Button
-                size="lg"
-                colorPalette="blue"
-                onClick={onCreateProcedure}
-              >
-                <LuFolderPlus size={18} />
-                Commencez une démarche
-              </Button>
-            }
-          />
+          <Box position="relative" overflow="hidden" minH="300px" mx="-6" mb="-6" px="6" pb="6">
+            {/* Wave/Mountain Gradient Background */}
+            <Box
+              position="absolute"
+              left="50%"
+              bottom="0"
+              transform="translateX(-50%)"
+              width="500px"
+              height="300px"
+              bgGradient="radial-gradient(ellipse 500px 300px at 50% 100%, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.12) 30%, rgba(59, 130, 246, 0.06) 50%, transparent 75%)"
+              filter="blur(50px)"
+              pointerEvents="none"
+              zIndex="0"
+            />
+            <Box position="relative" zIndex="1">
+              <EmptyState
+                icon={<LuFolder size={64} />}
+                description="Aucun dossier pour le moment"
+                action={
+                  <Button
+                    size="lg"
+                    colorPalette="blue"
+                    onClick={onCreateProcedure}
+                  >
+                    <LuFolderPlus size={18} />
+                    Commencez une démarche
+                  </Button>
+                }
+              />
+            </Box>
+          </Box>
         ) : (
           <Flex direction="column" gap="0">
             {procedures.map((procedure, index) => {
