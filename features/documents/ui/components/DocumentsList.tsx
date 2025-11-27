@@ -8,7 +8,7 @@ import { EditDocumentDialog } from './EditDocumentDialog';
 import { DeleteDocumentDialog } from './DeleteDocumentDialog';
 import { DocumentDetailsDialog } from './DocumentDetailsDialog';
 import { Badge } from '@/shared/components/ui/badge';
-import { getDrivePreviewUrl } from '../../utils';
+import { getDrivePreviewUrl, getDriveThumbnailUrl } from '../../utils';
 import { DocumentsEmptyState } from './DocumentsEmptyState';
 import { DocumentStatusBadge } from '@/shared/components/documents/DocumentStatusBadge';
 
@@ -56,6 +56,7 @@ export function DocumentsList({ documents }: DocumentsListProps) {
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }} gap={6}>
                 {documents.map((doc) => {
                     const previewUrl = getDrivePreviewUrl(doc.urlStockage);
+                    const thumbnailUrl = getDriveThumbnailUrl(doc.urlStockage);
 
                     return (
                         <Box
@@ -81,7 +82,17 @@ export function DocumentsList({ documents }: DocumentsListProps) {
                                 overflow="hidden"
                                 borderTopRadius="xl"
                             >
-                                {previewUrl ? (
+                                {thumbnailUrl ? (
+                                    <img
+                                        src={thumbnailUrl}
+                                        alt={doc.nomFichier}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                        }}
+                                    />
+                                ) : previewUrl ? (
                                     <iframe
                                         src={previewUrl}
                                         title={doc.nomFichier}
