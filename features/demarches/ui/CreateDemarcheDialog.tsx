@@ -42,7 +42,7 @@ interface CreateDemarcheDialogProps {
     modeleId: string,
     documents: DemarcheDocuments,
     name?: string
-  ) => Promise<{ success: boolean; demarcheId?: string }>;
+  ) => Promise<{ success: boolean; demarcheId?: string; demarcheTitle?: string | null }>;
 }
 
 export function CreateDemarcheDialog({
@@ -61,6 +61,7 @@ export function CreateDemarcheDialog({
   const [matchedDocuments, setMatchedDocuments] = useState<MatchedDocument[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<DemarcheDocuments>({});
   const [createdDemarcheId, setCreatedDemarcheId] = useState<string | null>(null);
+  const [createdDemarcheTitle, setCreatedDemarcheTitle] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Create list collection for documents dropdown
@@ -84,6 +85,7 @@ export function CreateDemarcheDialog({
       setMatchedDocuments([]);
       setSelectedDocuments({});
       setCreatedDemarcheId(null);
+      setCreatedDemarcheTitle(null);
       setIsLoading(false);
     }
   }, [isOpen]);
@@ -205,6 +207,7 @@ export function CreateDemarcheDialog({
       
       if (result.success) {
         setCreatedDemarcheId(result.demarcheId || null);
+        setCreatedDemarcheTitle(result.demarcheTitle || null);
         setStep('success');
       } else {
         // Go back to review on error
@@ -278,6 +281,7 @@ export function CreateDemarcheDialog({
         {step === 'success' && selectedModele && (
           <SuccessStep
             modeleTitre={selectedModele.titre}
+            demarcheTitle={createdDemarcheTitle || undefined}
             dossierId={createdDemarcheId || ''}
             userEmail={userEmail}
             onClose={onClose}

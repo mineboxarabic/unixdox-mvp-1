@@ -26,13 +26,13 @@ export function DemarcheCard({
   const getStatusBadge = () => {
     switch (statut) {
       case DemarcheStatut.EN_COURS:
-        return { label: 'Vide', colorScheme: 'primary' as const };
+        return { label: 'En cours', colorScheme: 'primary' as const };
       case DemarcheStatut.COMPLETE:
-        return { label: 'Vidé', colorScheme: 'success' as const };
+        return { label: 'Complétée', colorScheme: 'success' as const };
       case DemarcheStatut.ABANDONNEE:
-        return { label: 'Expirée', colorScheme: 'warning' as const };
+        return { label: 'Abandonnée', colorScheme: 'warning' as const };
       default:
-        return { label: 'Vide', colorScheme: 'neutral' as const };
+        return { label: 'En cours', colorScheme: 'neutral' as const };
     }
   };
 
@@ -54,6 +54,7 @@ export function DemarcheCard({
             transform: 'scale(1.05)',
           },
         }}
+        title={`Créée le ${new Date(dateDebut).toLocaleDateString()}`}
       >
         {/* Folder SVG Background */}
         <Box
@@ -96,10 +97,17 @@ export function DemarcheCard({
               fontSize="xs"
               fontWeight="medium"
               bg="white"
-              color={statusBadge.colorScheme === 'warning' ? 'accent.500' : 'primary.600'}
+              color={
+                statusBadge.colorScheme === 'success' 
+                  ? 'green.600' 
+                  : statusBadge.colorScheme === 'warning' 
+                    ? 'orange.600' 
+                    : 'primary.600'
+              }
               px={2}
               py={1}
               borderRadius="sm"
+              boxShadow="sm"
             >
               {statusBadge.label}
             </Box>
@@ -115,6 +123,7 @@ export function DemarcheCard({
               display="flex"
               alignItems="center"
               gap={1}
+              boxShadow="sm"
             >
               <FiFile size={12} />
               {fileCount} fichier{fileCount !== 1 ? 's' : ''}

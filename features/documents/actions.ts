@@ -110,7 +110,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
     auth.setCredentials(credentials);
 
     // 3. Upload to Drive
-    const { id: storageId, webViewLink } = await storageService.uploadFile(auth, file);
+    const { id: storageId, webViewLink, thumbnailLink } = await storageService.uploadFile(auth, file);
 
     // 4. Save metadata to DB
     let doc = await documentService.createDocument({
@@ -121,6 +121,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
       size: file.size,
       proprietaire: { connect: { id: userId } },
       extractionStatus: ExtractionStatus.PENDING,
+      metadata: thumbnailLink ? { thumbnailLink } : undefined,
     });
 
     // 5. AI Extraction
@@ -138,7 +139,10 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
         where: { id: doc.id },
         data: {
           extractionStatus: ExtractionStatus.COMPLETED,
-          metadata: extractionResult.metadata || {},
+          metadata: {
+            ...(doc.metadata as object),
+            ...(extractionResult.metadata || {})
+          },
           dateExpiration: extractionResult.dateExpiration,
           tags: extractionResult.tags,
           type: extractionResult.type || DocumentType.AUTRE,

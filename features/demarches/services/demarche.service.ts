@@ -1,6 +1,7 @@
 import { prisma } from '@/shared/config/prisma';
 import { DemarcheStatut } from '@prisma/client';
 import type { DemarcheListItem, DemarcheStats, DemarcheDocuments } from '../types/schemas';
+import { formatDate } from '@/shared/utils/date';
 
 export class DemarcheService {
   /**
@@ -72,6 +73,12 @@ export class DemarcheService {
 
     if (!modele || !modele.actif) {
       throw new Error('Modèle de démarche introuvable ou inactif');
+    }
+
+    // Generate default title if not provided
+    if (!titre) {
+      const dateStr = formatDate(new Date());
+      titre = `${modele.titre} démarche de ${dateStr}`;
     }
 
     const demarche = await prisma.demarcheUtilisateur.create({
@@ -178,6 +185,40 @@ export class DemarcheService {
     });
 
     return { success: true };
+  }
+
+  /**
+   * Link a document to a specific requirement of a demarche
+   */
+  async linkDocument(
+    demarcheId: string,
+    userId: string,
+    requirementName: string,
+    documentId: string
+  ) {
+    // Verify ownership
+    const existing = await prisma.demarcheUtilisateur.findUnique({
+      where: { id: demarcheId },
+    });
+
+    if (!existing || existing.idUtilisateur !== userId) {
+      throw new Error('Démarche introuvable ou accès non autorisé');
+    }
+
+    const currentDocs = (existing.documentsAssocies as Record<string, string>) || {};
+    const newDocs = { ...currentDocs, [requirementName]: documentId };
+
+    const updated = await prisma.demarcheUtilisateur.update({
+      where: { id: demarcheId },
+      data: {
+        documentsAssocies: newDocs,
+      },
+      include: {
+        modele: true,
+      },
+    });
+
+    return updated;
   }
 }
 

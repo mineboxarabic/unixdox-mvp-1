@@ -37,12 +37,11 @@ export async function getHomeData(): Promise<HomeData> {
         },
       },
     }),
-    // Count automatic demarches completed this month
+    // Count automatic demarches created this month
     prisma.demarcheUtilisateur.count({
       where: {
         idUtilisateur: session.user.id,
-        complete: true,
-        dateCompletion: {
+        createdAt: {
           gte: startOfMonth,
         },
       },

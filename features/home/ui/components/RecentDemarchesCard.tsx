@@ -10,6 +10,7 @@ import {
     Separator,
 } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
 import { LuFolder, LuFolderPlus, LuExternalLink } from "react-icons/lu";
 import type { DemarcheUtilisateur } from "@prisma/client";
 import { formatDistanceToNow } from "date-fns";
@@ -60,7 +61,7 @@ export function RecentDemarchesCard({
                     <Flex gap="1" fontSize="sm" color="text.fg.muted">
                         <Text>Démarches automatiques ce mois ci :</Text>
                         <Text fontWeight="medium" color="text.fg">
-                            {automaticDemarchesCount}/{automaticDemarchesTotal}
+                            {demarches.length}/{automaticDemarchesCount}
                         </Text>
                     </Flex>
                 </Flex>
@@ -110,9 +111,16 @@ export function RecentDemarchesCard({
                                         gap="4"
                                     >
                                         <Flex direction="column" gap="1" flex="1">
-                                            <Text fontSize="sm" fontWeight="medium" color="text.fg">
-                                                {demarche.titre || demarche.modele.titre}
-                                            </Text>
+                                            <Flex alignItems="center" gap="2">
+                                                <Text fontSize="sm" fontWeight="medium" color="text.fg">
+                                                    {demarche.titre || demarche.modele.titre}
+                                                </Text>
+                                                {demarche.complete && (
+                                                    <Badge colorScheme="success" size="sm">
+                                                        Complétée
+                                                    </Badge>
+                                                )}
+                                            </Flex>
                                             <Text fontSize="xs" color="text.fg.muted">
                                                 {formatDate(demarche.dateDebut)}
                                             </Text>

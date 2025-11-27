@@ -97,7 +97,7 @@ export async function startNewDemarcheAction(formData: FormData) {
 /**
  * Update demarche status
  */
-export async function updateDemarcheStatusAction(
+export async function updateDemarcheAction(
   demarcheId: string,
   formData: FormData
 ) {
@@ -109,9 +109,10 @@ export async function updateDemarcheStatusAction(
     }
 
     const rawData = {
-      statut: formData.get('statut') as string | undefined,
-      notes: formData.get('notes') as string | undefined,
-      complete: formData.get('complete') === 'true',
+      statut: (formData.get('statut') as string) || undefined,
+      notes: formData.get('notes') !== null ? (formData.get('notes') as string) : undefined,
+      complete: formData.get('complete') ? formData.get('complete') === 'true' : undefined,
+      titre: formData.get('titre') !== null ? (formData.get('titre') as string) : undefined,
     };
 
     const validatedData = UpdateDemarcheSchema.parse(rawData);
@@ -216,6 +217,41 @@ export async function deleteDemarcheAction(demarcheId: string) {
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Erreur lors de la suppression de la démarche' 
+    };
+  }
+}
+
+/**
+ * Link a document to a demarche requirement
+ */
+export async function linkDocumentAction(
+  demarcheId: string,
+  requirementName: string,
+  documentId: string
+) {
+  try {
+    const session = await auth();
+    
+    if (!session?.user?.id) {
+      return { success: false, error: 'Non authentifié' };
+    }
+
+    const updated = await demarcheService.linkDocument(
+      demarcheId,
+      session.user.id,
+      requirementName,
+      documentId
+    );
+
+    revalidatePath('/demarches');
+    revalidatePath(`/demarches/${demarcheId}`);
+    
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error('Error linking document:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Erreur lors de la liaison du document' 
     };
   }
 }

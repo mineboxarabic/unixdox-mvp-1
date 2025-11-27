@@ -11,6 +11,7 @@ export const UpdateDemarcheSchema = z.object({
   statut: z.nativeEnum(DemarcheStatut).optional(),
   notes: z.string().optional(),
   complete: z.boolean().optional(),
+  titre: z.string().optional(),
 });
 
 export const DemarcheFilterSchema = z.object({

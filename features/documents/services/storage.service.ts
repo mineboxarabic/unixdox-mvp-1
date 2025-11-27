@@ -7,7 +7,7 @@ export class StorageService {
     auth: OAuth2Client,
     file: File,
     folderName: string = 'Unidox'
-  ): Promise<{ id: string; webViewLink: string; webContentLink?: string }> {
+  ): Promise<{ id: string; webViewLink: string; webContentLink?: string; thumbnailLink?: string }> {
     const drive = google.drive({ version: 'v3', auth });
 
     // 1. Find or Create Folder
@@ -27,16 +27,21 @@ export class StorageService {
         mimeType: file.type,
         body: stream,
       },
-      fields: 'id, webViewLink, webContentLink',
+      fields: 'id, webViewLink, webContentLink, thumbnailLink',
     });
 
-    const { id, webViewLink, webContentLink } = driveResponse.data;
+    const { id, webViewLink, webContentLink, thumbnailLink } = driveResponse.data;
 
     if (!id || !webViewLink) {
       throw new Error('Failed to get file info from Google Drive');
     }
 
-    return { id, webViewLink, webContentLink: webContentLink || undefined };
+    return { 
+      id, 
+      webViewLink, 
+      webContentLink: webContentLink || undefined,
+      thumbnailLink: thumbnailLink || undefined
+    };
   }
 
   async deleteFile(auth: OAuth2Client, fileId: string): Promise<void> {
@@ -49,6 +54,15 @@ export class StorageService {
       console.error('Error deleting file from Drive:', error);
       throw new Error('Failed to delete file from Google Drive');
     }
+  }
+
+  async getFileStream(auth: OAuth2Client, fileId: string): Promise<Readable> {
+    const drive = google.drive({ version: 'v3', auth });
+    const response = await drive.files.get(
+      { fileId, alt: 'media' },
+      { responseType: 'stream' }
+    );
+    return response.data;
   }
 
   private async getOrCreateFolder(drive: any, folderName: string): Promise<string | undefined> {

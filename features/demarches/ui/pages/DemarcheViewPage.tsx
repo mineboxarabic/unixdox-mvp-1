@@ -22,17 +22,23 @@ import {
   FiFile,
   FiCheck,
   FiAlertCircle,
+  FiAlertTriangle,
   FiClock,
   FiTrash2,
   FiEdit2,
   FiPlus,
+  FiRefreshCw,
+  FiDownload,
 } from 'react-icons/fi';
 import { LuFileText } from 'react-icons/lu';
 import Link from 'next/link';
 import { DemarcheStatut, DemarcheCategorie, Document } from '@prisma/client';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteDemarcheAction, updateDemarcheStatusAction } from '../../actions';
+import { deleteDemarcheAction, updateDemarcheAction, linkDocumentAction } from '../../actions';
+import { EditDemarcheDialog } from '../EditDemarcheDialog';
+import { LinkDocumentDialog } from '../LinkDocumentDialog';
+import { toaster } from '@/shared/components/ui/toaster';
 
 interface DemarcheViewPageProps {
   demarche: {
@@ -63,6 +69,10 @@ interface DemarcheViewPageProps {
 export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [selectedRequirement, setSelectedRequirement] = useState<string>('');
   const router = useRouter();
 
   // Get the documents associated with this demarche
@@ -130,13 +140,87 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
     const formData = new FormData();
     formData.append('complete', 'true');
 
-    const result = await updateDemarcheStatusAction(demarche.id, formData);
+    const result = await updateDemarcheAction(demarche.id, formData);
     if (result.success) {
       router.refresh();
     } else {
       alert(result.error || 'Erreur lors de la mise à jour');
     }
   }, [demarche.id, router]);
+
+  // Handle download all
+  const handleDownloadAll = async () => {
+    if (completedDocs === 0) {
+      toaster.create({
+        title: "Aucun document",
+        description: "Il n'y a aucun document à télécharger.",
+        type: "info",
+      });
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      // Trigger download via API route
+      const response = await fetch(`/api/demarches/${demarche.id}/download`);
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement');
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${demarche.titre || demarche.modele.titre}_documents.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toaster.create({
+        title: "Téléchargement terminé",
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toaster.create({
+        title: "Erreur",
+        description: "Impossible de télécharger les documents.",
+        type: "error",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // Handle link document
+  const handleLinkDocument = async (documentId: string) => {
+    if (!selectedRequirement) return;
+
+    const result = await linkDocumentAction(demarche.id, selectedRequirement, documentId);
+    
+    if (result.success) {
+      toaster.create({
+        title: "Document ajouté",
+        type: "success",
+      });
+      router.refresh();
+    } else {
+      toaster.create({
+        title: "Erreur",
+        description: result.error || "Erreur lors de l'ajout du document",
+        type: "error",
+      });
+    }
+  };
+
+  // Open link dialog
+  const openLinkDialog = (requirement: string) => {
+    setSelectedRequirement(requirement);
+    setIsLinkDialogOpen(true);
+  };
 
   // Filter required documents based on search
   const filteredRequirements = demarche.modele.typesDocumentsRequis.filter((req) =>
@@ -237,6 +321,19 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
 
             {/* Action Buttons */}
             <HStack gap={2}>
+              <Button
+                variant="outline"
+                size="md"
+                borderRadius="full"
+                onClick={handleDownloadAll}
+                loading={isDownloading}
+                disabled={completedDocs === 0}
+                title="Télécharger tous les documents"
+              >
+                <FiDownload />
+                <Text ml={2} display={{ base: 'none', md: 'block' }}>Télécharger tout</Text>
+              </Button>
+
               {demarche.statut === DemarcheStatut.EN_COURS && (
                 <Button
                   size="md"
@@ -251,6 +348,15 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                   <Text ml={2}>Marquer comme complète</Text>
                 </Button>
               )}
+              <IconButton
+                aria-label="Modifier"
+                variant="outline"
+                size="md"
+                borderRadius="full"
+                onClick={() => setIsEditing(true)}
+              >
+                <FiEdit2 />
+              </IconButton>
               <IconButton
                 aria-label="Supprimer"
                 variant="outline"
@@ -385,32 +491,35 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                   ? getDocumentById(associatedDocId)
                   : null;
                 const isComplete = !!associatedDoc;
+                const isTypeMismatch = associatedDoc && associatedDoc.type !== requirement;
 
                 return (
                   <Box
                     key={index}
                     bg="bg.surface"
                     border="1px"
-                    borderColor={isComplete ? 'green.200' : 'border.default'}
+                    borderColor={isTypeMismatch ? 'orange.300' : (isComplete ? 'green.200' : 'border.default')}
                     borderRadius="xl"
                     p={4}
                     transition="all 0.2s"
                     _hover={{
                       boxShadow: 'md',
-                      borderColor: isComplete ? 'green.300' : 'primary.200',
+                      borderColor: isTypeMismatch ? 'orange.400' : (isComplete ? 'green.300' : 'primary.200'),
                     }}
                   >
                     <Flex justify="space-between" align="flex-start" gap={3}>
                       <HStack align="flex-start" gap={3}>
                         <Box
                           p={2}
-                          bg={isComplete ? 'green.50' : 'neutral.100'}
+                          bg={isTypeMismatch ? 'orange.50' : (isComplete ? 'green.50' : 'neutral.100')}
                           borderRadius="md"
                           display="flex"
                           alignItems="center"
                           justifyContent="center"
                         >
-                          {isComplete ? (
+                          {isTypeMismatch ? (
+                            <FiAlertTriangle size={20} color="var(--chakra-colors-orange-500)" />
+                          ) : isComplete ? (
                             <FiCheck size={20} color="var(--chakra-colors-green-600)" />
                           ) : (
                             <LuFileText size={20} color="var(--chakra-colors-neutral-500)" />
@@ -421,9 +530,16 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                             {requirement}
                           </Text>
                           {associatedDoc ? (
-                            <Text fontSize="xs" color="green.600">
-                              {associatedDoc.nomFichier}
-                            </Text>
+                            <VStack align="flex-start" gap={0}>
+                              <Text fontSize="xs" color={isTypeMismatch ? 'orange.600' : 'green.600'}>
+                                {associatedDoc.nomFichier}
+                              </Text>
+                              {isTypeMismatch && (
+                                <Text fontSize="xs" color="orange.600" fontWeight="medium">
+                                  Type incorrect: {associatedDoc.type}
+                                </Text>
+                              )}
+                            </VStack>
                           ) : (
                             <Text fontSize="xs" color="fg.muted">
                               Document non fourni
@@ -433,9 +549,33 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                       </HStack>
 
                       {isComplete && (
-                        <Badge variant="subtle" colorScheme="success" size="sm">
-                          Fourni
-                        </Badge>
+                        <HStack gap={2}>
+                          <Badge variant="subtle" colorScheme="success" size="sm">
+                            Fourni
+                          </Badge>
+                          <IconButton
+                            aria-label="Remplacer le document"
+                            variant="ghost"
+                            size="sm"
+                            color="fg.muted"
+                            onClick={() => openLinkDialog(requirement)}
+                            title="Remplacer le document"
+                          >
+                            <FiRefreshCw />
+                          </IconButton>
+                        </HStack>
+                      )}
+                      
+                      {!isComplete && (
+                        <IconButton
+                          aria-label="Ajouter un document"
+                          variant="ghost"
+                          size="sm"
+                          color="primary.600"
+                          onClick={() => openLinkDialog(requirement)}
+                        >
+                          <FiPlus />
+                        </IconButton>
                       )}
                     </Flex>
                   </Box>
@@ -462,6 +602,20 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
           </Box>
         </VStack>
       </Container>
+
+      <EditDemarcheDialog
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        demarche={demarche}
+      />
+
+      <LinkDocumentDialog
+        isOpen={isLinkDialogOpen}
+        onClose={() => setIsLinkDialogOpen(false)}
+        requirementName={selectedRequirement}
+        userDocuments={userDocuments}
+        onLink={handleLinkDocument}
+      />
     </Box>
   );
 }

@@ -65,7 +65,7 @@ export function HomePageClient({
     
     if (result.success && result.data) {
       router.refresh();
-      return { success: true, demarcheId: result.data.id };
+      return { success: true, demarcheId: result.data.id, demarcheTitle: result.data.titre };
     }
     
     return { success: false };

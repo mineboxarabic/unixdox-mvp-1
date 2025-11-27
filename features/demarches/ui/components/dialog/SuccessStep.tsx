@@ -8,11 +8,13 @@ import {
   DialogFooter, 
   DialogTitle,
 } from '@/shared/components/ui/dialog';
+import { toaster } from '@/shared/components/ui/toaster';
 import { Button } from '@/shared/components/ui/button';
 import { LuCircleCheck, LuDownload, LuMail, LuPencil, LuCheck, LuSend } from 'react-icons/lu';
 
 interface SuccessStepProps {
   modeleTitre: string;
+  demarcheTitle?: string;
   dossierId: string;
   userEmail?: string;
   onClose: () => void;
@@ -22,13 +24,14 @@ interface SuccessStepProps {
 
 export function SuccessStep({
   modeleTitre,
+  demarcheTitle,
   dossierId,
   userEmail = '',
   onClose,
   onViewDossier,
   onUpdateTitle,
 }: SuccessStepProps) {
-  const [demarcheName, setDemarcheName] = useState(modeleTitre);
+  const [demarcheName, setDemarcheName] = useState(demarcheTitle || modeleTitre);
   const [isEditingName, setIsEditingName] = useState(false);
   const [isSavingName, setIsSavingName] = useState(false);
   const [email, setEmail] = useState(userEmail);
@@ -49,7 +52,7 @@ export function SuccessStep({
   };
 
   const handleDownload = () => {
-    window.open(`/api/dossiers/${dossierId}/download`, '_blank');
+    window.open(`/api/demarches/${dossierId}/download`, '_blank');
   };
 
   const handleEmailDownload = async () => {
@@ -57,11 +60,30 @@ export function SuccessStep({
     
     setIsSending(true);
     try {
-      // TODO: Implement email sending functionality
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // After sending, could show a toast or close
+      const response = await fetch(`/api/demarches/${dossierId}/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      toaster.create({
+        title: "Email envoyé",
+        description: `Les documents ont été envoyés à ${email}`,
+        type: "success",
+      });
     } catch (error) {
       console.error('Failed to send email', error);
+      toaster.create({
+        title: "Erreur",
+        description: "Impossible d'envoyer l'email. Veuillez vérifier votre configuration.",
+        type: "error",
+      });
     } finally {
       setIsSending(false);
     }

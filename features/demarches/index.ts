@@ -3,7 +3,7 @@ export {
   getUserDemarchesAction,
   getDemarcheStatsAction,
   startNewDemarcheAction,
-  updateDemarcheStatusAction,
+  updateDemarcheAction,
   getAvailableModelesAction,
   deleteDemarcheAction,
 } from './actions';
