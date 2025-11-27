@@ -13,6 +13,7 @@ import { startNewDemarcheAction } from '@/features/demarches/actions';
 interface HomePageClientProps {
   data: HomeData;
   userRole?: string;
+  userEmail?: string;
   modeles: ModeleDemarche[];
   userDocuments: Document[];
   uploadDocumentsAction?: (formData: FormData) => Promise<void>;
@@ -21,6 +22,7 @@ interface HomePageClientProps {
 export function HomePageClient({
   data,
   userRole,
+  userEmail,
   modeles,
   userDocuments,
   uploadDocumentsAction,
@@ -86,6 +88,7 @@ export function HomePageClient({
         onClose={() => setIsDialogOpen(false)}
         modeles={modeles}
         userDocuments={userDocuments}
+        userEmail={userEmail}
         onMatchDocuments={handleMatchDocuments}
         onCreateDemarche={handleCreateDemarche}
       />

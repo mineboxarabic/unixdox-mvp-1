@@ -36,6 +36,7 @@ export default async function DemarchesRoute() {
       demarches={demarches || []} 
       modeles={modeles}
       userDocuments={userDocuments}
+      userEmail={session.user.email ?? undefined}
     />
   );
 }

@@ -51,7 +51,8 @@ export default async function Home() {
   return (
     <HomePageClient 
       data={homeData} 
-      userRole={session.user.role} 
+      userRole={session.user.role}
+      userEmail={session.user.email ?? undefined}
       modeles={modeles}
       userDocuments={userDocuments}
       uploadDocumentsAction={uploadDocumentsAction}

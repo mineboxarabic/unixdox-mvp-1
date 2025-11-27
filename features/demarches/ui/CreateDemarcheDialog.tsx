@@ -32,6 +32,7 @@ interface CreateDemarcheDialogProps {
   onClose: () => void;
   modeles: ModeleDemarche[];
   userDocuments: Document[];
+  userEmail?: string;
   onMatchDocuments: (modeleId: string) => Promise<{
     matches: DemarcheDocuments;
     missing: string[];
@@ -49,6 +50,7 @@ export function CreateDemarcheDialog({
   onClose,
   modeles,
   userDocuments,
+  userEmail,
   onMatchDocuments,
   onCreateDemarche,
 }: CreateDemarcheDialogProps) {
@@ -185,11 +187,21 @@ export function CreateDemarcheDialog({
     
     setStep('loading');
     
+    // Minimum loading time for better UX (3 seconds)
+    const minLoadingTime = 3000;
+    const startTime = Date.now();
+    
     try {
       const result = await onCreateDemarche(
         selectedModele.id,
         selectedDocuments
       );
+      
+      // Wait for minimum loading time to complete
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsed));
+      }
       
       if (result.success) {
         setCreatedDemarcheId(result.demarcheId || null);
@@ -258,8 +270,8 @@ export function CreateDemarcheDialog({
         )}
 
         {/* Step 3: Loading */}
-        {step === 'loading' && (
-          <LoadingStep message="Création du dossier en cours..." />
+        {step === 'loading' && selectedModele && (
+          <LoadingStep modeleTitre={selectedModele.titre} />
         )}
 
         {/* Step 4: Success */}
@@ -267,6 +279,7 @@ export function CreateDemarcheDialog({
           <SuccessStep
             modeleTitre={selectedModele.titre}
             dossierId={createdDemarcheId || ''}
+            userEmail={userEmail}
             onClose={onClose}
             onViewDossier={handleViewDossier}
             onUpdateTitle={handleUpdateTitle}

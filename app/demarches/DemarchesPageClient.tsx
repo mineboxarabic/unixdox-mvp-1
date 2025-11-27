@@ -13,6 +13,7 @@ interface DemarchesPageClientProps {
   demarches: DemarcheListItem[];
   modeles: ModeleDemarche[];
   userDocuments: Document[];
+  userEmail?: string;
   isLoading?: boolean;
 }
 
@@ -20,6 +21,7 @@ export function DemarchesPageClient({
   demarches,
   modeles,
   userDocuments,
+  userEmail,
   isLoading,
 }: DemarchesPageClientProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -79,6 +81,7 @@ export function DemarchesPageClient({
         onClose={() => setIsDialogOpen(false)}
         modeles={modeles}
         userDocuments={userDocuments}
+        userEmail={userEmail}
         onMatchDocuments={handleMatchDocuments}
         onCreateDemarche={handleCreateDemarche}
       />
