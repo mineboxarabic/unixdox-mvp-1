@@ -29,7 +29,7 @@ export class AIService {
       try {
         console.log(`Attempting AI extraction with model: ${modelName}`);
         const model = genAI.getGenerativeModel({ model: modelName });
-        
+
         const prompt = this.getPromptForType(currentType, tagList);
         const imagePart = {
           inlineData: {
@@ -41,7 +41,7 @@ export class AIService {
         const result = await model.generateContent([prompt, imagePart]);
         const response = await result.response;
         const text = response.text();
-        
+
         console.log('AI Raw Response:', text); // Debug log
 
         return this.parseResponse(text);
@@ -57,7 +57,7 @@ export class AIService {
 
   private getPromptForType(type: DocumentType, availableTags: string[]): string {
     const documentTypes = Object.values(DocumentType).join(', ');
-    const tagsInstruction = availableTags.length > 0 
+    const tagsInstruction = availableTags.length > 0
       ? `Choose tags ONLY from this list: [${availableTags.join(', ')}]. Do not invent new tags.`
       : `Suggest relevant tags (max 5).`;
 
