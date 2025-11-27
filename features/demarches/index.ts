@@ -28,4 +28,5 @@ export {
 export { DemarcheCard } from './ui/components/DemarcheCard';
 export { DemarcheGrid } from './ui/components/DemarcheGrid';
 export { DemarchesPage } from './ui/pages/DemarchesPage';
+export { DemarcheViewPage } from './ui/pages/DemarcheViewPage';
 export { CreateDemarcheDialog } from './ui/CreateDemarcheDialog';
