@@ -9,12 +9,14 @@ Implement an AI-powered feature to automatically match a user's available docume
 > **Privacy**: Document metadata (types, tags) will be sent to the AI provider (Google Gemini). No file content is sent in this specific step, only metadata.
 
 ## Architecture & Usage Context
-This feature enables two distinct workflows for the user when starting a demarche:
+This feature implements a **Unified Smart Selection Workflow**:
 
-1.  **Manual Selection**: The user selects a procedure and sees a list of required documents. They manually browse their library and assign a document to each requirement.
-2.  **Automatic Selection (Smart Matching)**: The user selects a procedure, and the system **automatically** scans their document library. It pre-fills the requirements with the best matching documents (or valid replacements like Passport for ID). The user simply reviews and confirms.
-
-The `aiService.matchDocumentsToRequirements` function powers the **Automatic Selection** mode.
+1.  **Step 1: Exact Match**: When a user selects a procedure, the system first attempts to automatically match requirements to documents in the vault based on exact `DocumentType`.
+2.  **Step 2: AI Fallback**: For any requirements that remain **unmatched** (missing), the system calls the AI service. The AI analyzes the user's remaining documents to suggest valid replacements (e.g., "Passport" for "ID Card").
+3.  **Step 3: User Review**: The user is presented with a pre-filled form.
+    *   **Matched**: Shows the document (Exact or AI-suggested).
+    *   **Missing**: Shows as empty/upload field.
+    *   The user can manually override any selection or upload new files before confirming.
 
 ## Proposed Changes
 
@@ -22,18 +24,49 @@ The `aiService.matchDocumentsToRequirements` function powers the **Automatic Sel
 #### [MODIFY] [ai.service.ts](file:///c:/Projects/unixdox-mvp-1/features/documents/services/ai.service.ts)
 - Add `matchDocumentsToRequirements` method.
 - **Input**: `requiredTypes: string[]`, `userDocuments: SimplifiedDocument[]`.
-- **Data Privacy**: **ONLY** database metadata (type, tags, name, extracted metadata) will be sent to the AI. **NO** file content or buffers will be transmitted.
-- **Output**: JSON object with `matches`, `missing`, and `replacements`.
-- **Prompt Engineering**: Construct a prompt that explains the logic of document substitution (e.g., "Passport is a valid ID").
+- **Logic**:
+    1.  Perform exact matching on `DocumentType` first.
+    2.  Identify missing requirements.
+    3.  Call AI **only** for the missing requirements to find replacements among the remaining documents.
+- **Data Privacy**: **ONLY** database metadata (type, tags, name, extracted metadata) will be sent to the AI.
+- **Output**: JSON object with `matches` (Record<Requirement, DocID>), `missing` (string[]), and `replacements` (details on AI choices).
+
+### Database Schema Updates
+#### [MODIFY] [schema.prisma](file:///c:/Projects/unixdox-mvp-1/prisma/schema.prisma)
+- Add `documentsAssocies` field to `DemarcheUtilisateur` model.
+- **Type**: `Json`.
+- **Interface**:
+  ```typescript
+  // In features/demarches/types/schemas.ts
+  export interface DemarcheDocuments {
+    [requirementName: string]: string; // Maps Requirement Name -> Document ID
+  }
+  ```
+
+### Page Orchestration (Fixing Feature Isolation)
+#### [MODIFY] [page.tsx](file:///c:/Projects/unixdox-mvp-1/app/demarches/create/page.tsx) (or relevant page)
+- The **Page** (Server Component) orchestrates the "Fill-then-Create" strategy.
+- **Logic**:
+    1.  Fetch `ModeleDemarche` & User `Documents`.
+    2.  Call `aiService.matchDocumentsToRequirements`.
+    3.  Pass the result to the UI.
+
+### Frontend - UI Components
+#### [CREATE] `features/demarches/ui/DemarcheDocumentSelector.tsx`
+- A component to display the list of requirements.
+- **Props**: `requirements: string[]`, `initialMatches: DemarcheDocuments`, `userDocuments: Document[]`.
+- **State**: Manages the current selection of documents.
+- **Render**:
+    -   For each requirement, show a dropdown/selector.
+    -   Pre-select the value from `initialMatches`.
+    -   If missing, show "Select a document" placeholder.
+    -   Allow user to change selection.
 
 ### Backend - Demarche Actions
 #### [MODIFY] [actions.ts](file:///c:/Projects/unixdox-mvp-1/features/demarches/actions.ts)
-- Add `checkDemarcheRequirementsAction(modeleId: string)`.
-- This action will:
-    1. Fetch the `ModeleDemarche` to get `typesDocumentsRequis`.
-    2. Fetch all user documents using `documentService`.
-    3. Call `aiService.matchDocumentsToRequirements`.
-    4. Return the matching result.
+- Update `startNewDemarcheAction` to accept `documents: DemarcheDocuments`.
+- Validate that at least some documents are provided (or allow partial save based on business rule).
+- Save to `documentsAssocies`.
 
 ### Frontend - UI (Future Work - Not in this plan's scope but context)
 - The UI will call `checkDemarcheRequirementsAction` when a user selects a model.

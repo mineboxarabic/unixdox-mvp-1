@@ -16,6 +16,7 @@ export type {
   DemarcheCardProps,
   DemarcheListItem,
   DemarcheStats,
+  DemarcheDocuments,
 } from './types/schemas';
 export {
   StartDemarcheSchema,
@@ -27,3 +28,4 @@ export {
 export { DemarcheCard } from './ui/components/DemarcheCard';
 export { DemarcheGrid } from './ui/components/DemarcheGrid';
 export { DemarchesPage } from './ui/pages/DemarchesPage';
+export { CreateDemarcheDialog } from './ui/CreateDemarcheDialog';

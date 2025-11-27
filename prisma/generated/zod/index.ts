@@ -62,7 +62,7 @@ export const DossierScalarFieldEnumSchema = z.enum(['id','idProprietaire','nom',
 
 export const ModeleDemarcheScalarFieldEnumSchema = z.enum(['id','titre','description','typesDocumentsRequis','categorie','actif','ordre','createdById','createdAt','updatedAt']);
 
-export const DemarcheUtilisateurScalarFieldEnumSchema = z.enum(['id','idUtilisateur','idModele','complete','dateDebut','dateCompletion','statut','notes','createdAt','updatedAt']);
+export const DemarcheUtilisateurScalarFieldEnumSchema = z.enum(['id','idUtilisateur','idModele','complete','dateDebut','dateCompletion','statut','notes','documentsAssocies','createdAt','updatedAt']);
 
 export const NotificationScalarFieldEnumSchema = z.enum(['id','idUser','type','message','idDocumentLie','lu','dateCreation','priorite','createdAt','updatedAt']);
 
@@ -215,6 +215,7 @@ export const DemarcheUtilisateurSchema = z.object({
   dateDebut: z.coerce.date(),
   dateCompletion: z.coerce.date().nullable(),
   notes: z.string().nullable(),
+  documentsAssocies: JsonValueSchema.nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -504,6 +505,7 @@ export const DemarcheUtilisateurSelectSchema: z.ZodType<Prisma.DemarcheUtilisate
   dateCompletion: z.boolean().optional(),
   statut: z.boolean().optional(),
   notes: z.boolean().optional(),
+  documentsAssocies: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   utilisateur: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
@@ -1082,6 +1084,7 @@ export const DemarcheUtilisateurWhereInputSchema: z.ZodType<Prisma.DemarcheUtili
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   statut: z.union([ z.lazy(() => EnumDemarcheStatutFilterSchema), z.lazy(() => DemarcheStatutSchema) ]).optional(),
   notes: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  documentsAssocies: z.lazy(() => JsonNullableFilterSchema).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   utilisateur: z.union([ z.lazy(() => UserRelationFilterSchema), z.lazy(() => UserWhereInputSchema) ]).optional(),
@@ -1097,6 +1100,7 @@ export const DemarcheUtilisateurOrderByWithRelationInputSchema: z.ZodType<Prisma
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
   statut: z.lazy(() => SortOrderSchema).optional(),
   notes: z.lazy(() => SortOrderSchema).optional(),
+  documentsAssocies: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   utilisateur: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
@@ -1118,6 +1122,7 @@ export const DemarcheUtilisateurWhereUniqueInputSchema: z.ZodType<Prisma.Demarch
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   statut: z.union([ z.lazy(() => EnumDemarcheStatutFilterSchema), z.lazy(() => DemarcheStatutSchema) ]).optional(),
   notes: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  documentsAssocies: z.lazy(() => JsonNullableFilterSchema).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   utilisateur: z.union([ z.lazy(() => UserRelationFilterSchema), z.lazy(() => UserWhereInputSchema) ]).optional(),
@@ -1133,6 +1138,7 @@ export const DemarcheUtilisateurOrderByWithAggregationInputSchema: z.ZodType<Pri
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
   statut: z.lazy(() => SortOrderSchema).optional(),
   notes: z.lazy(() => SortOrderSchema).optional(),
+  documentsAssocies: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => DemarcheUtilisateurCountOrderByAggregateInputSchema).optional(),
@@ -1152,6 +1158,7 @@ export const DemarcheUtilisateurScalarWhereWithAggregatesInputSchema: z.ZodType<
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema), z.coerce.date() ]).optional().nullable(),
   statut: z.union([ z.lazy(() => EnumDemarcheStatutWithAggregatesFilterSchema), z.lazy(() => DemarcheStatutSchema) ]).optional(),
   notes: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
+  documentsAssocies: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
 });
@@ -1997,6 +2004,7 @@ export const DemarcheUtilisateurCreateInputSchema: z.ZodType<Prisma.DemarcheUtil
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   utilisateur: z.lazy(() => UserCreateNestedOneWithoutDemarchesUtilisateurInputSchema),
@@ -2012,6 +2020,7 @@ export const DemarcheUtilisateurUncheckedCreateInputSchema: z.ZodType<Prisma.Dem
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2022,6 +2031,7 @@ export const DemarcheUtilisateurUpdateInputSchema: z.ZodType<Prisma.DemarcheUtil
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   utilisateur: z.lazy(() => UserUpdateOneRequiredWithoutDemarchesUtilisateurNestedInputSchema).optional(),
@@ -2036,6 +2046,7 @@ export const DemarcheUtilisateurUncheckedUpdateInputSchema: z.ZodType<Prisma.Dem
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -2049,6 +2060,7 @@ export const DemarcheUtilisateurCreateManyInputSchema: z.ZodType<Prisma.Demarche
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2059,6 +2071,7 @@ export const DemarcheUtilisateurUpdateManyMutationInputSchema: z.ZodType<Prisma.
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -2071,6 +2084,7 @@ export const DemarcheUtilisateurUncheckedUpdateManyInputSchema: z.ZodType<Prisma
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -2983,6 +2997,7 @@ export const DemarcheUtilisateurCountOrderByAggregateInputSchema: z.ZodType<Pris
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
   statut: z.lazy(() => SortOrderSchema).optional(),
   notes: z.lazy(() => SortOrderSchema).optional(),
+  documentsAssocies: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
 });
@@ -4428,6 +4443,7 @@ export const DemarcheUtilisateurCreateWithoutUtilisateurInputSchema: z.ZodType<P
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   modele: z.lazy(() => ModeleDemarcheCreateNestedOneWithoutDemarchesUtilisateurInputSchema),
@@ -4441,6 +4457,7 @@ export const DemarcheUtilisateurUncheckedCreateWithoutUtilisateurInputSchema: z.
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -4682,6 +4699,7 @@ export const DemarcheUtilisateurScalarWhereInputSchema: z.ZodType<Prisma.Demarch
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
   statut: z.union([ z.lazy(() => EnumDemarcheStatutFilterSchema), z.lazy(() => DemarcheStatutSchema) ]).optional(),
   notes: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  documentsAssocies: z.lazy(() => JsonNullableFilterSchema).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
 });
@@ -5233,6 +5251,7 @@ export const DemarcheUtilisateurCreateWithoutModeleInputSchema: z.ZodType<Prisma
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   utilisateur: z.lazy(() => UserCreateNestedOneWithoutDemarchesUtilisateurInputSchema),
@@ -5246,6 +5265,7 @@ export const DemarcheUtilisateurUncheckedCreateWithoutModeleInputSchema: z.ZodTy
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5953,6 +5973,7 @@ export const DemarcheUtilisateurCreateManyUtilisateurInputSchema: z.ZodType<Pris
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6097,6 +6118,7 @@ export const DemarcheUtilisateurUpdateWithoutUtilisateurInputSchema: z.ZodType<P
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   modele: z.lazy(() => ModeleDemarcheUpdateOneRequiredWithoutDemarchesUtilisateurNestedInputSchema).optional(),
@@ -6109,6 +6131,7 @@ export const DemarcheUtilisateurUncheckedUpdateWithoutUtilisateurInputSchema: z.
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -6120,6 +6143,7 @@ export const DemarcheUtilisateurUncheckedUpdateManyWithoutUtilisateurInputSchema
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -6386,6 +6410,7 @@ export const DemarcheUtilisateurCreateManyModeleInputSchema: z.ZodType<Prisma.De
   dateCompletion: z.coerce.date().optional().nullable(),
   statut: z.lazy(() => DemarcheStatutSchema).optional(),
   notes: z.string().optional().nullable(),
+  documentsAssocies: InputJsonValueSchema.optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6396,6 +6421,7 @@ export const DemarcheUtilisateurUpdateWithoutModeleInputSchema: z.ZodType<Prisma
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   utilisateur: z.lazy(() => UserUpdateOneRequiredWithoutDemarchesUtilisateurNestedInputSchema).optional(),
@@ -6408,6 +6434,7 @@ export const DemarcheUtilisateurUncheckedUpdateWithoutModeleInputSchema: z.ZodTy
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });
@@ -6419,6 +6446,7 @@ export const DemarcheUtilisateurUncheckedUpdateManyWithoutModeleInputSchema: z.Z
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   statut: z.union([ z.lazy(() => DemarcheStatutSchema), z.lazy(() => EnumDemarcheStatutFieldUpdateOperationsInputSchema) ]).optional(),
   notes: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  documentsAssocies: z.union([ InputJsonValueSchema,InputJsonValueSchema ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 });

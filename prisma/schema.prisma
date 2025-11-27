@@ -189,6 +189,7 @@ model DemarcheUtilisateur {
   dateCompletion    DateTime?
   statut            DemarcheStatut     @default(EN_COURS)
   notes             String?
+  documentsAssocies Json?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   utilisateur       User               @relation(fields: [idUtilisateur], references: [id], onDelete: Cascade)

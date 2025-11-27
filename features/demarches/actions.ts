@@ -65,15 +65,20 @@ export async function startNewDemarcheAction(formData: FormData) {
 
     const rawData = {
       modeleId: formData.get('modeleId') as string,
-      notes: formData.get('notes') as string | undefined,
+      notes: formData.get('notes') || undefined, // Convert null to undefined
     };
 
     const validatedData = StartDemarcheSchema.parse(rawData);
 
+    // Parse documents from formData
+    const documentsJson = formData.get('documents') as string;
+    const documents = documentsJson ? JSON.parse(documentsJson) : undefined;
+
     const demarche = await demarcheService.startDemarche(
       session.user.id,
       validatedData.modeleId,
-      validatedData.notes
+      validatedData.notes,
+      documents
     );
 
     revalidatePath('/demarches');

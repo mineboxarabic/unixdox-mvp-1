@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/shared/config/prisma";
-import { HomePage } from "@/features/home";
+import { HomePageClient } from "./HomePageClient";
 import { getHomeData } from "@/features/home/actions";
 import { uploadDocumentFile } from "@/features/documents/actions";
 import { revalidatePath } from "next/cache";
@@ -35,12 +35,25 @@ export default async function Home() {
     redirect("/register");
   }
 
-  const homeData = await getHomeData();
+  // Fetch all data in parallel
+  const [homeData, modeles, userDocuments] = await Promise.all([
+    getHomeData(),
+    prisma.modeleDemarche.findMany({
+      where: { actif: true },
+      orderBy: { ordre: 'asc' },
+    }),
+    prisma.document.findMany({
+      where: { idProprietaire: session.user.id },
+      orderBy: { dateUpload: 'desc' },
+    }),
+  ]);
 
   return (
-    <HomePage 
+    <HomePageClient 
       data={homeData} 
       userRole={session.user.role} 
+      modeles={modeles}
+      userDocuments={userDocuments}
       uploadDocumentsAction={uploadDocumentsAction}
     />
   );

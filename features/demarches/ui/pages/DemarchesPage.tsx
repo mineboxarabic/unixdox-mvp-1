@@ -10,9 +10,10 @@ import { useState } from 'react';
 interface DemarchesPageProps {
   demarches: DemarcheListItem[];
   isLoading?: boolean;
+  onCreateDemarche?: () => void;
 }
 
-export function DemarchesPage({ demarches, isLoading }: DemarchesPageProps) {
+export function DemarchesPage({ demarches, isLoading, onCreateDemarche }: DemarchesPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter demarches based on search query
@@ -92,10 +93,7 @@ export function DemarchesPage({ demarches, isLoading }: DemarchesPageProps) {
               color="white"
               borderRadius="full"
               _hover={{ bg: 'primary.500' }}
-              onClick={() => {
-                // TODO: Open modal to select demarche model
-                console.log('Start new demarche');
-              }}
+              onClick={onCreateDemarche}
             >
               <Flex align="center" gap={2}>
                 <FiPlus />

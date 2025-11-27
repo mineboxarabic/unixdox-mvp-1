@@ -49,3 +49,7 @@ export interface DemarcheStats {
   complete: number;
   abandonnee: number;
 }
+
+export interface DemarcheDocuments {
+  [requirementName: string]: string; // Maps Requirement Name -> Document ID
+}

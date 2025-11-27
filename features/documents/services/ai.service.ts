@@ -11,8 +11,139 @@ export interface ExtractedMetadata {
   metadata?: Record<string, any>;
 }
 
+export interface SimplifiedDocument {
+  id: string;
+  type: DocumentType;
+  tags: string[];
+  nomFichier: string;
+  metadata?: any;
+}
+
+export interface MatchingResult {
+  matches: Record<string, string>; // Requirement -> Document ID
+  missing: string[]; // List of missing requirements
+  replacements: Record<string, { docId: string; reason: string }>; // Requirement -> { docId, reason }
+}
+
 export class AIService {
   private models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-flash-001', 'gemini-1.5-pro'];
+
+  async matchDocumentsToRequirements(
+    requiredTypes: string[],
+    userDocuments: SimplifiedDocument[]
+  ): Promise<MatchingResult> {
+    const matches: Record<string, string> = {};
+    const missing: string[] = [];
+    const replacements: Record<string, { docId: string; reason: string }> = {};
+
+    // 1. Exact Matching
+    for (const req of requiredTypes) {
+      // Try to find a document with the exact same type
+      // We look for a document where the type matches the requirement string
+      // Note: This assumes requiredTypes are strings that match DocumentType enum values
+      const exactMatch = userDocuments.find(doc => doc.type === req);
+      
+      if (exactMatch) {
+        matches[req] = exactMatch.id;
+      } else {
+        missing.push(req);
+      }
+    }
+
+    // 2. AI Fallback for Missing Documents
+    if (missing.length > 0 && userDocuments.length > 0) {
+      try {
+        // Filter out documents that are already used in exact matches to avoid duplicates?
+        // Or keep them available if one doc can serve multiple purposes? 
+        // Let's keep them available but prioritize unused ones in the prompt logic if needed.
+        // For now, we send all documents to give AI full context.
+
+        const prompt = this.getMatchingPrompt(missing, userDocuments);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Use fast model for matching
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        console.log('AI Matching Response:', text);
+        
+        const aiSuggestions = this.parseMatchingResponse(text);
+        
+        // Merge AI suggestions
+        for (const req of missing) {
+          if (aiSuggestions[req]) {
+            const suggestion = aiSuggestions[req];
+            // Verify the suggested doc exists
+            const docExists = userDocuments.find(d => d.id === suggestion.docId);
+            if (docExists) {
+              matches[req] = suggestion.docId;
+              replacements[req] = {
+                docId: suggestion.docId,
+                reason: suggestion.reason
+              };
+              // Remove from missing list
+              const index = missing.indexOf(req);
+              if (index > -1) {
+                missing.splice(index, 1);
+              }
+            }
+          }
+        }
+
+      } catch (error) {
+        console.error('AI Matching Error:', error);
+        // If AI fails, we just return what we have (exact matches) and leave the rest as missing
+      }
+    }
+
+    return { matches, missing, replacements };
+  }
+
+  private getMatchingPrompt(missingRequirements: string[], userDocuments: SimplifiedDocument[]): string {
+    const docsJson = JSON.stringify(userDocuments.map(d => ({
+      id: d.id,
+      type: d.type,
+      name: d.nomFichier,
+      tags: d.tags,
+      metadata: d.metadata
+    })), null, 2);
+
+    return `
+      I have a list of missing document requirements for a procedure and a list of available user documents.
+      Please analyze if any of the available documents can serve as a valid substitute or replacement for the missing requirements.
+
+      Missing Requirements: ${JSON.stringify(missingRequirements)}
+
+      Available User Documents:
+      ${docsJson}
+
+      Rules:
+      1. Look for semantic matches (e.g., "PASSEPORT" is a valid "Pièce d'identité").
+      2. Look for metadata matches (e.g., a document named "Facture EDF" is a "JUSTIFICATIF_DOMICILE").
+      3. Only suggest a match if you are confident it is a valid substitute.
+      4. Return a JSON object where keys are the missing requirements and values are objects with "docId" and "reason".
+
+      Example Output:
+      {
+        "CARTE_IDENTITE": {
+          "docId": "12345",
+          "reason": "Passport is a valid alternative for Identity Card"
+        }
+      }
+
+      Return ONLY the JSON.
+    `;
+  }
+
+  private parseMatchingResponse(text: string): Record<string, { docId: string; reason: string }> {
+    try {
+      const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(cleanText);
+    } catch (error) {
+      console.error('Failed to parse AI matching response:', text);
+      return {};
+    }
+  }
 
   async extractDocumentMetadata(
     fileBuffer: Buffer,

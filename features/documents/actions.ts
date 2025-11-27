@@ -298,3 +298,62 @@ export async function getTags(): Promise<string[]> {
   });
   return tags.map((t) => t.name);
 }
+
+/**
+ * Get all documents for the current user
+ */
+export async function getUserDocumentsAction(): Promise<ActionResult<Document[]>> {
+  const session = await requireAuth();
+  const userId = session.user?.id;
+
+  if (!userId) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  try {
+    const documents = await documentService.getUserDocuments(userId);
+    return { success: true, data: documents };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to fetch documents' };
+  }
+}
+
+/**
+ * Match user documents to required document types using exact matching + AI fallback
+ */
+export async function matchDocumentsToRequirementsAction(
+  requiredTypes: string[]
+): Promise<ActionResult<{
+  matches: Record<string, string>;
+  missing: string[];
+  replacements: Record<string, { docId: string; reason: string }>;
+}>> {
+  const session = await requireAuth();
+  const userId = session.user?.id;
+
+  if (!userId) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  try {
+    // Get user's documents
+    const userDocuments = await documentService.getUserDocuments(userId);
+    
+    // Simplify documents for AI processing
+    const simplifiedDocs = userDocuments.map(doc => ({
+      id: doc.id,
+      type: doc.type,
+      tags: doc.tags || [],
+      nomFichier: doc.nomFichier,
+      metadata: doc.metadata,
+    }));
+
+    // Run matching algorithm
+    const result = await aiService.matchDocumentsToRequirements(requiredTypes, simplifiedDocs);
+
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error('Error matching documents:', error);
+    return { success: false, error: error.message || 'Failed to match documents' };
+  }
+}

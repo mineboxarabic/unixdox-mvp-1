@@ -1,6 +1,6 @@
 import { prisma } from '@/shared/config/prisma';
 import { DemarcheStatut } from '@prisma/client';
-import type { DemarcheListItem, DemarcheStats } from '../types/schemas';
+import type { DemarcheListItem, DemarcheStats, DemarcheDocuments } from '../types/schemas';
 
 export class DemarcheService {
   /**
@@ -27,7 +27,7 @@ export class DemarcheService {
       categorie: demarche.modele.categorie,
       dateDebut: demarche.dateDebut,
       dateCompletion: demarche.dateCompletion,
-      fileCount: 0, // TODO: Count documents when document linking is implemented
+      fileCount: demarche.documentsAssocies ? Object.keys(demarche.documentsAssocies as object).length : 0,
       complete: demarche.complete,
       typesDocumentsRequis: demarche.modele.typesDocumentsRequis,
     }));
@@ -58,7 +58,12 @@ export class DemarcheService {
   /**
    * Start a new demarche from a model
    */
-  async startDemarche(userId: string, modeleId: string, notes?: string) {
+  async startDemarche(
+    userId: string, 
+    modeleId: string, 
+    notes?: string,
+    documents?: DemarcheDocuments
+  ) {
     // Check if model exists and is active
     const modele = await prisma.modeleDemarche.findUnique({
       where: { id: modeleId },
@@ -74,6 +79,7 @@ export class DemarcheService {
         idModele: modeleId,
         statut: DemarcheStatut.EN_COURS,
         notes,
+        documentsAssocies: documents as any, // Cast to any for Prisma Json type
       },
       include: {
         modele: true,
