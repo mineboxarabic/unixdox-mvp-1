@@ -39,8 +39,10 @@ export interface Demarche {
   dateCompletion: Date | null;
   statut: DemarcheStatut;
   notes: string | null;
+  documentsAssocies: any;
   createdAt: Date;
   updatedAt: Date;
+  titre?: string | null;
   modele: {
     titre: string;
   };

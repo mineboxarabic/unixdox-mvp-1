@@ -42,6 +42,7 @@ interface DemarcheViewPageProps {
     statut: DemarcheStatut;
     notes: string | null;
     complete: boolean;
+    titre?: string | null;
     documentsAssocies: Record<string, string> | null;
     modele: {
       id: string;
@@ -166,7 +167,7 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
               </Link>
               <Text>&gt;</Text>
               <Text fontWeight="medium" color="fg.default">
-                {demarche.modele.titre}
+                {demarche.titre || demarche.modele.titre}
               </Text>
             </HStack>
           </Box>
@@ -217,7 +218,7 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                 </Box>
                 <VStack align="flex-start" gap={1}>
                   <Heading size="xl" fontWeight="semibold" color="fg.default">
-                    {demarche.modele.titre}
+                    {demarche.titre || demarche.modele.titre}
                   </Heading>
                   <HStack gap={2}>
                     <Badge variant="subtle" colorScheme={statusBadge.colorScheme}>

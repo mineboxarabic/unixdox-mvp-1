@@ -184,6 +184,7 @@ model DemarcheUtilisateur {
   id                String             @id @default(auto()) @map("_id") @db.ObjectId
   idUtilisateur     String             @db.ObjectId
   idModele          String             @db.ObjectId
+  titre             String?
   complete          Boolean            @default(false)
   dateDebut         DateTime           @default(now())
   dateCompletion    DateTime?

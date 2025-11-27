@@ -72,8 +72,10 @@ export async function getHomeData(): Promise<HomeData> {
     dateCompletion: demarche.dateCompletion,
     statut: demarche.statut,
     notes: demarche.notes,
+    documentsAssocies: demarche.documentsAssocies,
     createdAt: demarche.createdAt,
     updatedAt: demarche.updatedAt,
+    titre: demarche.titre,
     modele: {
       titre: demarche.modele.titre,
     },

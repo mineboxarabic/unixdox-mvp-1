@@ -111,7 +111,7 @@ export function RecentDemarchesCard({
                                     >
                                         <Flex direction="column" gap="1" flex="1">
                                             <Text fontSize="sm" fontWeight="medium" color="text.fg">
-                                                {demarche.modele.titre}
+                                                {demarche.titre || demarche.modele.titre}
                                             </Text>
                                             <Text fontSize="xs" color="text.fg.muted">
                                                 {formatDate(demarche.dateDebut)}

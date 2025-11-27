@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: DemarcheViewRouteProps) {
   }
 
   return {
-    title: `${demarche.modele.titre} | Unidox`,
+    title: `${demarche.titre || demarche.modele.titre} | Unidox`,
     description: demarche.modele.description || 'Détails de la démarche',
   };
 }
@@ -71,6 +71,7 @@ export default async function DemarcheViewRoute({ params }: DemarcheViewRoutePro
     statut: demarche.statut,
     notes: demarche.notes,
     complete: demarche.complete,
+    titre: demarche.titre,
     documentsAssocies: demarche.documentsAssocies as Record<string, string> | null,
     modele: {
       id: demarche.modele.id,

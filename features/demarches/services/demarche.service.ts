@@ -21,7 +21,7 @@ export class DemarcheService {
 
     return demarches.map((demarche) => ({
       id: demarche.id,
-      titre: demarche.modele.titre,
+      titre: demarche.titre || demarche.modele.titre,
       description: demarche.modele.description,
       statut: demarche.statut,
       categorie: demarche.modele.categorie,
@@ -62,7 +62,8 @@ export class DemarcheService {
     userId: string, 
     modeleId: string, 
     notes?: string,
-    documents?: DemarcheDocuments
+    documents?: DemarcheDocuments,
+    titre?: string
   ) {
     // Check if model exists and is active
     const modele = await prisma.modeleDemarche.findUnique({
@@ -79,6 +80,7 @@ export class DemarcheService {
         idModele: modeleId,
         statut: DemarcheStatut.EN_COURS,
         notes,
+        titre,
         documentsAssocies: documents as any, // Cast to any for Prisma Json type
       },
       include: {
@@ -99,6 +101,7 @@ export class DemarcheService {
       statut?: DemarcheStatut;
       notes?: string;
       complete?: boolean;
+      titre?: string;
     }
   ) {
     // Verify ownership

@@ -82,6 +82,7 @@ export async function startNewDemarcheAction(formData: FormData) {
     );
 
     revalidatePath('/demarches');
+    revalidatePath('/');
     
     return { success: true, data: demarche };
   } catch (error) {
@@ -130,6 +131,36 @@ export async function updateDemarcheStatusAction(
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Erreur lors de la mise à jour de la démarche' 
+    };
+  }
+}
+
+/**
+ * Update demarche title
+ */
+export async function updateDemarcheTitleAction(demarcheId: string, titre: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: 'Non authentifié' };
+    }
+
+    const updated = await demarcheService.updateDemarche(
+      demarcheId,
+      session.user.id,
+      { titre }
+    );
+
+    revalidatePath('/demarches');
+    revalidatePath(`/demarches/${demarcheId}`);
+    revalidatePath('/');
+    
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error('Error updating demarche title:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Erreur lors de la mise à jour du titre' 
     };
   }
 }

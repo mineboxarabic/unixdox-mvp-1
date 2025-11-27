@@ -4,7 +4,6 @@ import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { Input } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
 import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus, LuShield } from "react-icons/lu";
-import { RecentProceduresCard } from "../components/RecentProceduresCard";
 import { UpcomingDeadlinesCard } from "../components/UpcomingDeadlinesCard";
 import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
 import { RecentDemarchesCard } from "../components/RecentDemarchesCard";

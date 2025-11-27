@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation';
 import type { ModeleDemarche, Document } from '@prisma/client';
 import type { DemarcheDocuments } from '../types/schemas';
 
+import { updateDemarcheTitleAction } from '../actions';
+
 // Import step components
 import { SearchStep, ReviewStep, LoadingStep, SuccessStep } from './components/dialog';
 
@@ -205,8 +207,18 @@ export function CreateDemarcheDialog({
   // Navigate to dossier
   const handleViewDossier = () => {
     if (createdDemarcheId) {
-      router.push(`/dossiers/${createdDemarcheId}`);
+      router.push(`/demarches/${createdDemarcheId}`);
       onClose();
+    }
+  };
+
+  const handleUpdateTitle = async (title: string) => {
+    if (createdDemarcheId) {
+      await updateDemarcheTitleAction(createdDemarcheId, title);
+      toaster.create({
+        title: "Titre mis à jour",
+        type: "success",
+      });
     }
   };
 
@@ -257,6 +269,7 @@ export function CreateDemarcheDialog({
             dossierId={createdDemarcheId || ''}
             onClose={onClose}
             onViewDossier={handleViewDossier}
+            onUpdateTitle={handleUpdateTitle}
           />
         )}
       </DialogContent>

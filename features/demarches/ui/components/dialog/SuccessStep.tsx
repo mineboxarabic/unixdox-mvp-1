@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Text, VStack, HStack } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, Text, VStack, HStack, Input, Icon } from '@chakra-ui/react';
 import { 
   DialogHeader, 
   DialogBody, 
@@ -8,13 +9,14 @@ import {
   DialogTitle,
 } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
-import { LuCheck, LuDownload, LuFolderOpen } from 'react-icons/lu';
+import { LuCheck, LuDownload, LuFolderOpen, LuPencil, LuCheck as LuCheckIcon } from 'react-icons/lu';
 
 interface SuccessStepProps {
   modeleTitre: string;
   dossierId: string;
   onClose: () => void;
   onViewDossier: () => void;
+  onUpdateTitle: (title: string) => Promise<void>;
 }
 
 export function SuccessStep({
@@ -22,28 +24,90 @@ export function SuccessStep({
   dossierId,
   onClose,
   onViewDossier,
+  onUpdateTitle,
 }: SuccessStepProps) {
+  const defaultTitle = `${modeleTitre} - Démarche du ${new Date().toLocaleDateString()}`;
+  const [title, setTitle] = useState(defaultTitle);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveTitle = async () => {
+    setIsSaving(true);
+    try {
+      await onUpdateTitle(title);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update title', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <>
       <DialogHeader>
         <DialogTitle>Dossier créé avec succès</DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <VStack gap={4} py={4} align="center">
+        <VStack gap={6} py={4} align="center">
           <Box
-            p={3}
+            p={4}
             borderRadius="full"
             bg="green.100"
             color="green.600"
           >
-            <LuCheck size={32} />
+            <LuCheck size={40} />
           </Box>
-          <VStack gap={1} align="center">
+          <VStack gap={2} align="center" w="full">
             <Text fontSize="lg" fontWeight="medium" color="fg.default">
               Votre dossier a été créé !
             </Text>
+            
+            {/* Editable Title Section */}
+            <Box w="full" maxW="md">
+              {isEditing ? (
+                <HStack gap={2}>
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveTitle();
+                      if (e.key === 'Escape') {
+                        setTitle(defaultTitle); // Or previous title?
+                        setIsEditing(false);
+                      }
+                    }}
+                  />
+                  <Button
+                    aria-label="Save title"
+                    size="sm"
+                    colorPalette="green"
+                    onClick={handleSaveTitle}
+                    disabled={isSaving}
+                  >
+                    <Icon as={LuCheckIcon} />
+                  </Button>
+                </HStack>
+              ) : (
+                <HStack justify="center" gap={2}>
+                  <Text fontWeight="semibold" fontSize="md">
+                    {title}
+                  </Text>
+                  <Button
+                    aria-label="Edit title"
+                    size="xs"
+                    variant="ghost"
+                    color="fg.muted"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Icon as={LuPencil} />
+                  </Button>
+                </HStack>
+              )}
+            </Box>
+
             <Text fontSize="sm" color="fg.muted" textAlign="center">
-              Le dossier pour "{modeleTitre}" est prêt.
               Vous pouvez maintenant télécharger vos documents ou accéder au dossier.
             </Text>
           </VStack>
@@ -63,7 +127,7 @@ export function SuccessStep({
               window.open(`/api/dossiers/${dossierId}/download`, '_blank');
             }}
           >
-            Télécharger les documents
+            Télécharger
           </Button>
           <Button
             colorPalette="blue"
@@ -77,3 +141,4 @@ export function SuccessStep({
     </>
   );
 }
+

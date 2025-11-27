@@ -62,7 +62,7 @@ export const DossierScalarFieldEnumSchema = z.enum(['id','idProprietaire','nom',
 
 export const ModeleDemarcheScalarFieldEnumSchema = z.enum(['id','titre','description','typesDocumentsRequis','categorie','actif','ordre','createdById','createdAt','updatedAt']);
 
-export const DemarcheUtilisateurScalarFieldEnumSchema = z.enum(['id','idUtilisateur','idModele','complete','dateDebut','dateCompletion','statut','notes','documentsAssocies','createdAt','updatedAt']);
+export const DemarcheUtilisateurScalarFieldEnumSchema = z.enum(['id','idUtilisateur','idModele','titre','complete','dateDebut','dateCompletion','statut','notes','documentsAssocies','createdAt','updatedAt']);
 
 export const NotificationScalarFieldEnumSchema = z.enum(['id','idUser','type','message','idDocumentLie','lu','dateCreation','priorite','createdAt','updatedAt']);
 
@@ -211,6 +211,7 @@ export const DemarcheUtilisateurSchema = z.object({
   id: z.string(),
   idUtilisateur: z.string(),
   idModele: z.string(),
+  titre: z.string().nullable(),
   complete: z.boolean(),
   dateDebut: z.coerce.date(),
   dateCompletion: z.coerce.date().nullable(),
@@ -500,6 +501,7 @@ export const DemarcheUtilisateurSelectSchema: z.ZodType<Prisma.DemarcheUtilisate
   id: z.boolean().optional(),
   idUtilisateur: z.boolean().optional(),
   idModele: z.boolean().optional(),
+  titre: z.boolean().optional(),
   complete: z.boolean().optional(),
   dateDebut: z.boolean().optional(),
   dateCompletion: z.boolean().optional(),
@@ -1079,6 +1081,7 @@ export const DemarcheUtilisateurWhereInputSchema: z.ZodType<Prisma.DemarcheUtili
   id: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   idUtilisateur: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   idModele: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
+  titre: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   complete: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
   dateDebut: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
@@ -1095,6 +1098,7 @@ export const DemarcheUtilisateurOrderByWithRelationInputSchema: z.ZodType<Prisma
   id: z.lazy(() => SortOrderSchema).optional(),
   idUtilisateur: z.lazy(() => SortOrderSchema).optional(),
   idModele: z.lazy(() => SortOrderSchema).optional(),
+  titre: z.lazy(() => SortOrderSchema).optional(),
   complete: z.lazy(() => SortOrderSchema).optional(),
   dateDebut: z.lazy(() => SortOrderSchema).optional(),
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
@@ -1117,6 +1121,7 @@ export const DemarcheUtilisateurWhereUniqueInputSchema: z.ZodType<Prisma.Demarch
   NOT: z.union([ z.lazy(() => DemarcheUtilisateurWhereInputSchema), z.lazy(() => DemarcheUtilisateurWhereInputSchema).array() ]).optional(),
   idUtilisateur: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   idModele: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
+  titre: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   complete: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
   dateDebut: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
@@ -1133,6 +1138,7 @@ export const DemarcheUtilisateurOrderByWithAggregationInputSchema: z.ZodType<Pri
   id: z.lazy(() => SortOrderSchema).optional(),
   idUtilisateur: z.lazy(() => SortOrderSchema).optional(),
   idModele: z.lazy(() => SortOrderSchema).optional(),
+  titre: z.lazy(() => SortOrderSchema).optional(),
   complete: z.lazy(() => SortOrderSchema).optional(),
   dateDebut: z.lazy(() => SortOrderSchema).optional(),
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
@@ -1153,6 +1159,7 @@ export const DemarcheUtilisateurScalarWhereWithAggregatesInputSchema: z.ZodType<
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema), z.string() ]).optional(),
   idUtilisateur: z.union([ z.lazy(() => StringWithAggregatesFilterSchema), z.string() ]).optional(),
   idModele: z.union([ z.lazy(() => StringWithAggregatesFilterSchema), z.string() ]).optional(),
+  titre: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
   complete: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema), z.boolean() ]).optional(),
   dateDebut: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema), z.coerce.date() ]).optional(),
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema), z.coerce.date() ]).optional().nullable(),
@@ -1999,6 +2006,7 @@ export const ModeleDemarcheUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Mode
 
 export const DemarcheUtilisateurCreateInputSchema: z.ZodType<Prisma.DemarcheUtilisateurCreateInput> = z.strictObject({
   id: z.string().optional(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -2015,6 +2023,7 @@ export const DemarcheUtilisateurUncheckedCreateInputSchema: z.ZodType<Prisma.Dem
   id: z.string().optional(),
   idUtilisateur: z.string(),
   idModele: z.string(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -2026,6 +2035,7 @@ export const DemarcheUtilisateurUncheckedCreateInputSchema: z.ZodType<Prisma.Dem
 });
 
 export const DemarcheUtilisateurUpdateInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUpdateInput> = z.strictObject({
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2041,6 +2051,7 @@ export const DemarcheUtilisateurUpdateInputSchema: z.ZodType<Prisma.DemarcheUtil
 export const DemarcheUtilisateurUncheckedUpdateInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedUpdateInput> = z.strictObject({
   idUtilisateur: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   idModele: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2055,6 +2066,7 @@ export const DemarcheUtilisateurCreateManyInputSchema: z.ZodType<Prisma.Demarche
   id: z.string().optional(),
   idUtilisateur: z.string(),
   idModele: z.string(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -2066,6 +2078,7 @@ export const DemarcheUtilisateurCreateManyInputSchema: z.ZodType<Prisma.Demarche
 });
 
 export const DemarcheUtilisateurUpdateManyMutationInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUpdateManyMutationInput> = z.strictObject({
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2079,6 +2092,7 @@ export const DemarcheUtilisateurUpdateManyMutationInputSchema: z.ZodType<Prisma.
 export const DemarcheUtilisateurUncheckedUpdateManyInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedUpdateManyInput> = z.strictObject({
   idUtilisateur: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   idModele: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2992,6 +3006,7 @@ export const DemarcheUtilisateurCountOrderByAggregateInputSchema: z.ZodType<Pris
   id: z.lazy(() => SortOrderSchema).optional(),
   idUtilisateur: z.lazy(() => SortOrderSchema).optional(),
   idModele: z.lazy(() => SortOrderSchema).optional(),
+  titre: z.lazy(() => SortOrderSchema).optional(),
   complete: z.lazy(() => SortOrderSchema).optional(),
   dateDebut: z.lazy(() => SortOrderSchema).optional(),
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
@@ -3006,6 +3021,7 @@ export const DemarcheUtilisateurMaxOrderByAggregateInputSchema: z.ZodType<Prisma
   id: z.lazy(() => SortOrderSchema).optional(),
   idUtilisateur: z.lazy(() => SortOrderSchema).optional(),
   idModele: z.lazy(() => SortOrderSchema).optional(),
+  titre: z.lazy(() => SortOrderSchema).optional(),
   complete: z.lazy(() => SortOrderSchema).optional(),
   dateDebut: z.lazy(() => SortOrderSchema).optional(),
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
@@ -3019,6 +3035,7 @@ export const DemarcheUtilisateurMinOrderByAggregateInputSchema: z.ZodType<Prisma
   id: z.lazy(() => SortOrderSchema).optional(),
   idUtilisateur: z.lazy(() => SortOrderSchema).optional(),
   idModele: z.lazy(() => SortOrderSchema).optional(),
+  titre: z.lazy(() => SortOrderSchema).optional(),
   complete: z.lazy(() => SortOrderSchema).optional(),
   dateDebut: z.lazy(() => SortOrderSchema).optional(),
   dateCompletion: z.lazy(() => SortOrderSchema).optional(),
@@ -4438,6 +4455,7 @@ export const DossierCreateManyProprietaireInputEnvelopeSchema: z.ZodType<Prisma.
 
 export const DemarcheUtilisateurCreateWithoutUtilisateurInputSchema: z.ZodType<Prisma.DemarcheUtilisateurCreateWithoutUtilisateurInput> = z.strictObject({
   id: z.string().optional(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -4452,6 +4470,7 @@ export const DemarcheUtilisateurCreateWithoutUtilisateurInputSchema: z.ZodType<P
 export const DemarcheUtilisateurUncheckedCreateWithoutUtilisateurInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedCreateWithoutUtilisateurInput> = z.strictObject({
   id: z.string().optional(),
   idModele: z.string(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -4694,6 +4713,7 @@ export const DemarcheUtilisateurScalarWhereInputSchema: z.ZodType<Prisma.Demarch
   id: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   idUtilisateur: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
   idModele: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
+  titre: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   complete: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
   dateDebut: z.union([ z.lazy(() => DateTimeFilterSchema), z.coerce.date() ]).optional(),
   dateCompletion: z.union([ z.lazy(() => DateTimeNullableFilterSchema), z.coerce.date() ]).optional().nullable(),
@@ -5246,6 +5266,7 @@ export const UserCreateOrConnectWithoutCreatedDemarchesInputSchema: z.ZodType<Pr
 
 export const DemarcheUtilisateurCreateWithoutModeleInputSchema: z.ZodType<Prisma.DemarcheUtilisateurCreateWithoutModeleInput> = z.strictObject({
   id: z.string().optional(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -5260,6 +5281,7 @@ export const DemarcheUtilisateurCreateWithoutModeleInputSchema: z.ZodType<Prisma
 export const DemarcheUtilisateurUncheckedCreateWithoutModeleInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedCreateWithoutModeleInput> = z.strictObject({
   id: z.string().optional(),
   idUtilisateur: z.string(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -5968,6 +5990,7 @@ export const DossierCreateManyProprietaireInputSchema: z.ZodType<Prisma.DossierC
 export const DemarcheUtilisateurCreateManyUtilisateurInputSchema: z.ZodType<Prisma.DemarcheUtilisateurCreateManyUtilisateurInput> = z.strictObject({
   id: z.string().optional(),
   idModele: z.string(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -6113,6 +6136,7 @@ export const DossierUncheckedUpdateManyWithoutProprietaireInputSchema: z.ZodType
 });
 
 export const DemarcheUtilisateurUpdateWithoutUtilisateurInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUpdateWithoutUtilisateurInput> = z.strictObject({
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -6126,6 +6150,7 @@ export const DemarcheUtilisateurUpdateWithoutUtilisateurInputSchema: z.ZodType<P
 
 export const DemarcheUtilisateurUncheckedUpdateWithoutUtilisateurInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedUpdateWithoutUtilisateurInput> = z.strictObject({
   idModele: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -6138,6 +6163,7 @@ export const DemarcheUtilisateurUncheckedUpdateWithoutUtilisateurInputSchema: z.
 
 export const DemarcheUtilisateurUncheckedUpdateManyWithoutUtilisateurInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedUpdateManyWithoutUtilisateurInput> = z.strictObject({
   idModele: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -6405,6 +6431,7 @@ export const DocumentUncheckedUpdateManyWithoutDossiersInputSchema: z.ZodType<Pr
 export const DemarcheUtilisateurCreateManyModeleInputSchema: z.ZodType<Prisma.DemarcheUtilisateurCreateManyModeleInput> = z.strictObject({
   id: z.string().optional(),
   idUtilisateur: z.string(),
+  titre: z.string().optional().nullable(),
   complete: z.boolean().optional(),
   dateDebut: z.coerce.date().optional(),
   dateCompletion: z.coerce.date().optional().nullable(),
@@ -6416,6 +6443,7 @@ export const DemarcheUtilisateurCreateManyModeleInputSchema: z.ZodType<Prisma.De
 });
 
 export const DemarcheUtilisateurUpdateWithoutModeleInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUpdateWithoutModeleInput> = z.strictObject({
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -6429,6 +6457,7 @@ export const DemarcheUtilisateurUpdateWithoutModeleInputSchema: z.ZodType<Prisma
 
 export const DemarcheUtilisateurUncheckedUpdateWithoutModeleInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedUpdateWithoutModeleInput> = z.strictObject({
   idUtilisateur: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -6441,6 +6470,7 @@ export const DemarcheUtilisateurUncheckedUpdateWithoutModeleInputSchema: z.ZodTy
 
 export const DemarcheUtilisateurUncheckedUpdateManyWithoutModeleInputSchema: z.ZodType<Prisma.DemarcheUtilisateurUncheckedUpdateManyWithoutModeleInput> = z.strictObject({
   idUtilisateur: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  titre: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   complete: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   dateDebut: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   dateCompletion: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
