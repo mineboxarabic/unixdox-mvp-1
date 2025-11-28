@@ -27,6 +27,7 @@ export interface HomePageProps {
   onUpgradeToPremium?: () => void;
   onFileUpload?: (files: File[]) => void;
   uploadDocumentsAction?: (formData: FormData) => Promise<void>;
+  onRenewDocument?: (documentId?: string) => void;
 }
 
 export function HomePage({
@@ -40,6 +41,7 @@ export function HomePage({
   onUpgradeToPremium,
   onFileUpload,
   uploadDocumentsAction,
+  onRenewDocument,
 }: HomePageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -252,6 +254,7 @@ export function HomePage({
             isPremiumUser={data.isPremiumUser}
             onViewAll={onViewAllDeadlines}
             onUpgrade={onUpgradeToPremium}
+            onRenew={onRenewDocument}
           />
 
           <Box gridColumn={{ lg: "span 2" }}>

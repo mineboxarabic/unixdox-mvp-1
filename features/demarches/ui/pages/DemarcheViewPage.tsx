@@ -39,6 +39,7 @@ import { deleteDemarcheAction, updateDemarcheAction, linkDocumentAction } from '
 import { EditDemarcheDialog } from '../EditDemarcheDialog';
 import { LinkDocumentDialog } from '../LinkDocumentDialog';
 import { toaster } from '@/shared/components/ui/toaster';
+import { DocumentDetailsDialog } from '../../../documents/ui/components/DocumentDetailsDialog';
 
 interface DemarcheViewPageProps {
   demarche: {
@@ -73,6 +74,8 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
   const [isEditing, setIsEditing] = useState(false);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedRequirement, setSelectedRequirement] = useState<string>('');
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const router = useRouter();
 
   // Get the documents associated with this demarche
@@ -220,6 +223,11 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
   const openLinkDialog = (requirement: string) => {
     setSelectedRequirement(requirement);
     setIsLinkDialogOpen(true);
+  };
+
+  const handleOpenDocumentDetails = (doc: Document) => {
+    setSelectedDocument(doc);
+    setIsDetailsDialogOpen(true);
   };
 
   // Filter required documents based on search
@@ -502,6 +510,8 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                     borderRadius="xl"
                     p={4}
                     transition="all 0.2s"
+                    cursor={associatedDoc ? 'pointer' : 'default'}
+                    onClick={() => associatedDoc && handleOpenDocumentDetails(associatedDoc)}
                     _hover={{
                       boxShadow: 'md',
                       borderColor: isTypeMismatch ? 'orange.400' : (isComplete ? 'green.300' : 'primary.200'),
@@ -558,7 +568,10 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                             variant="ghost"
                             size="sm"
                             color="fg.muted"
-                            onClick={() => openLinkDialog(requirement)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openLinkDialog(requirement);
+                            }}
                             title="Remplacer le document"
                           >
                             <FiRefreshCw />
@@ -572,7 +585,10 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                           variant="ghost"
                           size="sm"
                           color="primary.600"
-                          onClick={() => openLinkDialog(requirement)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openLinkDialog(requirement);
+                          }}
                         >
                           <FiPlus />
                         </IconButton>
@@ -616,6 +632,38 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
         userDocuments={userDocuments}
         onLink={handleLinkDocument}
       />
+
+      {selectedDocument && (
+        <DocumentDetailsDialog
+          isOpen={isDetailsDialogOpen}
+          onClose={() => setIsDetailsDialogOpen(false)}
+          document={{
+            id: selectedDocument.id,
+            name: selectedDocument.nomFichier,
+            type: selectedDocument.type,
+            url: selectedDocument.urlStockage || undefined,
+            size: selectedDocument.size,
+            status: selectedDocument.statut,
+            tags: selectedDocument.tags,
+            expirationDate: selectedDocument.dateExpiration,
+            nomFichier: selectedDocument.nomFichier
+          }}
+          onEdit={() => {
+            toaster.create({
+              title: "Non implémenté",
+              description: "La modification depuis cette vue n'est pas encore disponible",
+              type: "info",
+            });
+          }}
+          onDelete={() => {
+            toaster.create({
+              title: "Non implémenté",
+              description: "La suppression depuis cette vue n'est pas encore disponible",
+              type: "info",
+            });
+          }}
+        />
+      )}
     </Box>
   );
 }

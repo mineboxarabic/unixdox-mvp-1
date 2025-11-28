@@ -82,17 +82,7 @@ export function DocumentsList({ documents }: DocumentsListProps) {
                                 overflow="hidden"
                                 borderTopRadius="xl"
                             >
-                                {thumbnailUrl ? (
-                                    <img
-                                        src={thumbnailUrl}
-                                        alt={doc.nomFichier}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover',
-                                        }}
-                                    />
-                                ) : previewUrl ? (
+                                {previewUrl ? (
                                     <iframe
                                         src={previewUrl}
                                         title={doc.nomFichier}
@@ -101,6 +91,16 @@ export function DocumentsList({ documents }: DocumentsListProps) {
                                             height: '100%',
                                             border: 'none',
                                             pointerEvents: 'none'
+                                        }}
+                                    />
+                                ) : thumbnailUrl ? (
+                                    <img
+                                        src={thumbnailUrl}
+                                        alt={doc.nomFichier}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
                                         }}
                                     />
                                 ) : (

@@ -12,7 +12,9 @@ export interface Deadline {
   id: string;
   title: string;
   date: Date;
-  status: "À venir" | "Urgent";
+  status: "À venir" | "Urgent" | "Expiré";
+  documentId?: string;
+  documentName?: string;
 }
 
 export interface Document {
@@ -42,7 +44,7 @@ export interface Demarche {
   documentsAssocies: any;
   createdAt: Date;
   updatedAt: Date;
-  titre?: string | null;
+  titre: string | null;
   modele: {
     titre: string;
   };

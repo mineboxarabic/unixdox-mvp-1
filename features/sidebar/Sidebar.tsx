@@ -8,6 +8,7 @@ import {
   LuShield,
   LuPlus
 } from 'react-icons/lu';
+import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import {
   Logo,
@@ -28,6 +29,7 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathname = usePathname();
 
   const defaultUser: UserAccountType = {
     name: user?.name || 'Segun Adebayo',
@@ -38,6 +40,12 @@ export function Sidebar({ user }: SidebarProps) {
 
   const handleLogout = async () => {
     await signOut();
+  };
+
+  const isItemActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href === '#') return false;
+    return pathname?.startsWith(href);
   };
 
   return (
@@ -96,7 +104,14 @@ export function Sidebar({ user }: SidebarProps) {
         {/* Main Navigation */}
         <Flex direction="column" gap={1} flex="1" overflow="auto">
           {mainNavItems.map((item) => (
-            <NavButton key={item.label} item={item} isCollapsed={isCollapsed} />
+            <NavButton 
+              key={item.label} 
+              item={{
+                ...item,
+                isActive: isItemActive(item.href)
+              }} 
+              isCollapsed={isCollapsed} 
+            />
           ))}
 
           {/* Admin Section */}
@@ -112,7 +127,7 @@ export function Sidebar({ user }: SidebarProps) {
                     label: 'All Models',
                     icon: LuShield,
                     href: '/admin/modele-demarche',
-                    isActive: false,
+                    isActive: pathname?.startsWith('/admin/modele-demarche') && pathname !== '/admin/modele-demarche/create',
                   }}
                   isCollapsed={isCollapsed}
                 />
@@ -121,7 +136,7 @@ export function Sidebar({ user }: SidebarProps) {
                     label: 'Create Model',
                     icon: LuPlus,
                     href: '/admin/modele-demarche/create',
-                    isActive: false,
+                    isActive: pathname === '/admin/modele-demarche/create',
                   }}
                   isCollapsed={isCollapsed}
                 />
@@ -147,7 +162,13 @@ export function Sidebar({ user }: SidebarProps) {
                 key={item.label}
                 onClick={item.label === 'Déconnexion' ? handleLogout : undefined}
               >
-                <NavButton item={item} isCollapsed={isCollapsed} />
+                <NavButton 
+                  item={{
+                    ...item,
+                    isActive: isItemActive(item.href)
+                  }} 
+                  isCollapsed={isCollapsed} 
+                />
               </Box>
             ))}
           </Flex>

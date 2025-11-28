@@ -32,8 +32,6 @@ export const mainNavItems: NavItem[] = [
     label: 'Echéances',
     icon: LuClock,
     href: '/echeances',
-    isPremium: true,
-    isDisabled: true,
     badge: 2,
   },
 ];

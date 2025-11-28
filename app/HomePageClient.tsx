@@ -81,6 +81,7 @@ export function HomePageClient({
         onViewAllProcedures={() => router.push('/demarches')}
         onViewAllDeadlines={() => router.push('/settings')}
         onViewAllDocuments={() => router.push('/documents')}
+        onRenewDocument={() => setIsDialogOpen(true)}
       />
       
       <CreateDemarcheDialog

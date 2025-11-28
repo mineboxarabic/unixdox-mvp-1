@@ -15,11 +15,14 @@ import { LuClock, LuCrown, LuArrowUpRight } from "react-icons/lu";
 import type { Deadline } from "../../types";
 import { formatDate } from "@/shared/utils/date";
 
+import { useRouter } from "next/navigation";
+
 export interface UpcomingDeadlinesCardProps {
   deadlines: Deadline[];
   isPremiumUser: boolean;
   onViewAll?: () => void;
   onUpgrade?: () => void;
+  onRenew?: (documentId?: string) => void;
 }
 
 export function UpcomingDeadlinesCard({
@@ -27,35 +30,22 @@ export function UpcomingDeadlinesCard({
   isPremiumUser,
   onViewAll,
   onUpgrade,
+  onRenew,
 }: UpcomingDeadlinesCardProps) {
-  const getStatusBadgeProps = (status: Deadline["status"]) => {
-    switch (status) {
-      case "À venir":
-        return { colorScheme: "primary" as const, label: "À venir" };
-      case "Urgent":
-        return { colorScheme: "danger" as const, label: "Urgent" };
-    }
+  const router = useRouter();
+  
+  const getTimeLeft = (date: Date) => {
+    const now = new Date();
+    const target = new Date(date);
+    const diffTime = target.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return `Expiré`;
+    if (diffDays === 0) return "Aujourd'hui";
+    if (diffDays < 30) return `${diffDays} jours`;
+    const diffMonths = Math.round(diffDays / 30);
+    return `${diffMonths} mois`;
   };
-
-  const renderPremiumUpgrade = () => (
-    <EmptyState
-      icon={<LuCrown />}
-      title=""
-      description="Les échéances à venir sont une fonctionnalité premium"
-      action={
-        <Button
-          size="md"
-          bg="primary.50"
-          color="primary.600"
-          _hover={{ bg: "primary.100" }}
-          onClick={onUpgrade}
-          rightIcon={<LuArrowUpRight />}
-        >
-          Passer à Unidox premium
-        </Button>
-      }
-    />
-  );
 
   const renderEmptyState = () => (
     <EmptyState
@@ -68,39 +58,39 @@ export function UpcomingDeadlinesCard({
   const renderDeadlinesList = () => (
     <Flex direction="column" gap="0">
       {deadlines.map((deadline, index) => {
-        const statusProps = getStatusBadgeProps(deadline.status);
-        const formattedDate = formatDate(deadline.date, { day: "2-digit", month: "short" });
+        const timeLeft = getTimeLeft(deadline.date);
+        const isUrgent = deadline.status === "Urgent";
+        const isExpired = deadline.status === "Expiré";
+        
+        let badgeColorScheme: "warning" | "danger" | "primary" = "primary";
+        if (isExpired) badgeColorScheme = "danger";
+        else if (isUrgent) badgeColorScheme = "warning";
+
         return (
           <Box key={deadline.id}>
-            <Flex py="3" alignItems="center" gap="4">
-              <Flex
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                minW="50px"
-                h="50px"
-                bg="primary.50"
-                borderRadius="md"
-              >
-                <Text fontSize="lg" fontWeight="bold" color="primary.600">
-                  {formattedDate.split(" ")[0]}
-                </Text>
-                <Text fontSize="xs" color="primary.600" textTransform="uppercase">
-                  {formattedDate.split(" ")[1]}
-                </Text>
-              </Flex>
-              <Flex direction="column" gap="1" flex="1">
-                <Text fontSize="sm" fontWeight="medium" color="text.fg">
+            <Flex py="4" alignItems="center" gap="4" justifyContent="space-between">
+              <Flex alignItems="center" gap="4" flex="1">
+                <Badge
+                  colorScheme={badgeColorScheme}
+                  variant="subtle"
+                  size="sm"
+                >
+                  <span suppressHydrationWarning>{timeLeft}</span>
+                </Badge>
+                <Text fontSize="md" color="text.fg">
                   {deadline.title}
                 </Text>
               </Flex>
-              <Badge
-                colorScheme={statusProps.colorScheme}
-                variant="subtle"
+              
+              <Button 
+                variant="plain" 
+                colorPalette="blue"
                 size="sm"
+                textDecoration="underline"
+                onClick={() => onRenew ? onRenew(deadline.documentId) : router.push(`/documents?id=${deadline.documentId}`)}
               >
-                {statusProps.label}
-              </Badge>
+                Renouveler
+              </Button>
             </Flex>
             {index < deadlines.length - 1 && <Separator />}
           </Box>
@@ -117,24 +107,14 @@ export function UpcomingDeadlinesCard({
           <Text fontSize="lg" fontWeight="semibold" color="text.fg">
             Échéances à venir
           </Text>
-          {isPremiumUser && (
-            <Badge colorScheme="accent" variant="subtle" size="sm">
-              <Flex alignItems="center" gap="1">
-                <LuCrown size={12} />
-                Premium
-              </Flex>
-            </Badge>
-          )}
         </Flex>
       </CardHeader>
       <CardBody>
-        {!isPremiumUser
-          ? renderPremiumUpgrade()
-          : deadlines.length === 0
+        {deadlines.length === 0
             ? renderEmptyState()
             : renderDeadlinesList()}
       </CardBody>
-      {isPremiumUser && deadlines.length > 0 && (
+      {deadlines.length > 0 && (
         <CardFooter>
           <Button variant="ghost" size="sm" onClick={onViewAll}>
             Voir tout
