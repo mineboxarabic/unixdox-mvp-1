@@ -8,6 +8,7 @@ import {
   LuShield,
   LuPlus
 } from 'react-icons/lu';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import {
@@ -93,7 +94,9 @@ export function Sidebar({ user }: SidebarProps) {
       >
         {/* Logo */}
         <Box px={1} pt={1}>
-          <Logo isCollapsed={isCollapsed} />
+          <Link href="/">
+            <Logo isCollapsed={isCollapsed} />
+          </Link>
         </Box>
 
         {/* User Account */}
@@ -104,13 +107,13 @@ export function Sidebar({ user }: SidebarProps) {
         {/* Main Navigation */}
         <Flex direction="column" gap={1} flex="1" overflow="auto">
           {mainNavItems.map((item) => (
-            <NavButton 
-              key={item.label} 
+            <NavButton
+              key={item.label}
               item={{
                 ...item,
                 isActive: isItemActive(item.href)
-              }} 
-              isCollapsed={isCollapsed} 
+              }}
+              isCollapsed={isCollapsed}
             />
           ))}
 
@@ -162,12 +165,12 @@ export function Sidebar({ user }: SidebarProps) {
                 key={item.label}
                 onClick={item.label === 'Déconnexion' ? handleLogout : undefined}
               >
-                <NavButton 
+                <NavButton
                   item={{
                     ...item,
                     isActive: isItemActive(item.href)
-                  }} 
-                  isCollapsed={isCollapsed} 
+                  }}
+                  isCollapsed={isCollapsed}
                 />
               </Box>
             ))}
