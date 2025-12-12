@@ -30,11 +30,11 @@ export function Avatar({ name, src, size = 'md', ...props }: AvatarProps) {
       <ChakraAvatar.Fallback>
         {name
           ? name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')
-              .toUpperCase()
-              .slice(0, 2)
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
           : '?'}
       </ChakraAvatar.Fallback>
     </ChakraAvatar.Root>
