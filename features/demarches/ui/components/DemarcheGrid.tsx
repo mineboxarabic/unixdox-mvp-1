@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import { DemarcheCard } from './DemarcheCard';
 import type { DemarcheListItem } from '../../types/schemas';
 
@@ -20,12 +21,22 @@ export function DemarcheGrid({ demarches, isLoading }: DemarcheGridProps) {
         {[...Array(10)].map((_, i) => (
           <Box
             key={i}
-            width="181px"
+            width="100%"
             height="160px"
-            bg="neutral.100"
+            bg="white"
             borderRadius="lg"
-            animation="pulse"
-          />
+            borderWidth="1px"
+            borderColor="border.muted"
+            p={4}
+          >
+            <VStack align="start" gap={3} height="full">
+              <Skeleton height="20px" width="70%" />
+              <Skeleton height="16px" width="40%" />
+              <Box mt="auto" width="full">
+                <Skeleton height="24px" width="100%" borderRadius="full" />
+              </Box>
+            </VStack>
+          </Box>
         ))}
       </SimpleGrid>
     );
