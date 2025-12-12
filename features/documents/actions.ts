@@ -185,17 +185,19 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
         });
 
         console.log('File successfully renamed to:', newFileName);
-      } catch (renameError: any) {
-        console.error('File rename failed (non-critical):', renameError);
+      } catch (renameError: unknown) {
+        const errorMessage = renameError instanceof Error ? renameError.message : 'Unknown error';
+        console.error('File rename failed (non-critical):', errorMessage);
         // Continue - renaming is nice to have but not critical
       }
-    } catch (aiError: any) {
-      console.error('AI Extraction failed:', aiError);
+    } catch (aiError: unknown) {
+      const errorMessage = aiError instanceof Error ? aiError.message : 'Unknown error';
+      console.error('AI Extraction failed:', errorMessage);
       doc = await prisma.document.update({
         where: { id: doc.id },
         data: {
           extractionStatus: ExtractionStatus.FAILED,
-          extractionError: aiError.message || 'Unknown error',
+          extractionError: errorMessage,
         },
         include: { proprietaire: { select: { id: true, name: true, email: true } } },
       });

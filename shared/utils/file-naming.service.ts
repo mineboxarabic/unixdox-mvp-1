@@ -13,6 +13,10 @@ export interface FileNamingMetadata {
 }
 
 export class FileNamingService {
+  // Constants for configuration
+  private readonly MAX_FILENAME_LENGTH = 200;
+  private readonly MEANINGFUL_METADATA_KEYS = ['name', 'title', 'subject', 'numero', 'reference'];
+
   /**
    * Generates a semantic file name based on document type and extracted metadata
    * Format: [DocumentType]_[RelevantInfo]_[Timestamp].[extension]
@@ -159,8 +163,7 @@ export class FileNamingService {
     }
     
     // Or use first meaningful metadata value
-    const meaningfulKeys = ['name', 'title', 'subject', 'numero', 'reference'];
-    for (const key of meaningfulKeys) {
+    for (const key of this.MEANINGFUL_METADATA_KEYS) {
       if (metadata[key]) {
         return String(metadata[key]);
       }
@@ -239,9 +242,9 @@ export class FileNamingService {
       .replace(/_+/g, '_')
       .replace(/^_|_$/g, '');
     
-    // Limit length (max 200 chars for the base name)
-    if (sanitized.length > 200) {
-      sanitized = sanitized.substring(0, 200);
+    // Limit length to MAX_FILENAME_LENGTH
+    if (sanitized.length > this.MAX_FILENAME_LENGTH) {
+      sanitized = sanitized.substring(0, this.MAX_FILENAME_LENGTH);
     }
     
     return sanitized || 'document';
