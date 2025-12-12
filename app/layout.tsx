@@ -5,6 +5,7 @@ import { Provider } from "@/shared/components/ui/provider";
 import { auth } from '@/auth';
 import { LayoutWrapper } from '@/shared/components/LayoutWrapper';
 import { Sidebar } from "@/features/sidebar";
+import { SessionProvider } from "next-auth/react";
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -26,11 +27,13 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`} style={{ fontFamily: 'var(--font-inter)' }}>
-        <Provider>
-          <LayoutWrapper SideBar={Sidebar} authenticated={!!session?.user} user={session?.user}>
-            {children}
-          </LayoutWrapper>
-        </Provider>
+        <SessionProvider session={session}>
+          <Provider>
+            <LayoutWrapper SideBar={Sidebar} authenticated={!!session?.user} user={session?.user}>
+              {children}
+            </LayoutWrapper>
+          </Provider>
+        </SessionProvider>
       </body>
     </html>
   );

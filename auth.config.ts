@@ -23,9 +23,12 @@ export const authConfig = {
     signIn: '/login',
   },
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
-        token.role = user.role;
+        token.role = user.role as 'USER' | 'ADMIN' | 'MANAGER';
+        // Explicitly clear picture to prevent huge base64 from DB entering the token
+        // We use /api/user/avatar instead
+        token.picture = null;
       }
       return token;
     },
@@ -51,7 +54,7 @@ export const authConfig = {
         }
         return true;
       }
-      
+
       if (isLoginPage) {
         if (isLoggedIn) return Response.redirect(new URL('/', nextUrl));
         return true;

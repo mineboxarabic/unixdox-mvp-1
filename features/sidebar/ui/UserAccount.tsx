@@ -24,7 +24,7 @@ export function UserAccount({ user, isCollapsed = false, onClick }: UserAccountP
       >
         <Avatar
           name={user.name}
-          src={user.avatarUrl}
+          src={user.avatarUrl || `/api/user/avatar`}
           size="sm"
         />
       </Box>
@@ -47,7 +47,7 @@ export function UserAccount({ user, isCollapsed = false, onClick }: UserAccountP
     >
       <Avatar
         name={user.name}
-        src={user.avatarUrl}
+        src={user.avatarUrl || `/api/user/avatar`}
         size="sm"
       />
       <Box flex="1" minW={0}>
