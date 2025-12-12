@@ -29,28 +29,31 @@ export class FileNamingService {
 
   /**
    * Document-specific naming rules
+   * General rule: DOCUMENTTYPE_NAME_DATE for all documents
+   * Exception: CNI (CARTE_IDENTITE) uses DOCUMENTTYPE_NAME (no date)
    * Easy to extend: just add new document types with their rules
    */
   private readonly DOCUMENT_RULES: Partial<Record<DocumentType, DocumentNamingRule>> = {
-    // Identity documents - no date, just name (no numero for CNI)
+    // CNI - EXCEPTION: no date, just name (no numero)
     CARTE_IDENTITE: {
       includeDate: false,
       formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
     },
+    // All other documents follow general rule: include date and name
     // Carte Vitale - includes date and name only (no numero)
     CARTE_VITALE: {
       includeDate: true,
       formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
     },
-    // Passport - no date, just name
+    // Passport - includes date and name only (no numero)
     PASSEPORT: {
-      includeDate: false,
-      formatInfo: (metadata) => this.formatIdentityInfo(metadata),
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
     },
-    // Driver's License - no date, just name
+    // Driver's License - includes date and name only (no numero)
     PERMIS_CONDUIRE: {
-      includeDate: false,
-      formatInfo: (metadata) => this.formatIdentityInfo(metadata),
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
     },
     // Invoices - include date
     FACTURE: {

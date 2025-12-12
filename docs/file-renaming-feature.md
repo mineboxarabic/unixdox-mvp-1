@@ -21,15 +21,16 @@ A modular, reusable service following SOLID principles (Single Responsibility).
 
 **Filename Format:**
 ```
-[DocumentType]_[RelevantInfo]_[Date].[extension]
+[DocumentType]_[Name]_[Date].[extension]
 ```
-*Note: Date inclusion varies by document type (configurable)*
+*General rule: All documents include date*
+*Exception: CNI (CARTE_IDENTITE) has no date*
 
 **Examples:**
-- Identity Card (CNI): `CIN_Dupont_Jean.pdf` *(no date, no numero)*
-- Carte Vitale: `CARTE_VITALE_Dupont_Jean_2024-12-12.jpg` *(with date, no numero)*
+- Identity Card (CNI): `CIN_Yassin_YOUNES.pdf` *(EXCEPTION: no date)*
+- Carte Vitale: `CARTE_VITALE_Yassin_YOUNES_2024-12-12.jpg` *(with date)*
+- Passport: `PASSEPORT_Martin_Sophie_2024-12-12.jpg` *(with date)*
 - Invoice: `FACTURE_EDF_INV2024001_2024-12-12.pdf` *(with date)*
-- Passport: `PASSEPORT_Martin_Sophie.jpg` *(no date)*
 - Insurance: `ASSURANCE_AXA_POL123456_Auto_2024-12-12.pdf` *(with date)*
 - Payslip: `FICHE_PAIE_TechCorp_2024-01_2024-12-12.pdf` *(with date)*
 
@@ -52,14 +53,17 @@ Modified to automatically rename files after AI extraction completes.
 
 ### 3. Document Type Handling
 
-The service uses a **scalable, configuration-based approach** for document-specific rules:
+The service uses a **scalable, configuration-based approach** with a **general rule**:
+
+**General Rule:** `DOCUMENTTYPE_NAME_DATE` for all documents
+**Exception:** CNI (CARTE_IDENTITE) uses `DOCUMENTTYPE_NAME` (no date)
 
 | Document Type | Extracted Information | Include Date? |
 |--------------|----------------------|---------------|
-| CARTE_IDENTITE (CNI) | Last name, first name only | ❌ No |
+| CARTE_IDENTITE (CNI) | Last name, first name only | ❌ No (EXCEPTION) |
 | CARTE_VITALE | Last name, first name only | ✅ Yes |
-| PASSEPORT | Last name, first name, document number | ❌ No |
-| PERMIS_CONDUIRE | Last name, first name, document number | ❌ No |
+| PASSEPORT | Last name, first name only | ✅ Yes |
+| PERMIS_CONDUIRE | Last name, first name only | ✅ Yes |
 | FACTURE | Vendor name, invoice number, date | ✅ Yes |
 | CONTRAT | Parties, signature date | ✅ Yes |
 | ASSURANCE | Insurer, policy number, insurance type | ✅ Yes |
@@ -132,9 +136,9 @@ interface DocumentNamingRule {
 
 **2. Easy to Add New Documents:**
 ```typescript
-// Example: Adding a new document type
+// Example: Adding a new document type (follows general rule by default)
 DIPLOME: {
-  includeDate: false,  // No date for diplomas
+  includeDate: true,  // General rule: include date (unless exception like CNI)
   formatInfo: (metadata) => {
     // Extract school name and degree
     const parts = [];
@@ -146,9 +150,11 @@ DIPLOME: {
 ```
 
 **3. Easy to Add Exceptions:**
-Different rules for similar documents (e.g., CNI vs CARTE_VITALE):
-- CNI: No date, no numero → `CIN_Dupont_Jean.pdf`
-- CARTE_VITALE: With date, no numero → `CARTE_VITALE_Dupont_Jean_2024-12-12.jpg`
+General rule: All documents use `DOCUMENTTYPE_NAME_DATE`
+Exception: Only CNI uses `DOCUMENTTYPE_NAME` (no date)
+- CNI: No date → `CIN_Yassin_YOUNES.pdf`
+- CARTE_VITALE: With date → `CARTE_VITALE_Yassin_YOUNES_2024-12-12.jpg`
+- PASSEPORT: With date → `PASSEPORT_Martin_Sophie_2024-12-12.jpg`
 
 ### Feature Folder Structure
 - FileNamingService placed in `shared/utils` (can be used by any feature)

@@ -85,7 +85,7 @@ test('generateFileName - Invoice with vendor info', () => {
   assertContains(fileName, '.pdf', 'Should end with .pdf');
 });
 
-// Test 4: Generate filename for passport
+// Test 4: Generate filename for passport (should include date now)
 test('generateFileName - Passport', () => {
   const fileName = fileNamingService.generateFileName({
     type: DocumentType.PASSEPORT,
@@ -98,7 +98,14 @@ test('generateFileName - Passport', () => {
   
   assertContains(fileName, 'PASSEPORT_', 'Should start with PASSEPORT prefix');
   assertContains(fileName, 'Martin', 'Should contain last name');
+  assertContains(fileName, 'Sophie', 'Should contain first name');
+  // Should NOT contain numero for passport
+  assertEquals(fileName.includes('PA9876543'), false, 'Should NOT contain numero');
+  // Should include date
+  const datePattern = /\d{4}-\d{2}-\d{2}/;
+  assertEquals(datePattern.test(fileName), true, 'Should contain date for PASSEPORT');
   assertContains(fileName, '.jpg', 'Should end with .jpg');
+  // Expected format: PASSEPORT_Martin_Sophie_2025-12-12.jpg
 });
 
 // Test 5: Generate filename for insurance
