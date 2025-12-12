@@ -224,13 +224,18 @@ export class AIService {
       case 'CARTE_IDENTITE':
       case 'PASSEPORT':
       case 'PERMIS_CONDUIRE':
+      case 'CARTE_VITALE':
+      case 'ACTE_NAISSANCE':
+      case 'ACTE_MARIAGE':
+      case 'DIPLOME':
+      case 'ATTESTATION_TRAVAIL':
         specificInstructions = `
           For metadata, extract:
-          - nom (string)
-          - prenom (string)
-          - numero (string, document number)
-          - dateNaissance (YYYY-MM-DD)
-          - lieuNaissance (string)
+          - nom (string, last name)
+          - prenom (string, first name)
+          - numero (string, document number if applicable)
+          - dateNaissance (YYYY-MM-DD, if applicable)
+          - lieuNaissance (string, if applicable)
         `;
         break;
       case 'CONTRAT':

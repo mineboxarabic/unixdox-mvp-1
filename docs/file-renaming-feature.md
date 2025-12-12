@@ -64,6 +64,10 @@ The service uses a **scalable, configuration-based approach** with a **general r
 | CARTE_VITALE | Last name, first name only | ✅ Yes |
 | PASSEPORT | Last name, first name only | ✅ Yes |
 | PERMIS_CONDUIRE | Last name, first name only | ✅ Yes |
+| ACTE_NAISSANCE | Last name, first name only | ✅ Yes |
+| ACTE_MARIAGE | Last name, first name only | ✅ Yes |
+| DIPLOME | Last name, first name only | ✅ Yes |
+| ATTESTATION_TRAVAIL | Last name, first name only | ✅ Yes |
 | FACTURE | Vendor name, invoice number, date | ✅ Yes |
 | CONTRAT | Parties, signature date | ✅ Yes |
 | ASSURANCE | Insurer, policy number, insurance type | ✅ Yes |

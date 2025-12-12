@@ -80,6 +80,23 @@ export class FileNamingService {
       includeDate: true,
       formatInfo: (metadata) => this.formatProofOfAddressInfo(metadata),
     },
+    // Personal documents with names - include date and name
+    ACTE_NAISSANCE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
+    },
+    ACTE_MARIAGE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
+    },
+    DIPLOME: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
+    },
+    ATTESTATION_TRAVAIL: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
+    },
   };
 
   /**
