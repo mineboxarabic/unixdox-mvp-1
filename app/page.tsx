@@ -5,18 +5,35 @@ import { HomePageClient } from "./HomePageClient";
 import { getHomeData } from "@/features/home/actions";
 import { uploadDocumentFile } from "@/features/documents/actions";
 import { revalidatePath } from "next/cache";
+import type { ActionResult } from "@/shared/types/actions";
+import type { Document } from "@prisma/client";
 
-async function uploadDocumentsAction(formData: FormData) {
+type UploadResult = {
+  results: ActionResult<Document>[];
+  hasReauthError: boolean;
+};
+
+async function uploadDocumentsAction(formData: FormData): Promise<UploadResult> {
   "use server";
   const files = formData.getAll("files") as File[];
+  const results: ActionResult<Document>[] = [];
+  let hasReauthError = false;
   
   for (const file of files) {
     const singleFileFormData = new FormData();
     singleFileFormData.append("file", file);
-    await uploadDocumentFile(singleFileFormData);
+    const result = await uploadDocumentFile(singleFileFormData);
+    results.push(result);
+    
+    // Check if any result requires reauth
+    if (!result.success && result.requiresReauth) {
+      hasReauthError = true;
+      break; // Stop processing more files if reauth is needed
+    }
   }
 
   revalidatePath("/");
+  return { results, hasReauthError };
 }
 
 export default async function Home() {

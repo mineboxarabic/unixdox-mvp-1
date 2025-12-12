@@ -2,13 +2,22 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import type { ModeleDemarche, Document } from '@prisma/client';
 import { HomePage } from '@/features/home/ui/pages/HomePage';
 import { CreateDemarcheDialog } from '@/features/demarches/ui/CreateDemarcheDialog';
+import { ReauthDialog, toaster } from '@/shared/components/ui';
 import type { HomeData } from '@/features/home/types';
 import type { DemarcheDocuments } from '@/features/demarches/types/schemas';
 import { matchDocumentsToRequirementsAction } from '@/features/documents/actions';
 import { startNewDemarcheAction } from '@/features/demarches/actions';
+import type { ActionResult } from '@/shared/types/actions';
+
+// Type for upload action result
+type UploadResult = {
+  results: ActionResult<Document>[];
+  hasReauthError: boolean;
+};
 
 interface HomePageClientProps {
   data: HomeData;
@@ -16,7 +25,7 @@ interface HomePageClientProps {
   userEmail?: string;
   modeles: ModeleDemarche[];
   userDocuments: Document[];
-  uploadDocumentsAction?: (formData: FormData) => Promise<void>;
+  uploadDocumentsAction?: (formData: FormData) => Promise<UploadResult>;
 }
 
 export function HomePageClient({
@@ -28,7 +37,35 @@ export function HomePageClient({
   uploadDocumentsAction,
 }: HomePageClientProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isReauthDialogOpen, setIsReauthDialogOpen] = useState(false);
   const router = useRouter();
+
+  const handleReauth = useCallback(async () => {
+    await signOut({ callbackUrl: '/login' });
+  }, []);
+
+  const handleUploadWithReauthCheck = useCallback(async (formData: FormData) => {
+    if (!uploadDocumentsAction) return;
+    
+    const result = await uploadDocumentsAction(formData);
+    
+    if (result.hasReauthError) {
+      // Show reauth dialog
+      setIsReauthDialogOpen(true);
+    } else {
+      // Check for other errors and show toast
+      const errors = result.results.filter(r => !r.success);
+      if (errors.length > 0) {
+        const firstError = errors[0];
+        if (!firstError.success) {
+          toaster.error({
+            title: 'Erreur',
+            description: firstError.error,
+          });
+        }
+      }
+    }
+  }, [uploadDocumentsAction]);
 
   const handleMatchDocuments = useCallback(async (modeleId: string) => {
     const modele = modeles.find((m) => m.id === modeleId);
@@ -76,7 +113,7 @@ export function HomePageClient({
       <HomePage
         data={data}
         userRole={userRole}
-        uploadDocumentsAction={uploadDocumentsAction}
+        uploadDocumentsAction={handleUploadWithReauthCheck}
         onCreateProcedure={() => setIsDialogOpen(true)}
         onViewAllProcedures={() => router.push('/demarches')}
         onViewAllDeadlines={() => router.push('/settings')}
@@ -92,6 +129,12 @@ export function HomePageClient({
         userEmail={userEmail}
         onMatchDocuments={handleMatchDocuments}
         onCreateDemarche={handleCreateDemarche}
+      />
+
+      <ReauthDialog
+        isOpen={isReauthDialogOpen}
+        onClose={() => setIsReauthDialogOpen(false)}
+        onReauth={handleReauth}
       />
     </>
   );

@@ -22,3 +22,14 @@ So feature can't import from other feature folders directly
 Before creating new function check in the features if the function already exists
 
 If you need a function in feature that exists in another feature you CAN'T import it directly you have to pass it a prop and import it in page or any high level folder like shared or something.
+
+
+
+use the theme provided in shared/theme.ts
+
+Make sur to make components modulare and reusable
+
+
+Make sure to write comments for complex logic
+
+

@@ -14,3 +14,4 @@ export * from "./tooltip";
 export * from "./table";
 export * from "./dialog";
 export * from "./form-input";
+export * from "./reauth-dialog";

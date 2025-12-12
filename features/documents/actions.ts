@@ -5,6 +5,7 @@ import { documentService } from './services/document.service';
 import { storageService } from './services/storage.service';
 import { CreateDocumentSchema, UpdateDocumentStatusSchema, UpdateDocumentDetailsSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
+import { isGoogleAuthError, AUTH_ERROR_MESSAGES } from '@/shared/utils/errors';
 import { requireAuth } from '@/shared/auth/server';
 import { Document, DocumentStatut, DocumentType, ExtractionStatus } from '@prisma/client';
 import { google } from 'googleapis';
@@ -173,11 +174,12 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
   } catch (error: any) {
     console.error('Upload error:', error);
     
-    // Handle specific Google API errors
-    if (error.code === 401 || error.message?.includes('refresh token') || error.message?.includes('invalid authentication')) {
+    // Handle Google OAuth errors requiring re-authentication
+    if (isGoogleAuthError(error)) {
       return { 
         success: false, 
-        error: "Session Google Drive expirée ou incomplète. Veuillez retourner à l'étape précédente et relier votre compte." 
+        error: AUTH_ERROR_MESSAGES.REAUTH_REQUIRED,
+        requiresReauth: true,
       };
     }
 
