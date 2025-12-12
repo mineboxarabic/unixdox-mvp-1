@@ -61,7 +61,7 @@ export function RecentDemarchesCard({
                     <Flex gap="1" fontSize="sm" color="text.fg.muted">
                         <Text>Démarches automatiques ce mois ci :</Text>
                         <Text fontWeight="medium" color="text.fg">
-                            {demarches.length}/{automaticDemarchesCount}
+                            {automaticDemarchesCount}/{automaticDemarchesTotal}
                         </Text>
                     </Flex>
                 </Flex>

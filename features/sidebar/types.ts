@@ -13,6 +13,7 @@ export interface UserAccount {
   email: string;
   avatarUrl?: string | null;
   role?: string;
+  isPremium?: boolean;
 }
 
 export interface StorageInfo {

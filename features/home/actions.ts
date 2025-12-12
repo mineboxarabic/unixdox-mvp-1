@@ -64,7 +64,7 @@ export async function getHomeData(): Promise<HomeData> {
     const daysUntilExpiration = Math.ceil(
       (new Date(doc.dateExpiration!).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
-    
+
     let status = "À venir";
     if (daysUntilExpiration < 0) {
       status = "Expiré";
@@ -119,7 +119,7 @@ export async function getHomeData(): Promise<HomeData> {
     recentDemarches,
     isPremiumUser,
     automaticDemarchesCount,
-    automaticDemarchesTotal: 1, // This could be made dynamic based on user's plan
+    automaticDemarchesTotal: isPremiumUser ? 10 : 3, // Free: 3/month, Premium: 10/month (or unlimited)
   };
 }
 

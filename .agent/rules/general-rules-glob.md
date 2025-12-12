@@ -1,4 +1,9 @@
 ---
+trigger: model_decision
+description: all the time.
+---
+
+---
 applyTo: '**'
 ---
 Use DRY principle 

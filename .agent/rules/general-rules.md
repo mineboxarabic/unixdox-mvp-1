@@ -1,4 +1,8 @@
 ---
+trigger: always_on
+---
+
+---
 applyTo: '**'
 ---
 Use DRY principle 

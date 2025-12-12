@@ -1,11 +1,11 @@
-import { 
-  LuHouse, 
-  LuFolderOpen, 
-  LuFileText, 
+import {
+  LuHouse,
+  LuFolderOpen,
+  LuFileText,
   LuClock,
   LuLogOut,
   LuSettings,
-  LuCircleHelp 
+  LuCircleHelp
 } from 'react-icons/lu';
 import { NavItem, StorageInfo } from './types';
 
@@ -20,19 +20,17 @@ export const mainNavItems: NavItem[] = [
     label: 'Démarches',
     icon: LuFolderOpen,
     href: '/demarches',
-    badge: 2,
   },
   {
     label: 'Mes documents',
     icon: LuFileText,
     href: '/documents',
-    badge: 2,
   },
   {
     label: 'Echéances',
     icon: LuClock,
     href: '/echeances',
-    badge: 2,
+    isPremium: true, // Premium-only feature
   },
 ];
 

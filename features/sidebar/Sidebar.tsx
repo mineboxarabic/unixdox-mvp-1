@@ -24,11 +24,18 @@ import { mainNavItems, bottomNavItems, storageInfo } from './config';
 
 import { UserAccount as UserAccountType } from '@/shared/components';
 
-interface SidebarProps {
-  user?: UserAccountType;
+export interface SidebarCounts {
+  demarchesCount?: number;
+  documentsCount?: number;
+  echeancesCount?: number;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+interface SidebarProps {
+  user?: UserAccountType;
+  counts?: SidebarCounts;
+}
+
+export function Sidebar({ user, counts }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -38,7 +45,22 @@ export function Sidebar({ user }: SidebarProps) {
     email: user?.email || 'segunadebayo@example.com',
     avatarUrl: user?.avatarUrl,
     role: user?.role,
+    isPremium: user?.isPremium,
   };
+
+  // Create nav items with dynamic badge counts
+  const navItemsWithCounts: NavItem[] = mainNavItems.map((item) => {
+    if (item.href === '/demarches' && counts?.demarchesCount !== undefined) {
+      return { ...item, badge: counts.demarchesCount };
+    }
+    if (item.href === '/documents' && counts?.documentsCount !== undefined) {
+      return { ...item, badge: counts.documentsCount };
+    }
+    if (item.href === '/echeances' && counts?.echeancesCount !== undefined) {
+      return { ...item, badge: counts.echeancesCount };
+    }
+    return item;
+  });
 
   const handleLogout = async () => {
     await signOut();
@@ -111,7 +133,7 @@ export function Sidebar({ user }: SidebarProps) {
 
         {/* Main Navigation */}
         <Flex direction="column" gap={1} flex="1" overflow="auto">
-          {mainNavItems.map((item) => (
+          {navItemsWithCounts.map((item) => (
             <NavButton
               key={item.label}
               item={{
@@ -153,8 +175,8 @@ export function Sidebar({ user }: SidebarProps) {
           )}
         </Flex>
 
-        {/* Promo Card */}
-        <PromoCard isCollapsed={isCollapsed} />
+        {/* Promo Card - Only show to non-premium users */}
+        {!user?.isPremium && <PromoCard isCollapsed={isCollapsed} />}
 
         {/* Bottom Section */}
         <Flex direction="column" gap={4}>
