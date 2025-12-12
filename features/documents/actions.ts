@@ -11,6 +11,7 @@ import { Document, DocumentStatut, DocumentType, ExtractionStatus } from '@prism
 import { google } from 'googleapis';
 import { prisma } from '@/shared/config/prisma';
 import { aiService } from './services/ai.service';
+import { fileNamingService } from '@/shared/utils/file-naming.service';
 
 export async function updateDocumentDetails(
   documentId: string,
@@ -136,6 +137,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
       );
       console.log('AI Extraction Result:', extractionResult);
 
+      // Update document with extracted metadata
       doc = await prisma.document.update({
         where: { id: doc.id },
         data: {
@@ -151,6 +153,42 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
         },
         include: { proprietaire: { select: { id: true, name: true, email: true } } },
       });
+
+      // 6. Generate intelligent file name and rename in Google Drive
+      try {
+        const fileExtension = fileNamingService.getFileExtension(file.name);
+        const newFileName = fileNamingService.generateFileName({
+          type: extractionResult.type || DocumentType.AUTRE,
+          metadata: extractionResult.metadata,
+          originalFileName: file.name,
+          dateExpiration: extractionResult.dateExpiration,
+          tags: extractionResult.tags,
+        }, fileExtension);
+
+        console.log('Renaming file from', file.name, 'to', newFileName);
+        
+        // Rename the file in Google Drive
+        const { webViewLink: newWebViewLink } = await storageService.renameFile(
+          auth,
+          storageId,
+          newFileName
+        );
+
+        // Update document with new filename and URL
+        doc = await prisma.document.update({
+          where: { id: doc.id },
+          data: {
+            nomFichier: newFileName,
+            urlStockage: newWebViewLink,
+          },
+          include: { proprietaire: { select: { id: true, name: true, email: true } } },
+        });
+
+        console.log('File successfully renamed to:', newFileName);
+      } catch (renameError: any) {
+        console.error('File rename failed (non-critical):', renameError);
+        // Continue - renaming is nice to have but not critical
+      }
     } catch (aiError: any) {
       console.error('AI Extraction failed:', aiError);
       doc = await prisma.document.update({
@@ -163,7 +201,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
       });
     }
 
-    // 6. Mark onboarding as completed
+    // 7. Mark onboarding as completed
     await prisma.user.update({
       where: { id: userId },
       data: { onboardingCompleted: true },
