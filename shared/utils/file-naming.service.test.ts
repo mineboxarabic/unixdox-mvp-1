@@ -48,7 +48,7 @@ test('getFileExtension - No extension defaults to pdf', () => {
   assertEquals(ext, 'pdf');
 });
 
-// Test 2: Generate filename for identity document
+// Test 2: Generate filename for identity document (CNI - no date, no numero)
 test('generateFileName - Identity card with full metadata', () => {
   const fileName = fileNamingService.generateFileName({
     type: DocumentType.CARTE_IDENTITE,
@@ -62,8 +62,10 @@ test('generateFileName - Identity card with full metadata', () => {
   assertContains(fileName, 'CIN_', 'Should start with CIN prefix');
   assertContains(fileName, 'Dupont', 'Should contain last name');
   assertContains(fileName, 'Jean', 'Should contain first name');
-  assertContains(fileName, 'AB123456', 'Should contain document number');
+  assertEquals(fileName.includes('AB123456'), false, 'Should NOT contain document number for CNI');
+  assertEquals(fileName.includes('2025'), false, 'Should NOT contain date for CNI');
   assertContains(fileName, '.pdf', 'Should end with .pdf');
+  // Expected format: CIN_Dupont_Jean.pdf
 });
 
 // Test 3: Generate filename for invoice
@@ -132,6 +134,28 @@ test('generateFileName - Payslip', () => {
   assertContains(fileName, '.pdf', 'Should end with .pdf');
 });
 
+// Test 6b: Generate filename for Carte Vitale (includes date and name, no numero)
+test('generateFileName - Carte Vitale', () => {
+  const fileName = fileNamingService.generateFileName({
+    type: DocumentType.CARTE_VITALE,
+    metadata: {
+      nom: 'Dupont',
+      prenom: 'Jean',
+      numero: '1234567890123',
+    },
+  }, 'jpg');
+  
+  assertContains(fileName, 'CARTE_VITALE_', 'Should start with CARTE_VITALE prefix');
+  assertContains(fileName, 'Dupont', 'Should contain last name');
+  assertContains(fileName, 'Jean', 'Should contain first name');
+  assertEquals(fileName.includes('1234567890123'), false, 'Should NOT contain numero for Carte Vitale');
+  // Check for date pattern (YYYY-MM-DD)
+  const datePattern = /\d{4}-\d{2}-\d{2}/;
+  assertEquals(datePattern.test(fileName), true, 'Should contain date for Carte Vitale');
+  assertContains(fileName, '.jpg', 'Should end with .jpg');
+  // Expected format: CARTE_VITALE_Dupont_Jean_2025-12-12.jpg
+});
+
 // Test 7: Generate filename with tags when no specific metadata
 test('generateFileName - Generic document with tags', () => {
   const fileName = fileNamingService.generateFileName({
@@ -164,16 +188,28 @@ test('generateFileName - Sanitizes special characters', () => {
   assertEquals(fileName.includes('>'), false, 'Should not contain >');
 });
 
-// Test 9: Timestamp is always included
-test('generateFileName - Includes timestamp', () => {
+// Test 9: Date included for documents that require it
+test('generateFileName - Includes date for applicable documents', () => {
+  const fileName = fileNamingService.generateFileName({
+    type: DocumentType.FACTURE,
+    metadata: { vendorName: 'Test' },
+  }, 'pdf');
+  
+  // Check if filename contains a date pattern (YYYY-MM-DD)
+  const datePattern = /\d{4}-\d{2}-\d{2}/;
+  assertEquals(datePattern.test(fileName), true, 'Should contain date pattern for FACTURE');
+});
+
+// Test 9b: Date NOT included for documents that don't require it
+test('generateFileName - No date for CNI', () => {
   const fileName = fileNamingService.generateFileName({
     type: DocumentType.CARTE_IDENTITE,
     metadata: { nom: 'Test' },
   }, 'pdf');
   
-  // Check if filename contains a date pattern (YYYY-MM-DD)
+  // Check that filename does NOT contain a date pattern (YYYY-MM-DD)
   const datePattern = /\d{4}-\d{2}-\d{2}/;
-  assertEquals(datePattern.test(fileName), true, 'Should contain date pattern');
+  assertEquals(datePattern.test(fileName), false, 'Should NOT contain date for CNI');
 });
 
 // Test 10: Default to DOC prefix when type is missing

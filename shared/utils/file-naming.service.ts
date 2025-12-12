@@ -12,24 +12,95 @@ export interface FileNamingMetadata {
   tags?: string[];
 }
 
+/**
+ * Configuration for document-specific naming rules
+ */
+interface DocumentNamingRule {
+  /** Whether to include the date in the filename */
+  includeDate: boolean;
+  /** Custom formatter for extracting info from metadata */
+  formatInfo: (metadata: Record<string, any>) => string;
+}
+
 export class FileNamingService {
   // Constants for configuration
   private readonly MAX_FILENAME_LENGTH = 200;
   private readonly MEANINGFUL_METADATA_KEYS = ['name', 'title', 'subject', 'numero', 'reference'];
 
   /**
+   * Document-specific naming rules
+   * Easy to extend: just add new document types with their rules
+   */
+  private readonly DOCUMENT_RULES: Partial<Record<DocumentType, DocumentNamingRule>> = {
+    // Identity documents - no date, just name (no numero for CNI)
+    CARTE_IDENTITE: {
+      includeDate: false,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
+    },
+    // Carte Vitale - includes date and name only (no numero)
+    CARTE_VITALE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatNameOnlyInfo(metadata),
+    },
+    // Passport - no date, just name
+    PASSEPORT: {
+      includeDate: false,
+      formatInfo: (metadata) => this.formatIdentityInfo(metadata),
+    },
+    // Driver's License - no date, just name
+    PERMIS_CONDUIRE: {
+      includeDate: false,
+      formatInfo: (metadata) => this.formatIdentityInfo(metadata),
+    },
+    // Invoices - include date
+    FACTURE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatInvoiceInfo(metadata),
+    },
+    // Contracts - include date
+    CONTRAT: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatContractInfo(metadata),
+    },
+    // Insurance - include date
+    ASSURANCE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatInsuranceInfo(metadata),
+    },
+    // Payslips - include date
+    FICHE_PAIE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatPayslipInfo(metadata),
+    },
+    // Proof of address - include date
+    JUSTIFICATIF_DOMICILE: {
+      includeDate: true,
+      formatInfo: (metadata) => this.formatProofOfAddressInfo(metadata),
+    },
+  };
+
+  /**
    * Generates a semantic file name based on document type and extracted metadata
-   * Format: [DocumentType]_[RelevantInfo]_[Date].[extension]
+   * Format: [DocumentType]_[RelevantInfo]_[Date].[extension] (date optional based on document type)
    * Date format: YYYY-MM-DD
    */
   generateFileName(metadata: FileNamingMetadata, originalExtension: string): string {
-    const timestamp = this.formatTimestamp(new Date());
     const typePrefix = this.getTypePrefix(metadata.type);
     const relevantInfo = this.extractRelevantInfo(metadata);
     
+    // Check if this document type should include a date
+    const rule = metadata.type ? this.DOCUMENT_RULES[metadata.type] : undefined;
+    const includeDate = rule?.includeDate ?? true; // Default to including date
+    
+    // Build filename parts
+    const nameParts = [typePrefix, relevantInfo];
+    if (includeDate) {
+      const timestamp = this.formatTimestamp(new Date());
+      nameParts.push(timestamp);
+    }
+    
     // Combine parts and sanitize
-    const nameParts = [typePrefix, relevantInfo, timestamp].filter(Boolean);
-    const baseName = nameParts.join('_');
+    const baseName = nameParts.filter(Boolean).join('_');
     const sanitizedName = this.sanitizeFileName(baseName);
     
     return `${sanitizedName}.${originalExtension}`;
@@ -50,34 +121,18 @@ export class FileNamingService {
     const docMetadata = metadata.metadata;
     const type = metadata.type;
 
-    switch (type) {
-      case 'CARTE_IDENTITE':
-      case 'PASSEPORT':
-      case 'PERMIS_CONDUIRE':
-        return this.formatIdentityInfo(docMetadata);
-
-      case 'FACTURE':
-        return this.formatInvoiceInfo(docMetadata);
-
-      case 'CONTRAT':
-        return this.formatContractInfo(docMetadata);
-
-      case 'ASSURANCE':
-        return this.formatInsuranceInfo(docMetadata);
-
-      case 'FICHE_PAIE':
-        return this.formatPayslipInfo(docMetadata);
-
-      case 'JUSTIFICATIF_DOMICILE':
-        return this.formatProofOfAddressInfo(docMetadata);
-
-      default:
-        return this.formatGenericInfo(docMetadata, metadata.tags);
+    // Use document-specific rule if available
+    if (type && this.DOCUMENT_RULES[type]) {
+      return this.DOCUMENT_RULES[type]!.formatInfo(docMetadata);
     }
+
+    // Fallback to generic formatting
+    return this.formatGenericInfo(docMetadata, metadata.tags);
   }
 
   /**
    * Format identity document info (ID, Passport, Driver's License)
+   * Includes document number
    */
   private formatIdentityInfo(metadata: Record<string, any>): string {
     const parts: string[] = [];
@@ -85,6 +140,19 @@ export class FileNamingService {
     if (metadata.nom) parts.push(metadata.nom);
     if (metadata.prenom) parts.push(metadata.prenom);
     if (metadata.numero) parts.push(metadata.numero);
+    
+    return parts.join('_');
+  }
+
+  /**
+   * Format name-only info (for documents like CARTE_VITALE)
+   * Only includes nom and prenom, no document number
+   */
+  private formatNameOnlyInfo(metadata: Record<string, any>): string {
+    const parts: string[] = [];
+    
+    if (metadata.nom) parts.push(metadata.nom);
+    if (metadata.prenom) parts.push(metadata.prenom);
     
     return parts.join('_');
   }

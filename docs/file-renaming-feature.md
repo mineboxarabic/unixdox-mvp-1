@@ -23,13 +23,15 @@ A modular, reusable service following SOLID principles (Single Responsibility).
 ```
 [DocumentType]_[RelevantInfo]_[Date].[extension]
 ```
+*Note: Date inclusion varies by document type (configurable)*
 
 **Examples:**
-- Identity Card: `CIN_Dupont_Jean_AB123456_2024-12-12.pdf`
-- Invoice: `FACTURE_EDF_INV2024001_2024-12-12.pdf`
-- Passport: `PASSEPORT_Martin_Sophie_PA9876543_2024-12-12.jpg`
-- Insurance: `ASSURANCE_AXA_POL123456_Auto_2024-12-12.pdf`
-- Payslip: `FICHE_PAIE_TechCorp_2024-01_2024-12-12.pdf`
+- Identity Card (CNI): `CIN_Dupont_Jean.pdf` *(no date, no numero)*
+- Carte Vitale: `CARTE_VITALE_Dupont_Jean_2024-12-12.jpg` *(with date, no numero)*
+- Invoice: `FACTURE_EDF_INV2024001_2024-12-12.pdf` *(with date)*
+- Passport: `PASSEPORT_Martin_Sophie.jpg` *(no date)*
+- Insurance: `ASSURANCE_AXA_POL123456_Auto_2024-12-12.pdf` *(with date)*
+- Payslip: `FICHE_PAIE_TechCorp_2024-01_2024-12-12.pdf` *(with date)*
 
 #### **StorageService** (`features/documents/services/storage.service.ts`)
 Extended with `renameFile()` method to rename files in Google Drive.
@@ -50,17 +52,31 @@ Modified to automatically rename files after AI extraction completes.
 
 ### 3. Document Type Handling
 
-The service extracts relevant information based on document type:
+The service uses a **scalable, configuration-based approach** for document-specific rules:
 
-| Document Type | Extracted Information |
-|--------------|----------------------|
-| CARTE_IDENTITE, PASSEPORT, PERMIS_CONDUIRE | Last name, first name, document number |
-| FACTURE | Vendor name, invoice number, date |
-| CONTRAT | Parties, signature date |
-| ASSURANCE | Insurer, policy number, insurance type |
-| FICHE_PAIE | Employer, period |
-| JUSTIFICATIF_DOMICILE | Vendor name, type, date |
-| AUTRE (Generic) | First tag or first meaningful metadata value |
+| Document Type | Extracted Information | Include Date? |
+|--------------|----------------------|---------------|
+| CARTE_IDENTITE (CNI) | Last name, first name only | ❌ No |
+| CARTE_VITALE | Last name, first name only | ✅ Yes |
+| PASSEPORT | Last name, first name, document number | ❌ No |
+| PERMIS_CONDUIRE | Last name, first name, document number | ❌ No |
+| FACTURE | Vendor name, invoice number, date | ✅ Yes |
+| CONTRAT | Parties, signature date | ✅ Yes |
+| ASSURANCE | Insurer, policy number, insurance type | ✅ Yes |
+| FICHE_PAIE | Employer, period | ✅ Yes |
+| JUSTIFICATIF_DOMICILE | Vendor name, type, date | ✅ Yes |
+| AUTRE (Generic) | First tag or first meaningful metadata value | ✅ Yes |
+
+**Adding New Document Types:**
+Simply add a new entry to the `DOCUMENT_RULES` configuration in `FileNamingService`:
+```typescript
+DOCUMENT_RULES = {
+  NEW_DOCUMENT_TYPE: {
+    includeDate: true,  // or false
+    formatInfo: (metadata) => this.formatCustomInfo(metadata),
+  },
+}
+```
 
 ### 4. Safety Features
 
@@ -76,9 +92,9 @@ When a file with the same name already exists for the user, the system automatic
 
 **Example:**
 ```
-First upload:  CIN_Dupont_Jean_AB123456_2024-12-12.pdf
-Second upload: CIN_Dupont_Jean_AB123456_2024-12-12_2.pdf
-Third upload:  CIN_Dupont_Jean_AB123456_2024-12-12_3.pdf
+First upload:  CIN_Dupont_Jean.pdf
+Second upload: CIN_Dupont_Jean_2.pdf
+Third upload:  CIN_Dupont_Jean_3.pdf
 ```
 
 This Windows-style approach ensures:
@@ -96,7 +112,43 @@ This Windows-style approach ensures:
 ### SOLID Principles
 - **Single Responsibility**: FileNamingService only handles filename generation
 - **Open/Closed**: Easy to extend with new document types without modifying existing code
+  - Configuration-based approach using `DOCUMENT_RULES`
+  - Add new document types by simply adding configuration entries
+  - No need to modify core logic or switch statements
 - **Dependency Inversion**: Services depend on interfaces, not concrete implementations
+
+### Scalability & Extensibility
+
+The service is designed for easy extension:
+
+**1. Configuration-Based Rules:**
+Each document type has its own rule configuration:
+```typescript
+interface DocumentNamingRule {
+  includeDate: boolean;           // Whether to include date
+  formatInfo: (metadata) => string; // Custom formatter
+}
+```
+
+**2. Easy to Add New Documents:**
+```typescript
+// Example: Adding a new document type
+DIPLOME: {
+  includeDate: false,  // No date for diplomas
+  formatInfo: (metadata) => {
+    // Extract school name and degree
+    const parts = [];
+    if (metadata.school) parts.push(metadata.school);
+    if (metadata.degree) parts.push(metadata.degree);
+    return parts.join('_');
+  },
+}
+```
+
+**3. Easy to Add Exceptions:**
+Different rules for similar documents (e.g., CNI vs CARTE_VITALE):
+- CNI: No date, no numero → `CIN_Dupont_Jean.pdf`
+- CARTE_VITALE: With date, no numero → `CARTE_VITALE_Dupont_Jean_2024-12-12.jpg`
 
 ### Feature Folder Structure
 - FileNamingService placed in `shared/utils` (can be used by any feature)
