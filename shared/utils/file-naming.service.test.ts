@@ -171,9 +171,9 @@ test('generateFileName - Includes timestamp', () => {
     metadata: { nom: 'Test' },
   }, 'pdf');
   
-  // Check if filename contains a timestamp pattern (YYYYMMDD_HHMMSS)
-  const timestampPattern = /\d{8}_\d{6}/;
-  assertEquals(timestampPattern.test(fileName), true, 'Should contain timestamp pattern');
+  // Check if filename contains a date pattern (YYYY-MM-DD)
+  const datePattern = /\d{4}-\d{2}-\d{2}/;
+  assertEquals(datePattern.test(fileName), true, 'Should contain date pattern');
 });
 
 // Test 10: Default to DOC prefix when type is missing

@@ -98,7 +98,7 @@ LIMIT 10;
 - File name: `IMG_20241212.jpg`
 
 **Expected Output:**
-- Google Drive file: `CIN_Dupont_Jean_AB123456_20241212_090000.jpg`
+- Google Drive file: `CIN_Dupont_Jean_AB123456_2024-12-12.jpg`
 - Database: Same filename stored in `nomFichier`
 - Metadata extracted: name, document number, birth date
 
@@ -109,7 +109,7 @@ LIMIT 10;
 - File name: `facture.pdf`
 
 **Expected Output:**
-- Google Drive file: `FACTURE_EDF_INV2024001_20241212_090000.pdf`
+- Google Drive file: `FACTURE_EDF_INV2024001_2024-12-12.pdf`
 - Metadata: vendor name, amount, date, invoice number
 
 ### Scenario 3: Special Characters in Metadata
@@ -120,7 +120,7 @@ LIMIT 10;
 
 **Expected Output:**
 - Special characters sanitized to underscores
-- File: `FACTURE_Société_Test_Company_20241212_090000.pdf`
+- File: `FACTURE_Société_Test_Company_2024-12-12.pdf`
 
 ### Scenario 4: Rename Failure (Non-Critical)
 
@@ -147,7 +147,7 @@ LIMIT 10;
 **Expected Output:**
 - Each file renamed with appropriate prefix and metadata
 - All files in correct folder
-- No naming conflicts (timestamps ensure uniqueness)
+- No naming conflicts (dates ensure uniqueness)
 
 ## Debugging
 
@@ -157,8 +157,8 @@ Server logs should show:
 ```
 Starting AI extraction for file: IMG_20241212.jpg
 AI Extraction Result: { type: 'CARTE_IDENTITE', ... }
-Renaming file from IMG_20241212.jpg to CIN_Dupont_Jean_AB123456_20241212_090000.jpg
-File renamed successfully to: CIN_Dupont_Jean_AB123456_20241212_090000.jpg
+Renaming file from IMG_20241212.jpg to CIN_Dupont_Jean_AB123456_2024-12-12.jpg
+File renamed successfully to: CIN_Dupont_Jean_AB123456_2024-12-12.jpg
 ```
 
 ### Common Issues

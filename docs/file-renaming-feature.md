@@ -21,15 +21,15 @@ A modular, reusable service following SOLID principles (Single Responsibility).
 
 **Filename Format:**
 ```
-[DocumentType]_[RelevantInfo]_[Timestamp].[extension]
+[DocumentType]_[RelevantInfo]_[Date].[extension]
 ```
 
 **Examples:**
-- Identity Card: `CIN_Dupont_Jean_AB123456_20241212_143022.pdf`
-- Invoice: `FACTURE_EDF_INV2024001_20241212_143022.pdf`
-- Passport: `PASSEPORT_Martin_Sophie_PA9876543_20241212_143022.jpg`
-- Insurance: `ASSURANCE_AXA_POL123456_Auto_20241212_143022.pdf`
-- Payslip: `FICHE_PAIE_TechCorp_2024-01_20241212_143022.pdf`
+- Identity Card: `CIN_Dupont_Jean_AB123456_2024-12-12.pdf`
+- Invoice: `FACTURE_EDF_INV2024001_2024-12-12.pdf`
+- Passport: `PASSEPORT_Martin_Sophie_PA9876543_2024-12-12.jpg`
+- Insurance: `ASSURANCE_AXA_POL123456_Auto_2024-12-12.pdf`
+- Payslip: `FICHE_PAIE_TechCorp_2024-01_2024-12-12.pdf`
 
 #### **StorageService** (`features/documents/services/storage.service.ts`)
 Extended with `renameFile()` method to rename files in Google Drive.

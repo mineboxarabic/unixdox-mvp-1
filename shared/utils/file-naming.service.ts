@@ -19,7 +19,8 @@ export class FileNamingService {
 
   /**
    * Generates a semantic file name based on document type and extracted metadata
-   * Format: [DocumentType]_[RelevantInfo]_[Timestamp].[extension]
+   * Format: [DocumentType]_[RelevantInfo]_[Date].[extension]
+   * Date format: YYYY-MM-DD
    */
   generateFileName(metadata: FileNamingMetadata, originalExtension: string): string {
     const timestamp = this.formatTimestamp(new Date());
@@ -200,21 +201,18 @@ export class FileNamingService {
   }
 
   /**
-   * Format timestamp for filename: YYYYMMDD_HHMMSS
+   * Format timestamp for filename: YYYY-MM-DD
    */
   private formatTimestamp(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
     
-    return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    return `${year}-${month}-${day}`;
   }
 
   /**
-   * Format date for filename: YYYYMMDD
+   * Format date for filename: YYYY-MM-DD
    */
   private formatDate(dateStr: string): string {
     try {
@@ -225,7 +223,7 @@ export class FileNamingService {
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       
-      return `${year}${month}${day}`;
+      return `${year}-${month}-${day}`;
     } catch {
       return '';
     }
