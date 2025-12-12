@@ -8,7 +8,7 @@ import {
   LuShield,
   LuPlus
 } from 'react-icons/lu';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import {
   Logo,
@@ -30,6 +30,7 @@ interface SidebarProps {
 export function Sidebar({ user }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const defaultUser: UserAccountType = {
     name: user?.name || 'Segun Adebayo',
@@ -97,7 +98,11 @@ export function Sidebar({ user }: SidebarProps) {
         </Box>
 
         {/* User Account */}
-        <UserAccount user={defaultUser} isCollapsed={isCollapsed} />
+        <UserAccount
+          user={defaultUser}
+          isCollapsed={isCollapsed}
+          onClick={() => router.push('/profile')}
+        />
 
         <Separator variant="dashed" />
 
