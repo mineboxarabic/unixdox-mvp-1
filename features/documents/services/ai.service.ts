@@ -42,7 +42,7 @@ export class AIService {
       // We look for a document where the type matches the requirement string
       // Note: This assumes requiredTypes are strings that match DocumentType enum values
       const exactMatch = userDocuments.find(doc => doc.type === req);
-      
+
       if (exactMatch) {
         matches[req] = exactMatch.id;
       } else {
@@ -64,11 +64,11 @@ export class AIService {
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
-        
+
         console.log('AI Matching Response:', text);
-        
+
         const aiSuggestions = this.parseMatchingResponse(text);
-        
+
         // Merge AI suggestions
         for (const req of missing) {
           if (aiSuggestions[req]) {
@@ -268,7 +268,22 @@ export class AIService {
         specificInstructions = `
           Extract any clearly identifiable key-value pairs into the metadata object.
           If the document type seems wrong, suggest the correct one in suggestedType.
+          
+          If this appears to be an identity document (ID card, passport, driver's license, etc.), extract:
+          - nom (string, last name)
+          - prenom (string, first name)
+          - numero (string, document number if applicable)
+          - dateNaissance (YYYY-MM-DD, if applicable)
+          - lieuNaissance (string, if applicable)
+          
+          If this appears to be an invoice or bill, extract:
+          - amount (number)
+          - currency (string, e.g. EUR, USD)
+          - date (YYYY-MM-DD)
+          - vendorName (string)
+          - invoiceNumber (string)
         `;
+        break;
     }
 
     return `${basePrompt}\n${specificInstructions}\n\nIMPORTANT: Return ONLY the JSON string, no markdown formatting.`;
