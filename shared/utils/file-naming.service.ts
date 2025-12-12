@@ -34,7 +34,11 @@ export class FileNamingService {
    * Extracts relevant information from metadata based on document type
    */
   private extractRelevantInfo(metadata: FileNamingMetadata): string {
+    // If no metadata, try using tags
     if (!metadata.metadata || Object.keys(metadata.metadata).length === 0) {
+      if (metadata.tags && metadata.tags.length > 0) {
+        return metadata.tags[0];
+      }
       return '';
     }
 
