@@ -186,4 +186,61 @@ test('generateFileName - Defaults to DOC when no type', () => {
   assertContains(fileName, '.pdf', 'Should end with .pdf');
 });
 
+// Test 11: Append counter for duplicates
+test('appendCounter - Adds counter to filename', () => {
+  const result1 = fileNamingService.appendCounter('test.jpg', 2);
+  assertEquals(result1, 'test_2.jpg');
+
+  const result2 = fileNamingService.appendCounter('test.jpg', 3);
+  assertEquals(result2, 'test_3.jpg');
+
+  const result3 = fileNamingService.appendCounter('document.pdf', 10);
+  assertEquals(result3, 'document_10.pdf');
+});
+
+// Test 12: Generate unique filename with no duplicates
+test('generateUniqueFileName - No duplicates, returns base name', () => {
+  const baseFileName = 'CIN_Dupont_Jean_2024-12-12.pdf';
+  const existingFiles: string[] = [];
+  
+  const result = fileNamingService.generateUniqueFileName(baseFileName, existingFiles);
+  assertEquals(result, baseFileName, 'Should return base name when no duplicates');
+});
+
+// Test 13: Generate unique filename with one duplicate
+test('generateUniqueFileName - One duplicate exists', () => {
+  const baseFileName = 'CIN_Dupont_Jean_2024-12-12.pdf';
+  const existingFiles = ['CIN_Dupont_Jean_2024-12-12.pdf'];
+  
+  const result = fileNamingService.generateUniqueFileName(baseFileName, existingFiles);
+  assertEquals(result, 'CIN_Dupont_Jean_2024-12-12_2.pdf', 'Should append _2');
+});
+
+// Test 14: Generate unique filename with multiple duplicates
+test('generateUniqueFileName - Multiple duplicates exist', () => {
+  const baseFileName = 'FACTURE_EDF_2024-12-12.pdf';
+  const existingFiles = [
+    'FACTURE_EDF_2024-12-12.pdf',
+    'FACTURE_EDF_2024-12-12_2.pdf',
+    'FACTURE_EDF_2024-12-12_3.pdf',
+  ];
+  
+  const result = fileNamingService.generateUniqueFileName(baseFileName, existingFiles);
+  assertEquals(result, 'FACTURE_EDF_2024-12-12_4.pdf', 'Should append _4');
+});
+
+// Test 15: Generate unique filename with gaps in sequence
+test('generateUniqueFileName - Gaps in sequence', () => {
+  const baseFileName = 'test.jpg';
+  const existingFiles = [
+    'test.jpg',
+    'test_2.jpg',
+    // Gap: test_3.jpg is missing
+    'test_4.jpg',
+  ];
+  
+  const result = fileNamingService.generateUniqueFileName(baseFileName, existingFiles);
+  assertEquals(result, 'test_3.jpg', 'Should fill the gap at _3');
+});
+
 console.log('\n✨ All tests passed!\n');

@@ -149,6 +149,17 @@ LIMIT 10;
 - All files in correct folder
 - No naming conflicts (dates ensure uniqueness)
 
+### Scenario 6: Duplicate Filename Handling
+
+**Input:**
+- Upload the same document type with same metadata twice
+
+**Expected Output:**
+- First upload: `CIN_Dupont_Jean_AB123456_2024-12-12.pdf`
+- Second upload: `CIN_Dupont_Jean_AB123456_2024-12-12_2.pdf`
+- Third upload: `CIN_Dupont_Jean_AB123456_2024-12-12_3.pdf`
+- Counters increment automatically (Windows-style)
+
 ## Debugging
 
 ### Check Console Logs
@@ -159,6 +170,14 @@ Starting AI extraction for file: IMG_20241212.jpg
 AI Extraction Result: { type: 'CARTE_IDENTITE', ... }
 Renaming file from IMG_20241212.jpg to CIN_Dupont_Jean_AB123456_2024-12-12.jpg
 File renamed successfully to: CIN_Dupont_Jean_AB123456_2024-12-12.jpg
+```
+
+For duplicate files:
+```
+Checking for existing filenames...
+Found duplicate, appending counter...
+Renaming file from IMG_20241212.jpg to CIN_Dupont_Jean_AB123456_2024-12-12_2.jpg
+File renamed successfully to: CIN_Dupont_Jean_AB123456_2024-12-12_2.jpg
 ```
 
 ### Common Issues

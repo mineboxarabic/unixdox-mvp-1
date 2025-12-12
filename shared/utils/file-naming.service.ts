@@ -258,6 +258,47 @@ export class FileNamingService {
     }
     return fileName.substring(lastDot + 1).toLowerCase();
   }
+
+  /**
+   * Append a counter to filename for handling duplicates (Windows-style)
+   * Examples:
+   * - test.jpg → test_2.jpg
+   * - test.jpg → test_3.jpg
+   */
+  appendCounter(fileName: string, counter: number): string {
+    const lastDot = fileName.lastIndexOf('.');
+    if (lastDot === -1) {
+      return `${fileName}_${counter}`;
+    }
+    const baseName = fileName.substring(0, lastDot);
+    const extension = fileName.substring(lastDot);
+    return `${baseName}_${counter}${extension}`;
+  }
+
+  /**
+   * Generate unique filename by checking against existing filenames
+   * If the base filename exists, appends _2, _3, etc.
+   */
+  generateUniqueFileName(
+    baseFileName: string,
+    existingFileNames: string[]
+  ): string {
+    // If no conflict, return the base name
+    if (!existingFileNames.includes(baseFileName)) {
+      return baseFileName;
+    }
+
+    // Find the next available counter
+    let counter = 2;
+    let candidateName = this.appendCounter(baseFileName, counter);
+    
+    while (existingFileNames.includes(candidateName)) {
+      counter++;
+      candidateName = this.appendCounter(baseFileName, counter);
+    }
+
+    return candidateName;
+  }
 }
 
 export const fileNamingService = new FileNamingService();

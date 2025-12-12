@@ -157,7 +157,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
       // 6. Generate intelligent file name and rename in Google Drive
       try {
         const fileExtension = fileNamingService.getFileExtension(file.name);
-        const newFileName = fileNamingService.generateFileName({
+        const baseFileName = fileNamingService.generateFileName({
           type: extractionResult.type || DocumentType.AUTRE,
           metadata: extractionResult.metadata,
           originalFileName: file.name,
@@ -165,26 +165,39 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
           tags: extractionResult.tags,
         }, fileExtension);
 
-        console.log('Renaming file from', file.name, 'to', newFileName);
+        // Check for existing filenames in the database for this user
+        const existingDocs = await prisma.document.findMany({
+          where: { idProprietaire: userId },
+          select: { nomFichier: true },
+        });
+        const existingFileNames = existingDocs.map(d => d.nomFichier);
+
+        // Generate unique filename (appends _2, _3, etc. if duplicate)
+        const uniqueFileName = fileNamingService.generateUniqueFileName(
+          baseFileName,
+          existingFileNames
+        );
+
+        console.log('Renaming file from', file.name, 'to', uniqueFileName);
         
         // Rename the file in Google Drive
         const { webViewLink: newWebViewLink } = await storageService.renameFile(
           auth,
           storageId,
-          newFileName
+          uniqueFileName
         );
 
         // Update document with new filename and URL
         doc = await prisma.document.update({
           where: { id: doc.id },
           data: {
-            nomFichier: newFileName,
+            nomFichier: uniqueFileName,
             urlStockage: newWebViewLink,
           },
           include: { proprietaire: { select: { id: true, name: true, email: true } } },
         });
 
-        console.log('File successfully renamed to:', newFileName);
+        console.log('File successfully renamed to:', uniqueFileName);
       } catch (renameError: unknown) {
         const errorMessage = renameError instanceof Error ? renameError.message : 'Unknown error';
         console.error('File rename failed (non-critical):', errorMessage);

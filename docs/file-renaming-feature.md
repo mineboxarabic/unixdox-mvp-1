@@ -66,8 +66,25 @@ The service extracts relevant information based on document type:
 
 - **Non-blocking**: If renaming fails, the upload still succeeds with the original filename
 - **Sanitization**: Removes invalid characters (`< > : " / \ | ? *`) and limits filename length
-- **Timestamp**: Always includes timestamp to ensure uniqueness
+- **Date-based uniqueness**: Includes date in filename for organization
+- **Duplicate handling**: Automatically appends counters (_2, _3, etc.) for duplicate filenames, similar to Windows
 - **Fallback**: Uses tags or generic info when specific metadata is unavailable
+
+### 5. Duplicate Filename Handling
+
+When a file with the same name already exists for the user, the system automatically appends a counter:
+
+**Example:**
+```
+First upload:  CIN_Dupont_Jean_AB123456_2024-12-12.pdf
+Second upload: CIN_Dupont_Jean_AB123456_2024-12-12_2.pdf
+Third upload:  CIN_Dupont_Jean_AB123456_2024-12-12_3.pdf
+```
+
+This Windows-style approach ensures:
+- No file overwrites
+- Clear versioning of duplicate documents
+- User-friendly filename patterns
 
 ## Architecture Principles
 
@@ -100,6 +117,9 @@ Tests cover:
 - Special character sanitization
 - Timestamp inclusion
 - Tag fallback behavior
+- Duplicate filename handling (Windows-style counters)
+- Counter appending logic
+- Unique filename generation
 
 ### Manual Testing
 
@@ -113,6 +133,7 @@ Since the feature requires Google OAuth authentication, manual testing should be
    - Upload various document types (ID card, invoice, passport, etc.)
    - Verify files are renamed in Google Drive with intelligent names
    - Check database records have updated filenames
+   - Upload duplicate documents to verify counter appending (_2, _3, etc.)
    - Confirm original functionality (AI extraction) still works
    - Test edge cases (no metadata, special characters in metadata)
 
