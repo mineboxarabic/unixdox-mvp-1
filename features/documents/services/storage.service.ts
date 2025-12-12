@@ -65,6 +65,41 @@ export class StorageService {
     return response.data;
   }
 
+  /**
+   * Rename a file in Google Drive
+   * Returns updated file metadata with new webViewLink
+   */
+  async renameFile(
+    auth: OAuth2Client,
+    fileId: string,
+    newName: string
+  ): Promise<{ id: string; name: string; webViewLink: string }> {
+    const drive = google.drive({ version: 'v3', auth });
+    
+    try {
+      console.log(`Renaming file ${fileId} to ${newName}`);
+      const response = await drive.files.update({
+        fileId: fileId,
+        requestBody: {
+          name: newName,
+        },
+        fields: 'id, name, webViewLink',
+      });
+
+      const { id, name, webViewLink } = response.data;
+
+      if (!id || !name || !webViewLink) {
+        throw new Error('Failed to get updated file info from Google Drive');
+      }
+
+      console.log(`File renamed successfully to ${name}`);
+      return { id, name, webViewLink };
+    } catch (error) {
+      console.error('Error renaming file in Drive:', error);
+      throw new Error('Failed to rename file in Google Drive');
+    }
+  }
+
   private async getOrCreateFolder(drive: any, folderName: string): Promise<string | undefined> {
     try {
       console.log(`Searching for ${folderName} folder...`);

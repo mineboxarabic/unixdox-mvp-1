@@ -11,6 +11,7 @@ import { Document, DocumentStatut, DocumentType, ExtractionStatus } from '@prism
 import { google } from 'googleapis';
 import { prisma } from '@/shared/config/prisma';
 import { aiService } from './services/ai.service';
+import { fileNamingService } from '@/shared/utils/file-naming.service';
 
 export async function updateDocumentDetails(
   documentId: string,
@@ -136,6 +137,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
       );
       console.log('AI Extraction Result:', extractionResult);
 
+      // Update document with extracted metadata
       doc = await prisma.document.update({
         where: { id: doc.id },
         data: {
@@ -151,19 +153,70 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
         },
         include: { proprietaire: { select: { id: true, name: true, email: true } } },
       });
-    } catch (aiError: any) {
-      console.error('AI Extraction failed:', aiError);
+
+      // 6. Generate intelligent file name and rename in Google Drive
+      try {
+        const fileExtension = fileNamingService.getFileExtension(file.name);
+        const baseFileName = fileNamingService.generateFileName({
+          type: extractionResult.type || DocumentType.AUTRE,
+          metadata: extractionResult.metadata,
+          originalFileName: file.name,
+          dateExpiration: extractionResult.dateExpiration,
+          tags: extractionResult.tags,
+        }, fileExtension);
+
+        // Check for existing filenames in the database for this user
+        const existingDocs = await prisma.document.findMany({
+          where: { idProprietaire: userId },
+          select: { nomFichier: true },
+        });
+        const existingFileNames = existingDocs.map(d => d.nomFichier);
+
+        // Generate unique filename (appends _2, _3, etc. if duplicate)
+        const uniqueFileName = fileNamingService.generateUniqueFileName(
+          baseFileName,
+          existingFileNames
+        );
+
+        console.log('Renaming file from', file.name, 'to', uniqueFileName);
+        
+        // Rename the file in Google Drive
+        const { webViewLink: newWebViewLink } = await storageService.renameFile(
+          auth,
+          storageId,
+          uniqueFileName
+        );
+
+        // Update document with new filename and URL
+        doc = await prisma.document.update({
+          where: { id: doc.id },
+          data: {
+            nomFichier: uniqueFileName,
+            urlStockage: newWebViewLink,
+          },
+          include: { proprietaire: { select: { id: true, name: true, email: true } } },
+        });
+
+        console.log('File successfully renamed to:', uniqueFileName);
+      } catch (renameError: unknown) {
+        const errorMessage = renameError instanceof Error ? renameError.message : 'Unknown error';
+        console.error('File rename failed (non-critical):', errorMessage);
+        // Continue - renaming is nice to have but not critical
+      }
+    } catch (aiError: unknown) {
+      const errorMessage = aiError instanceof Error ? aiError.message : 'Unknown error';
+      console.error('AI Extraction failed:', errorMessage);
       doc = await prisma.document.update({
         where: { id: doc.id },
         data: {
           extractionStatus: ExtractionStatus.FAILED,
-          extractionError: aiError.message || 'Unknown error',
+          extractionError: errorMessage,
         },
         include: { proprietaire: { select: { id: true, name: true, email: true } } },
       });
     }
 
-    // 6. Mark onboarding as completed
+    // 7. Mark onboarding as completed
     await prisma.user.update({
       where: { id: userId },
       data: { onboardingCompleted: true },

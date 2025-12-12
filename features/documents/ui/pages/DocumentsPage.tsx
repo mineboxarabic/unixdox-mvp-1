@@ -1,5 +1,8 @@
 import { Text, HStack, Box, Flex } from '@chakra-ui/react';
 import { Suspense } from 'react';
+import { PageLayout } from '@/shared/components/PageLayout';
+import { FiFileText } from 'react-icons/fi';
+import { DocumentsGridSkeleton } from '../components/DocumentsGridSkeleton';
 import { DocumentSearch } from '../components/DocumentSearch';
 import { DocumentsFilters } from '../components/DocumentsFilters';
 import { DocumentsList } from '../components/DocumentsList';
@@ -7,8 +10,6 @@ import { documentService } from '../../services/document.service';
 import { requireAuth } from '@/shared/auth/server';
 import { DocumentType, DocumentStatut } from '@prisma/client';
 import { UploadDocumentButton } from '../components/UploadDocumentButton';
-import { PageLayout } from '@/shared/components/PageLayout';
-import { FiFileText } from 'react-icons/fi';
 
 interface DocumentsPageProps {
     searchParams: {
@@ -59,7 +60,7 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
                 <DocumentsFilters />
             </Flex>
 
-            <Suspense fallback={<Text textAlign="center">Chargement...</Text>}>
+            <Suspense fallback={<DocumentsGridSkeleton />}>
                 <DocumentsList documents={documents} />
             </Suspense>
         </PageLayout>
