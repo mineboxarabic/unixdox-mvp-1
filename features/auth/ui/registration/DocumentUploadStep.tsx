@@ -5,31 +5,32 @@ import { useState } from 'react';
 import { VStack, Heading, Text, Box, HStack } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
+import { showActionResultToast } from '@/shared/utils/action-toast';
 import { toaster } from '@/shared/components/ui/toaster';
 
 // Upload Icon SVG component
 function UploadIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path 
-        d="M12 15V3M12 3L8 7M12 3L16 7" 
-        stroke="currentColor" 
+      <path
+        d="M12 15V3M12 3L8 7M12 3L16 7"
+        stroke="currentColor"
         strokeWidth="2"
-        strokeLinecap="round" 
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path 
-        d="M3 15V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V15" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
+      <path
+        d="M3 15V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V15"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
   );
 }
 
-export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile}: StepComponentProps) {
+export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepComponentProps) {
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -76,20 +77,17 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile}: StepCo
 
       try {
         const result = await uploadDocumentFile(formData);
+        // Show toast for warnings or errors using shared utility
+        showActionResultToast(result);
+
         if (result.success) {
           // Redirect to main page after successful upload
           router.push('/');
-        } else {
-          toaster.create({
-            title: 'Erreur',
-            description: result.error || "Erreur lors de l'upload",
-            type: 'error',
-          });
         }
       } catch (error) {
         toaster.create({
           title: 'Erreur',
-          description: "Erreur lors de l'upload",
+          description: "Une erreur inattendue s'est produite. Veuillez réessayer.",
           type: 'error',
         });
       }
@@ -98,7 +96,8 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile}: StepCo
 
   return (
     <VStack
-      w="513px"
+      maxW="513px"
+      w="full"
       flex="1"
       justify="center"
       align="flex-start"
@@ -143,7 +142,7 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile}: StepCo
           <Box color={dragActive ? "primary.500" : "text.fg.muted"}>
             <UploadIcon />
           </Box>
-          
+
           <VStack gap={1} align="center">
             <Text
               fontSize="sm"

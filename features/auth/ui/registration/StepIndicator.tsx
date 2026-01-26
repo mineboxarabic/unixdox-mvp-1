@@ -16,17 +16,17 @@ interface StepIndicatorProps {
  */
 export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   return (
-    <HStack gap={3} align="center" w="full" justify="center">
+    <HStack gap={3} align="center" w="full" justify="center" px={4}>
       {steps.map((step, index) => {
         const stepNumber = index + 1;
         const isActive = stepNumber === currentStep;
         const isCompleted = stepNumber < currentStep;
         const isLast = index === steps.length - 1;
-        
+
         return (
-          <HStack key={step.id} gap={2} align="center" flex={isLast ? '0' : '1'}>
+          <HStack key={step.id} gap={2} align="center" flex={isLast ? 'none' : '1'}>
             {/* Step Circle and Label */}
-            <HStack gap={2} align="center" flexShrink={0} maxW="120px">
+            <HStack gap={2} align="center" flexShrink={0} minW="fit-content">
               <Box
                 w="24px"
                 h="24px"
@@ -48,19 +48,19 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
                   {stepNumber}
                 </Text>
               </Box>
-              
+
               <Text
                 fontSize="14px"
                 fontWeight="600"
                 color="gray.800"
                 lineHeight="20px"
                 whiteSpace="normal"
-                wordBreak="break-word"
+                maxW="140px"
               >
                 {step.title}
               </Text>
             </HStack>
-            
+
             {/* Separator Line */}
             {!isLast && (
               <Box
@@ -68,7 +68,8 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
                 h="0"
                 borderTop="1px solid"
                 borderColor="gray.300"
-                minW="32px"
+                minW="12px"
+                mx={1}
               />
             )}
           </HStack>

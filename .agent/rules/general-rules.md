@@ -2,9 +2,6 @@
 trigger: always_on
 ---
 
----
-applyTo: '**'
----
 Use DRY principle 
 Use SOLID Principles
 
@@ -38,3 +35,5 @@ Make sure to write comments for complex logic
 
 
 Make all the code scalable and maintainable and easy to read
+
+When you read this file say "I READ THE RULE FILE."

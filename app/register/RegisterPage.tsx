@@ -81,16 +81,18 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
         <BackgroundGradients />
 
         {/* Main Content */}
-        <Flex h="full" position="relative" zIndex={1}>
+        <Flex h="full" w="full" maxW="100vw" position="relative" zIndex={1}>
           {/* Left Side - Login Content */}
           <Flex
             flex="1"
+            h="full"
             bg="bg.surface"
             borderRight="1px solid"
             borderColor="border.muted"
             direction="column"
             justify="center"
             align="center"
+            overflowY="auto"
           >
             <VStack w="full" flex="1" justify="center" align="center">
               <InitialLoginStep
@@ -106,12 +108,13 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
 
           {/* Right Side - Logo */}
           <Flex
-            flex="1"
+            w="400px"
             h="full"
             p={2.5}
             overflow="hidden"
             justify="center"
             align="center"
+            display={{ base: 'none', lg: 'flex' }}
           >
             <Image
               src="/logo.svg"
@@ -135,19 +138,22 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
       <BackgroundGradients />
 
       {/* Main Content */}
-      <Flex h="full" position="relative" zIndex={1}>
+      <Flex h="full" w="full" maxW="100vw" position="relative" zIndex={1}>
         {/* Left Side - Form Content */}
         <Flex
           flex="1"
+          h="full"
           bg="bg.surface"
           borderRight="1px solid"
           borderColor="border.muted"
           direction="column"
           justify="space-between"
           align="center"
+          overflowY="auto"
+          px={8}
         >
           <VStack
-            w="754px"
+            w="full"
             flex="1"
             position="relative"
             justify="space-between"
@@ -172,12 +178,13 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
 
         {/* Right Side - Logo */}
         <Flex
-          flex="1"
+          w="400px"
           h="full"
           p={2.5}
           overflow="hidden"
           justify="center"
           align="center"
+          display={{ base: 'none', lg: 'flex' }}
         >
           <Image
             src="/logo.svg"

@@ -26,7 +26,13 @@ export interface MatchingResult {
 }
 
 export class AIService {
-  private models = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-flash-001', 'gemini-1.5-pro'];
+  // Updated model list with valid Gemini API model names
+  // Priority: stable models first, then experimental (experimental may have quota limits)
+  private models = [
+    'gemini-1.5-flash-latest',  // Stable, fast model
+    'gemini-1.5-pro-latest',    // More capable model
+    'gemini-2.0-flash-exp',     // Experimental (may have strict quota limits)
+  ];
 
   async matchDocumentsToRequirements(
     requiredTypes: string[],
@@ -59,7 +65,7 @@ export class AIService {
         // For now, we send all documents to give AI full context.
 
         const prompt = this.getMatchingPrompt(missing, userDocuments);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Use fast model for matching
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }); // Use fast stable model for matching
 
         const result = await model.generateContent(prompt);
         const response = await result.response;

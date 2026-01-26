@@ -4,8 +4,8 @@ import Google from "next-auth/providers/google";
 export const authConfig = {
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
           scope: "openid email profile https://www.googleapis.com/auth/drive.file",
@@ -19,6 +19,18 @@ export const authConfig = {
   ],
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
+  // Debug logs
+  logger: {
+    error: (code, ...message) => {
+      console.error(code, message)
+    },
+    warn: (code, ...message) => {
+      console.warn(code, message)
+    },
+    debug: (code, ...message) => {
+      console.debug(code, message)
+    },
+  },
   pages: {
     signIn: '/login',
   },

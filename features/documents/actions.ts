@@ -5,7 +5,7 @@ import { documentService } from './services/document.service';
 import { storageService } from './services/storage.service';
 import { CreateDocumentSchema, UpdateDocumentStatusSchema, UpdateDocumentDetailsSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
-import { isGoogleAuthError, AUTH_ERROR_MESSAGES } from '@/shared/utils/errors';
+import { isGoogleAuthError, AUTH_ERROR_MESSAGES, getAIErrorCode, getAIErrorMessage } from '@/shared/utils/errors';
 import { requireAuth } from '@/shared/auth/server';
 import { Document, DocumentStatut, DocumentType, ExtractionStatus } from '@prisma/client';
 import { google } from 'googleapis';
@@ -127,6 +127,8 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
     });
 
     // 5. AI Extraction
+    let aiExtractionWarning: string | undefined;
+    let aiExtractionWarningCode: string | undefined;
     try {
       const buffer = Buffer.from(await file.arrayBuffer());
       console.log('Starting AI extraction for file:', file.name);
@@ -179,7 +181,7 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
         );
 
         console.log('Renaming file from', file.name, 'to', uniqueFileName);
-        
+
         // Rename the file in Google Drive
         const { webViewLink: newWebViewLink } = await storageService.renameFile(
           auth,
@@ -204,13 +206,15 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
         // Continue - renaming is nice to have but not critical
       }
     } catch (aiError: unknown) {
-      const errorMessage = aiError instanceof Error ? aiError.message : 'Unknown error';
-      console.error('AI Extraction failed:', errorMessage);
+      // Use centralized AI error handling for user-friendly messages
+      aiExtractionWarningCode = getAIErrorCode(aiError);
+      aiExtractionWarning = getAIErrorMessage(aiError);
+      console.error('AI Extraction failed:', aiError instanceof Error ? aiError.message : 'Unknown error', '| Error Code:', aiExtractionWarningCode);
       doc = await prisma.document.update({
         where: { id: doc.id },
         data: {
           extractionStatus: ExtractionStatus.FAILED,
-          extractionError: errorMessage,
+          extractionError: aiExtractionWarning,
         },
         include: { proprietaire: { select: { id: true, name: true, email: true } } },
       });
@@ -223,14 +227,19 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
     });
 
     revalidatePath('/documents');
-    return { success: true, data: doc };
+    return {
+      success: true,
+      data: doc,
+      warning: aiExtractionWarning,
+      warningCode: aiExtractionWarningCode,
+    };
   } catch (error: any) {
     console.error('Upload error:', error);
-    
+
     // Handle Google OAuth errors requiring re-authentication
     if (isGoogleAuthError(error)) {
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: AUTH_ERROR_MESSAGES.REAUTH_REQUIRED,
         requiresReauth: true,
       };
@@ -397,7 +406,7 @@ export async function matchDocumentsToRequirementsAction(
   try {
     // Get user's documents
     const userDocuments = await documentService.getUserDocuments(userId);
-    
+
     // Simplify documents for AI processing
     const simplifiedDocs = userDocuments.map(doc => ({
       id: doc.id,
