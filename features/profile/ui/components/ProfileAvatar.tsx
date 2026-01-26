@@ -6,7 +6,7 @@ import { LuCamera } from 'react-icons/lu';
 interface ProfileAvatarProps {
     name: string;
     imagePreview?: string | null;
-    fileInputRef: React.RefObject<HTMLInputElement>;
+    fileInputRef: React.RefObject<HTMLInputElement | null>;
     onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onTriggerInput: () => void;
 }

@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
+import type { UserRole } from "@prisma/client";
 
 export const authConfig = {
   providers: [
@@ -49,7 +50,7 @@ export const authConfig = {
         session.user.id = token.sub;
       }
       if (session.user && token.role) {
-        session.user.role = token.role;
+        session.user.role = token.role as UserRole;
       }
       return session;
     },
