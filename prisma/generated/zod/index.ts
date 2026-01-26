@@ -66,7 +66,7 @@ export const DemarcheUtilisateurScalarFieldEnumSchema = z.enum(['id','idUtilisat
 
 export const NotificationScalarFieldEnumSchema = z.enum(['id','idUser','type','message','idDocumentLie','lu','dateCreation','priorite','createdAt','updatedAt']);
 
-export const AccountScalarFieldEnumSchema = z.enum(['id','userId','type','provider','providerAccountId','refresh_token','access_token','expires_at','token_type','scope','id_token','session_state']);
+export const AccountScalarFieldEnumSchema = z.enum(['id','userId','type','provider','providerAccountId','refresh_token','access_token','expires_at','token_type','scope','id_token','session_state','refresh_token_expires_in']);
 
 export const SessionScalarFieldEnumSchema = z.enum(['id','sessionToken','userId','expires']);
 
@@ -259,6 +259,7 @@ export const AccountSchema = z.object({
   scope: z.string().nullable(),
   id_token: z.string().nullable(),
   session_state: z.string().nullable(),
+  refresh_token_expires_in: z.number().int().nullable(),
 })
 
 export type Account = z.infer<typeof AccountSchema>
@@ -564,6 +565,7 @@ export const AccountSelectSchema: z.ZodType<Prisma.AccountSelect> = z.object({
   scope: z.boolean().optional(),
   id_token: z.boolean().optional(),
   session_state: z.boolean().optional(),
+  refresh_token_expires_in: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
@@ -1272,6 +1274,7 @@ export const AccountWhereInputSchema: z.ZodType<Prisma.AccountWhereInput> = z.st
   scope: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   id_token: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   session_state: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.lazy(() => IntNullableFilterSchema), z.number() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema), z.lazy(() => UserWhereInputSchema) ]).optional(),
 });
 
@@ -1288,6 +1291,7 @@ export const AccountOrderByWithRelationInputSchema: z.ZodType<Prisma.AccountOrde
   scope: z.lazy(() => SortOrderSchema).optional(),
   id_token: z.lazy(() => SortOrderSchema).optional(),
   session_state: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
 });
 
@@ -1320,6 +1324,7 @@ export const AccountWhereUniqueInputSchema: z.ZodType<Prisma.AccountWhereUniqueI
   scope: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   id_token: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   session_state: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.lazy(() => IntNullableFilterSchema), z.number().int() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema), z.lazy(() => UserWhereInputSchema) ]).optional(),
 }));
 
@@ -1336,6 +1341,7 @@ export const AccountOrderByWithAggregationInputSchema: z.ZodType<Prisma.AccountO
   scope: z.lazy(() => SortOrderSchema).optional(),
   id_token: z.lazy(() => SortOrderSchema).optional(),
   session_state: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => AccountCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => AccountAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => AccountMaxOrderByAggregateInputSchema).optional(),
@@ -1359,6 +1365,7 @@ export const AccountScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Accou
   scope: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
   id_token: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
   session_state: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema), z.string() ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema), z.number() ]).optional().nullable(),
 });
 
 export const SessionWhereInputSchema: z.ZodType<Prisma.SessionWhereInput> = z.strictObject({
@@ -2200,6 +2207,7 @@ export const AccountCreateInputSchema: z.ZodType<Prisma.AccountCreateInput> = z.
   scope: z.string().optional().nullable(),
   id_token: z.string().optional().nullable(),
   session_state: z.string().optional().nullable(),
+  refresh_token_expires_in: z.number().int().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutAccountsInputSchema),
 });
 
@@ -2216,6 +2224,7 @@ export const AccountUncheckedCreateInputSchema: z.ZodType<Prisma.AccountUnchecke
   scope: z.string().optional().nullable(),
   id_token: z.string().optional().nullable(),
   session_state: z.string().optional().nullable(),
+  refresh_token_expires_in: z.number().int().optional().nullable(),
 });
 
 export const AccountUpdateInputSchema: z.ZodType<Prisma.AccountUpdateInput> = z.strictObject({
@@ -2229,6 +2238,7 @@ export const AccountUpdateInputSchema: z.ZodType<Prisma.AccountUpdateInput> = z.
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutAccountsNestedInputSchema).optional(),
 });
 
@@ -2244,6 +2254,7 @@ export const AccountUncheckedUpdateInputSchema: z.ZodType<Prisma.AccountUnchecke
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 });
 
 export const AccountCreateManyInputSchema: z.ZodType<Prisma.AccountCreateManyInput> = z.strictObject({
@@ -2259,6 +2270,7 @@ export const AccountCreateManyInputSchema: z.ZodType<Prisma.AccountCreateManyInp
   scope: z.string().optional().nullable(),
   id_token: z.string().optional().nullable(),
   session_state: z.string().optional().nullable(),
+  refresh_token_expires_in: z.number().int().optional().nullable(),
 });
 
 export const AccountUpdateManyMutationInputSchema: z.ZodType<Prisma.AccountUpdateManyMutationInput> = z.strictObject({
@@ -2272,6 +2284,7 @@ export const AccountUpdateManyMutationInputSchema: z.ZodType<Prisma.AccountUpdat
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 });
 
 export const AccountUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AccountUncheckedUpdateManyInput> = z.strictObject({
@@ -2286,6 +2299,7 @@ export const AccountUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AccountUnch
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 });
 
 export const SessionCreateInputSchema: z.ZodType<Prisma.SessionCreateInput> = z.strictObject({
@@ -3163,10 +3177,12 @@ export const AccountCountOrderByAggregateInputSchema: z.ZodType<Prisma.AccountCo
   scope: z.lazy(() => SortOrderSchema).optional(),
   id_token: z.lazy(() => SortOrderSchema).optional(),
   session_state: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
 });
 
 export const AccountAvgOrderByAggregateInputSchema: z.ZodType<Prisma.AccountAvgOrderByAggregateInput> = z.strictObject({
   expires_at: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
 });
 
 export const AccountMaxOrderByAggregateInputSchema: z.ZodType<Prisma.AccountMaxOrderByAggregateInput> = z.strictObject({
@@ -3182,6 +3198,7 @@ export const AccountMaxOrderByAggregateInputSchema: z.ZodType<Prisma.AccountMaxO
   scope: z.lazy(() => SortOrderSchema).optional(),
   id_token: z.lazy(() => SortOrderSchema).optional(),
   session_state: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
 });
 
 export const AccountMinOrderByAggregateInputSchema: z.ZodType<Prisma.AccountMinOrderByAggregateInput> = z.strictObject({
@@ -3197,10 +3214,12 @@ export const AccountMinOrderByAggregateInputSchema: z.ZodType<Prisma.AccountMinO
   scope: z.lazy(() => SortOrderSchema).optional(),
   id_token: z.lazy(() => SortOrderSchema).optional(),
   session_state: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
 });
 
 export const AccountSumOrderByAggregateInputSchema: z.ZodType<Prisma.AccountSumOrderByAggregateInput> = z.strictObject({
   expires_at: z.lazy(() => SortOrderSchema).optional(),
+  refresh_token_expires_in: z.lazy(() => SortOrderSchema).optional(),
 });
 
 export const IntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.IntNullableWithAggregatesFilter> = z.strictObject({
@@ -4570,6 +4589,7 @@ export const AccountCreateWithoutUserInputSchema: z.ZodType<Prisma.AccountCreate
   scope: z.string().optional().nullable(),
   id_token: z.string().optional().nullable(),
   session_state: z.string().optional().nullable(),
+  refresh_token_expires_in: z.number().int().optional().nullable(),
 });
 
 export const AccountUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.AccountUncheckedCreateWithoutUserInput> = z.strictObject({
@@ -4584,6 +4604,7 @@ export const AccountUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.Acco
   scope: z.string().optional().nullable(),
   id_token: z.string().optional().nullable(),
   session_state: z.string().optional().nullable(),
+  refresh_token_expires_in: z.number().int().optional().nullable(),
 });
 
 export const AccountCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.AccountCreateOrConnectWithoutUserInput> = z.strictObject({
@@ -4820,6 +4841,7 @@ export const AccountScalarWhereInputSchema: z.ZodType<Prisma.AccountScalarWhereI
   scope: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   id_token: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
   session_state: z.union([ z.lazy(() => StringNullableFilterSchema), z.string() ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.lazy(() => IntNullableFilterSchema), z.number() ]).optional().nullable(),
 });
 
 export const SessionUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.SessionUpsertWithWhereUniqueWithoutUserInput> = z.strictObject({
@@ -6037,6 +6059,7 @@ export const AccountCreateManyUserInputSchema: z.ZodType<Prisma.AccountCreateMan
   scope: z.string().optional().nullable(),
   id_token: z.string().optional().nullable(),
   session_state: z.string().optional().nullable(),
+  refresh_token_expires_in: z.number().int().optional().nullable(),
 });
 
 export const SessionCreateManyUserInputSchema: z.ZodType<Prisma.SessionCreateManyUserInput> = z.strictObject({
@@ -6253,6 +6276,7 @@ export const AccountUpdateWithoutUserInputSchema: z.ZodType<Prisma.AccountUpdate
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 });
 
 export const AccountUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.AccountUncheckedUpdateWithoutUserInput> = z.strictObject({
@@ -6266,6 +6290,7 @@ export const AccountUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Acco
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 });
 
 export const AccountUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.AccountUncheckedUpdateManyWithoutUserInput> = z.strictObject({
@@ -6279,6 +6304,7 @@ export const AccountUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.
   scope: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   id_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   session_state: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  refresh_token_expires_in: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 });
 
 export const SessionUpdateWithoutUserInputSchema: z.ZodType<Prisma.SessionUpdateWithoutUserInput> = z.strictObject({

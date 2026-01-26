@@ -26,7 +26,6 @@ enum UserRole {
   ADMIN
 }
 
-
 enum DocumentType {
   FACTURE
   CONTRAT
@@ -86,29 +85,30 @@ enum DemarcheCategorie {
 }
 
 model User {
-  id                     String                  @id @default(auto()) @map("_id") @db.ObjectId
+  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
   // NextAuth standard fields (added)
-  name                   String?
-  image                  String?
-  email                  String?                 @unique
-  emailVerified          DateTime?
-  googleId               String?                 @unique
-  password               String?
-  plan                   SubscriptionPlan        @default(FREE)
-  role                   UserRole                @default(USER)
-  onboardingCompleted    Boolean                 @default(false)
-  dateInscription        DateTime                @default(now())
-  preferences            UserPreferences?
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
-  documents              Document[]
-  dossiers               Dossier[]
-  demarchesUtilisateur   DemarcheUtilisateur[]
-  createdDemarches       ModeleDemarche[]        @relation("CreatedDemarches")
-  notifications          Notification[]
+  name                 String?
+  image                String?
+  email                String?               @unique
+  emailVerified        DateTime?
+  googleId             String?               @unique
+  password             String?
+  plan                 SubscriptionPlan      @default(FREE)
+  role                 UserRole              @default(USER)
+  onboardingCompleted  Boolean               @default(false)
+  dateInscription      DateTime              @default(now())
+  preferences          UserPreferences?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  documents            Document[]
+  dossiers             Dossier[]
+  demarchesUtilisateur DemarcheUtilisateur[]
+  createdDemarches     ModeleDemarche[]      @relation("CreatedDemarches")
+  notifications        Notification[]
   // Relations required by NextAuth (added)
-  accounts               Account[]
-  sessions               Session[]
+  accounts             Account[]
+  sessions             Session[]
+
   @@map("users")
 }
 
@@ -118,26 +118,27 @@ type UserPreferences {
 }
 
 model Document {
-  id                String              @id @default(auto()) @map("_id") @db.ObjectId
-  idProprietaire    String              @db.ObjectId
-  nomFichier        String
-  urlStockage       String?
-  storageId         String?
-  type              DocumentType
-  statut            DocumentStatut      @default(EN_ATTENTE)
-  tags              String[]
-  dateUpload        DateTime            @default(now())
-  dateExpiration    DateTime?
-  size              Int
-  metadata          Json?
-  extractionStatus  ExtractionStatus    @default(PENDING)
-  extractionError   String?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  proprietaire      User                @relation(fields: [idProprietaire], references: [id], onDelete: Cascade)
-  dossiers          Dossier[]           @relation(fields: [dossierIds], references: [id])
-  dossierIds        String[]            @db.ObjectId
-  notifications     Notification[]
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  idProprietaire   String           @db.ObjectId
+  nomFichier       String
+  urlStockage      String?
+  storageId        String?
+  type             DocumentType
+  statut           DocumentStatut   @default(EN_ATTENTE)
+  tags             String[]
+  dateUpload       DateTime         @default(now())
+  dateExpiration   DateTime?
+  size             Int
+  metadata         Json?
+  extractionStatus ExtractionStatus @default(PENDING)
+  extractionError  String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  proprietaire     User             @relation(fields: [idProprietaire], references: [id], onDelete: Cascade)
+  dossiers         Dossier[]        @relation(fields: [dossierIds], references: [id])
+  dossierIds       String[]         @db.ObjectId
+  notifications    Notification[]
+
   @@index([idProprietaire])
   @@index([type])
   @@index([statut])
@@ -159,42 +160,45 @@ model Dossier {
   updatedAt      DateTime   @updatedAt
   proprietaire   User       @relation(fields: [idProprietaire], references: [id], onDelete: Cascade)
   documents      Document[] @relation(fields: [idsDocuments], references: [id])
+
   @@index([idProprietaire])
   @@map("dossiers")
 }
 
 model ModeleDemarche {
-  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
-  titre                 String                  @unique
-  description           String?
-  typesDocumentsRequis  String[]
-  categorie             DemarcheCategorie       @default(AUTRE)
-  actif                 Boolean                 @default(true)
-  ordre                 Int                     @default(0)
-  createdById           String?                 @db.ObjectId
-  createdBy             User?                   @relation("CreatedDemarches", fields: [createdById], references: [id])
-  createdAt             DateTime                @default(now())
-  updatedAt             DateTime                @updatedAt
-  demarchesUtilisateur  DemarcheUtilisateur[]
+  id                   String                @id @default(auto()) @map("_id") @db.ObjectId
+  titre                String                @unique
+  description          String?
+  typesDocumentsRequis String[]
+  categorie            DemarcheCategorie     @default(AUTRE)
+  actif                Boolean               @default(true)
+  ordre                Int                   @default(0)
+  createdById          String?               @db.ObjectId
+  createdBy            User?                 @relation("CreatedDemarches", fields: [createdById], references: [id])
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  demarchesUtilisateur DemarcheUtilisateur[]
+
   @@index([actif, ordre])
   @@map("modele_demarches")
 }
 
 model DemarcheUtilisateur {
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId
-  idUtilisateur     String             @db.ObjectId
-  idModele          String             @db.ObjectId
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  idUtilisateur     String         @db.ObjectId
+  idModele          String         @db.ObjectId
   titre             String?
-  complete          Boolean            @default(false)
-  dateDebut         DateTime           @default(now())
+  complete          Boolean        @default(false)
+  dateDebut         DateTime       @default(now())
   dateCompletion    DateTime?
-  statut            DemarcheStatut     @default(EN_COURS)
+  statut            DemarcheStatut @default(EN_COURS)
   notes             String?
   documentsAssocies Json?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  utilisateur       User               @relation(fields: [idUtilisateur], references: [id], onDelete: Cascade)
-  modele            ModeleDemarche     @relation(fields: [idModele], references: [id], onDelete: Cascade)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  utilisateur       User           @relation(fields: [idUtilisateur], references: [id], onDelete: Cascade)
+  modele            ModeleDemarche @relation(fields: [idModele], references: [id], onDelete: Cascade)
+
   @@index([idUtilisateur])
   @@index([complete])
   @@index([statut])
@@ -204,18 +208,19 @@ model DemarcheUtilisateur {
 }
 
 model Notification {
-  id             String                @id @default(auto()) @map("_id") @db.ObjectId
-  idUser         String                @db.ObjectId
-  type           NotificationType
-  message        String
-  idDocumentLie  String?               @db.ObjectId
-  lu             Boolean               @default(false)
-  dateCreation   DateTime              @default(now())
-  priorite       NotificationPriorite  @default(NORMALE)
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  user           User                  @relation(fields: [idUser], references: [id], onDelete: Cascade)
-  documentLie    Document?             @relation(fields: [idDocumentLie], references: [id], onDelete: SetNull)
+  id            String               @id @default(auto()) @map("_id") @db.ObjectId
+  idUser        String               @db.ObjectId
+  type          NotificationType
+  message       String
+  idDocumentLie String?              @db.ObjectId
+  lu            Boolean              @default(false)
+  dateCreation  DateTime             @default(now())
+  priorite      NotificationPriorite @default(NORMALE)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  user          User                 @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  documentLie   Document?            @relation(fields: [idDocumentLie], references: [id], onDelete: SetNull)
+
   @@index([idUser])
   @@index([type])
   @@index([lu])
@@ -229,19 +234,20 @@ model Notification {
 // NextAuth models for Prisma Adapter (MongoDB)
 
 model Account {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String   @db.ObjectId
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?  @db.String
-  access_token      String?  @db.String
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?  @db.String
-  session_state     String?
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                       String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId                   String  @db.ObjectId
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.String
+  access_token             String? @db.String
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.String
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])

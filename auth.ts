@@ -27,13 +27,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               token_type: account.token_type,
               scope: account.scope,
               id_token: account.id_token,
+              refresh_token_expires_in: (account as any).refresh_token_expires_in,
             },
           });
           console.log('Updated Google tokens for user:', user.id);
         } catch (error) {
-          console.error('Error updating tokens:', error);
+          console.error('Error updating tokens for user:', user.id, error);
+          // Don't throw to prevent blocking sign in
         }
+      } else {
+        console.log('SignIn callback: Skipping token update', { 
+            provider: account?.provider, 
+            hasUserId: !!user.id 
+        });
       }
+
       return true;
     },
   },
