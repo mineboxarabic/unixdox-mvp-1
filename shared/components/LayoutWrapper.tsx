@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Box, Flex } from '@chakra-ui/react';
 import { Toaster } from '@/shared/components/ui/toaster';
-import type { SidebarCounts } from '@/features/sidebar';
+import type { SidebarCounts, StorageInfo } from '@/features/sidebar';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -16,9 +16,10 @@ interface LayoutWrapperProps {
   };
   SideBar?: React.ComponentType<any>;
   sidebarCounts?: SidebarCounts;
+  sidebarStorage?: StorageInfo;
 }
 
-export function LayoutWrapper({ SideBar, children, authenticated, user, sidebarCounts }: LayoutWrapperProps) {
+export function LayoutWrapper({ SideBar, children, authenticated, user, sidebarCounts, sidebarStorage }: LayoutWrapperProps) {
   const pathname = usePathname();
 
   // Hide sidebar on auth pages
@@ -41,6 +42,7 @@ export function LayoutWrapper({ SideBar, children, authenticated, user, sidebarC
               : undefined
           }
           counts={sidebarCounts}
+          storage={sidebarStorage}
         />
       )}
       <Box flex="1" overflow="auto">

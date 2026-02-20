@@ -7,7 +7,10 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "db:clear": "npx tsx prisma/clear-data.ts",
+    "db:seed-demo": "npx tsx prisma/seed-demo.ts",
+    "db:reset-demo": "npm run db:clear && npm run db:seed-demo"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

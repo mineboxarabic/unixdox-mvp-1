@@ -9,6 +9,7 @@ export interface ExtractedMetadata {
   dateExpiration?: Date;
   tags?: string[];
   metadata?: Record<string, any>;
+  isDocument?: boolean; // Whether the AI determines this is a valid document
 }
 
 export interface SimplifiedDocument {
@@ -27,11 +28,9 @@ export interface MatchingResult {
 
 export class AIService {
   // Updated model list with valid Gemini API model names
-  // Priority: stable models first, then experimental (experimental may have quota limits)
+  // Priority: stable models first, then fallback options
   private models = [
-    'gemini-1.5-flash-latest',  // Stable, fast model
-    'gemini-1.5-pro-latest',    // More capable model
-    'gemini-2.0-flash-exp',     // Experimental (may have strict quota limits)
+    'gemini-2.0-flash',         // Latest stable flash model
   ];
 
   async matchDocumentsToRequirements(
@@ -151,41 +150,74 @@ export class AIService {
     }
   }
 
+  // Helper function to delay execution
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Check if error is a rate limit error
+  private isRateLimitError(error: unknown): boolean {
+    if (!error) return false;
+    const status = (error as { status?: number })?.status;
+    const message = error instanceof Error ? error.message : String(error);
+    return status === 429 || message.includes('429') || message.includes('Too Many Requests') || message.includes('quota');
+  }
+
   async extractDocumentMetadata(
     fileBuffer: Buffer,
     mimeType: string,
     currentType: DocumentType
   ): Promise<ExtractedMetadata> {
-    let lastError;
+    let lastError: unknown;
+    const maxRetries = 3;
+    const baseDelayMs = 2000; // Start with 2 second delay
 
     // Fetch available tags
     const availableTags = await prisma.tag.findMany({ select: { name: true } });
     const tagList = availableTags.map(t => t.name);
 
     for (const modelName of this.models) {
-      try {
-        console.log(`Attempting AI extraction with model: ${modelName}`);
-        const model = genAI.getGenerativeModel({ model: modelName });
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          console.log(`Attempting AI extraction with model: ${modelName} (attempt ${attempt + 1}/${maxRetries})`);
+          const model = genAI.getGenerativeModel({ model: modelName });
 
-        const prompt = this.getPromptForType(currentType, tagList);
-        const imagePart = {
-          inlineData: {
-            data: fileBuffer.toString('base64'),
-            mimeType,
-          },
-        };
+          const prompt = this.getPromptForType(currentType, tagList);
+          const imagePart = {
+            inlineData: {
+              data: fileBuffer.toString('base64'),
+              mimeType,
+            },
+          };
 
-        const result = await model.generateContent([prompt, imagePart]);
-        const response = await result.response;
-        const text = response.text();
+          const result = await model.generateContent([prompt, imagePart]);
+          const response = await result.response;
+          const text = response.text();
 
-        console.log('AI Raw Response:', text); // Debug log
+          console.log('AI Raw Response:', text); // Debug log
 
-        return this.parseResponse(text);
-      } catch (error) {
-        console.error(`AI Extraction Error with ${modelName}:`, error);
-        lastError = error;
-        // Continue to next model
+          return this.parseResponse(text);
+        } catch (error: unknown) {
+          // Log detailed error information for debugging
+          console.error(`AI Extraction Error with ${modelName} (attempt ${attempt + 1}):`, error);
+          console.error({
+            status: (error as { status?: number })?.status,
+            statusText: (error as { statusText?: string })?.statusText,
+            message: error instanceof Error ? error.message : String(error),
+          });
+          lastError = error;
+
+          // If it's a rate limit error, wait and retry
+          if (this.isRateLimitError(error) && attempt < maxRetries - 1) {
+            const delayTime = baseDelayMs * Math.pow(2, attempt); // Exponential backoff: 2s, 4s, 8s
+            console.log(`Rate limited. Waiting ${delayTime}ms before retry...`);
+            await this.delay(delayTime);
+            continue;
+          }
+
+          // For non-rate-limit errors, break out of retry loop and try next model
+          break;
+        }
       }
     }
 
@@ -199,10 +231,13 @@ export class AIService {
       : `Suggest relevant tags (max 5).`;
 
     const basePrompt = `
-      Analyze this document image. Extract relevant information in JSON format.
+      Analyze this image carefully. First, determine if this is a valid document.
+      A valid document is an official or semi-official paper such as: ID cards, passports, invoices, contracts, certificates, pay slips, insurance documents, bank statements, etc.
+      NOT valid documents: random photos, selfies, screenshots of apps/games, memes, artwork, landscapes, or any non-document images.
       
       Return a JSON object with the following structure:
       {
+        "isDocument": true/false,
         "suggestedType": "One of the following: ${documentTypes}",
         "dateExpiration": "YYYY-MM-DD (if applicable, e.g. for ID, Passport, Insurance)",
         "tags": ["array", "of", "relevant", "keywords", "max 5"],
@@ -211,6 +246,7 @@ export class AIService {
         }
       }
 
+      IMPORTANT: If "isDocument" is false, set "suggestedType" to "AUTRE" and leave "metadata" empty.
       ${tagsInstruction}
     `;
 
@@ -304,6 +340,8 @@ export class AIService {
       const result: ExtractedMetadata = {
         tags: json.tags,
         metadata: json.metadata,
+        // Default to true if not specified for backwards compatibility
+        isDocument: json.isDocument !== false,
       };
 
       if (json.suggestedType && Object.values(DocumentType).includes(json.suggestedType)) {

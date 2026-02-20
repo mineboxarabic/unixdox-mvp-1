@@ -151,7 +151,8 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
           dateExpiration: extractionResult.dateExpiration,
           tags: extractionResult.tags,
           type: extractionResult.type || DocumentType.AUTRE,
-          statut: DocumentStatut.VERIFIE, // Auto-verify if AI succeeds
+          // Only auto-verify if AI confirms this is a valid document
+          statut: extractionResult.isDocument !== false ? DocumentStatut.VERIFIE : DocumentStatut.EN_ATTENTE,
         },
         include: { proprietaire: { select: { id: true, name: true, email: true } } },
       });

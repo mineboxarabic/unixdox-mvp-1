@@ -4,7 +4,7 @@ import "./globals.css";
 import { Provider } from "@/shared/components/ui/provider";
 import { auth } from '@/auth';
 import { LayoutWrapper } from '@/shared/components/LayoutWrapper';
-import { Sidebar, getSidebarCounts } from "@/features/sidebar";
+import { Sidebar, getSidebarCounts, getSidebarStorageInfo } from "@/features/sidebar";
 import { SessionProvider } from "next-auth/react";
 import { prisma } from "@/shared/config/prisma";
 
@@ -29,17 +29,20 @@ export default async function RootLayout({
 
   // Fetch sidebar counts and user plan if user is authenticated
   let sidebarCounts;
+  let sidebarStorage;
   let isPremium = false;
 
   if (session?.user?.id) {
-    const [counts, user] = await Promise.all([
+    const [counts, user, storage] = await Promise.all([
       getSidebarCounts(),
       prisma.user.findUnique({
         where: { id: session.user.id },
         select: { plan: true },
       }),
+      getSidebarStorageInfo(),
     ]);
     sidebarCounts = counts;
+    sidebarStorage = storage ?? undefined;
     isPremium = user?.plan === 'PREMIUM' || user?.plan === 'ENTERPRISE';
   }
 
@@ -53,7 +56,13 @@ export default async function RootLayout({
       <body className={`${inter.variable} antialiased`} style={{ fontFamily: 'var(--font-inter)' }}>
         <SessionProvider session={session}>
           <Provider>
-            <LayoutWrapper SideBar={Sidebar} authenticated={!!session?.user} user={userWithPremium} sidebarCounts={sidebarCounts}>
+            <LayoutWrapper
+              SideBar={Sidebar}
+              authenticated={!!session?.user}
+              user={userWithPremium}
+              sidebarCounts={sidebarCounts}
+              sidebarStorage={sidebarStorage}
+            >
               {children}
             </LayoutWrapper>
           </Provider>

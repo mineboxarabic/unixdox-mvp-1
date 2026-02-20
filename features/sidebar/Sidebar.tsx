@@ -33,9 +33,10 @@ export interface SidebarCounts {
 interface SidebarProps {
   user?: UserAccountType;
   counts?: SidebarCounts;
+  storage?: StorageInfo;
 }
 
-export function Sidebar({ user, counts }: SidebarProps) {
+export function Sidebar({ user, counts, storage }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -71,6 +72,8 @@ export function Sidebar({ user, counts }: SidebarProps) {
     if (href === '#') return false;
     return pathname?.startsWith(href);
   };
+
+  const resolvedStorage = storage ?? storageInfo;
 
   return (
     <Box
@@ -181,7 +184,7 @@ export function Sidebar({ user, counts }: SidebarProps) {
         {/* Bottom Section */}
         <Flex direction="column" gap={4}>
           {/* Storage Indicator */}
-          <StorageIndicator storage={storageInfo} isCollapsed={isCollapsed} />
+          <StorageIndicator storage={resolvedStorage} isCollapsed={isCollapsed} />
 
           <Separator variant="dashed" />
 
