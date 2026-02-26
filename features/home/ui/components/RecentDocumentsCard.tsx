@@ -55,7 +55,7 @@ export function RecentDocumentsCard({
   /** Format file size to human-readable string */
   const formatSize = (bytes?: number) => {
     if (!bytes) return "--";
-const sizes = ["Octets", "Ko", "Mo", "Go", "To"];
+    const sizes = ["Octets", "Ko", "Mo", "Go", "To"];
     if (bytes === 0) return "0 Octet";
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString());
     return Math.round(bytes / Math.pow(1024, i)) + "" + sizes[i];
@@ -126,9 +126,6 @@ const sizes = ["Octets", "Ko", "Mo", "Go", "To"];
                         key={index}
                         variant="subtle"
                         colorScheme="neutral"
-                        bg="gray.100"
-                        color="gray.800"
-                        fontSize="xs"
                       >
                         {tag}
                       </Badge>

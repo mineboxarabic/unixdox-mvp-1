@@ -133,10 +133,9 @@ export function UpcomingDeadlinesCard({
                     <Flex alignItems="center" gap="3" flex="1" minW={0}>
                       {/* Orange time badge — matches Figma orange.subtle style */}
                       <Badge
-                        colorScheme={isExpired ? "danger" : "warning"}
+                        key={index}
                         variant="subtle"
-                        size="sm"
-                        flexShrink={0}
+                        colorScheme={isExpired ? "danger" : "warning"}
                       >
                         <span suppressHydrationWarning>{timeLeft}</span>
                       </Badge>

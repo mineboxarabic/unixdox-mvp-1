@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { VStack } from '@chakra-ui/react';
 import { AuthLayout } from '@/shared/auth/components/AuthLayout';
 import { StepIndicator } from '@/features/auth/ui/registration/StepIndicator';
@@ -46,6 +46,7 @@ interface RegisterPageProps {
  */
 export default function RegisterPage({ isAuthenticated = false }: RegisterPageProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
   const [currentStep, setCurrentStep] = useState(1);
 

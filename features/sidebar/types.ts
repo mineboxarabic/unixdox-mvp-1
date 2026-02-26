@@ -1,6 +1,6 @@
 export interface NavItem {
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<any>;
   href: string;
   isActive?: boolean;
   badge?: number;

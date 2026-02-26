@@ -51,7 +51,7 @@ export function NavButton({ item, isCollapsed = false }: NavButtonProps) {
         w="24px"
         h="24px"
       >
-        <item.icon style={{ width: 20, height: 20 }} />
+        <item.icon size={20} />
       </Box>
 
       {!isCollapsed && (
