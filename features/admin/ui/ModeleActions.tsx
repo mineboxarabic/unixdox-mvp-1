@@ -31,22 +31,22 @@ export function ModeleActions({ modeleId }: ModeleActionsProps) {
     try {
       const result = await deleteModeleDemarche(modeleId);
       if (result.success) {
-        toaster.create({
-          title: "Success",
-          description: "Model deleted successfully",
+toaster.create({
+          title: "Succès",
+          description: "Modèle supprimé avec succès",
           type: "success",
         });
       } else {
-        toaster.create({
-          title: "Error",
-          description: result.error || "Failed to delete model",
+toaster.create({
+          title: "Erreur",
+          description: result.error || "Échec de la suppression du modèle",
           type: "error",
         });
       }
     } catch (error) {
-      toaster.create({
-        title: "Error",
-        description: "An unexpected error occurred",
+toaster.create({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
         type: "error",
       });
     } finally {
@@ -57,15 +57,15 @@ export function ModeleActions({ modeleId }: ModeleActionsProps) {
   return (
     <>
       <Link href={`/admin/modele-demarche/${modeleId}/edit`}>
-        <IconButton aria-label="Edit model" variant="ghost" size="sm">
+        <IconButton aria-label="Modifier le modèle" variant="ghost" size="sm">
           <FiEdit />
         </IconButton>
       </Link>
 
       <DialogRoot role="alertdialog">
         <DialogTrigger asChild>
-          <IconButton
-            aria-label="Delete model"
+<IconButton
+            aria-label="Supprimer le modèle"
             variant="ghost"
             colorPalette="red"
             size="sm"
@@ -76,19 +76,18 @@ export function ModeleActions({ modeleId }: ModeleActionsProps) {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Model</DialogTitle>
+            <DialogTitle>Supprimer le modèle</DialogTitle>
             <DialogCloseTrigger />
           </DialogHeader>
-          <DialogBody>
-            Are you sure you want to delete this model? This action cannot be
-            undone.
+<DialogBody>
+            Êtes-vous sûr de vouloir supprimer ce modèle ? Cette action est irréversible.
           </DialogBody>
           <DialogFooter>
             <DialogActionTrigger asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">Annuler</Button>
             </DialogActionTrigger>
             <Button colorPalette="red" onClick={handleDelete} loading={isDeleting}>
-              Delete
+Supprimer
             </Button>
           </DialogFooter>
         </DialogContent>

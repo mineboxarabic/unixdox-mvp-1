@@ -22,6 +22,9 @@ import { useState, useEffect, useRef } from "react";
 import { toaster } from "@/shared/components/ui/toaster";
 import { updateDocumentDetails, getTags } from "../../actions";
 import { IoClose } from "react-icons/io5";
+import { getDrivePreviewUrl } from "../../utils";
+import { LuFile } from "react-icons/lu";
+import { Icon } from "@chakra-ui/react";
 
 interface EditableDocument {
   id: string;
@@ -31,6 +34,8 @@ interface EditableDocument {
   tags?: string[];
   dateExpiration?: Date | string | null;
   expirationDate?: Date | string | null;
+  urlStockage?: string | null;
+  url?: string | null;
 }
 
 interface EditDocumentDialogProps {
@@ -245,56 +250,92 @@ export function EditDocumentDialog({ isOpen, onClose, document }: EditDocumentDi
     items: Object.values(DocumentType).map((type) => ({ label: type, value: type })),
   });
 
+  const previewUrl = getDrivePreviewUrl(document?.urlStockage ?? document?.url ?? undefined);
+
   return (
-    <DialogRoot open={isOpen} onOpenChange={(e) => !e.open && onClose()}>
+    <DialogRoot open={isOpen} onOpenChange={(e) => !e.open && onClose()} size="xl">
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Modifier le document</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <VStack gap={4} align="stretch">
-            <FormInput
-              label="Nom du fichier"
-              value={formData.nomFichier}
-              onChange={(e) => setFormData({ ...formData, nomFichier: e.target.value })}
-            />
-
-            <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={1.5}>Type de document</Text>
-              <SelectRoot 
-                collection={documentTypes}
-                value={[formData.type]} 
-                onValueChange={(e) => setFormData({ ...formData, type: e.value[0] as DocumentType })}
-              >
-                <SelectTrigger>
-                  <SelectValueText placeholder="Sélectionner un type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {documentTypes.items.map((type) => (
-                    <SelectItem key={type.value} item={type}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </SelectRoot>
+          <Flex direction={{ base: "column", md: "row" }} gap={6}>
+            {/* Preview Section */}
+            <Box
+              flex="1"
+              bg="gray.50"
+              borderRadius="md"
+              overflow="hidden"
+              minH="360px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              border="1px solid"
+              borderColor="gray.200"
+            >
+              {previewUrl ? (
+                <iframe
+                  src={previewUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ minHeight: "360px", border: "none" }}
+                  title={`Aperçu de ${document?.name || document?.nomFichier}`}
+                />
+              ) : (
+                <VStack color="gray.400">
+                  <Icon as={LuFile} boxSize={12} />
+                  <Text fontSize="sm">Aperçu non disponible</Text>
+                </VStack>
+              )}
             </Box>
 
-            <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={1.5}>Tags</Text>
-              <TagInput
-                value={formData.tags}
-                onChange={(tags) => setFormData({ ...formData, tags })}
-                availableTags={availableTags}
-              />
-            </Box>
+            {/* Form Section */}
+            <Box flex={{ base: "1", md: "0 0 350px" }}>
+              <VStack gap={4} align="stretch">
+                <FormInput
+                  label="Nom du fichier"
+                  value={formData.nomFichier}
+                  onChange={(e) => setFormData({ ...formData, nomFichier: e.target.value })}
+                />
 
-            <FormInput
-              label="Date d'expiration"
-              type="date"
-              value={formData.dateExpiration}
-              onChange={(e) => setFormData({ ...formData, dateExpiration: e.target.value })}
-            />
-          </VStack>
+                <Box>
+                  <Text fontSize="sm" fontWeight="medium" mb={1.5}>Type de document</Text>
+                  <SelectRoot 
+                    collection={documentTypes}
+                    value={[formData.type]} 
+                    onValueChange={(e) => setFormData({ ...formData, type: e.value[0] as DocumentType })}
+                  >
+                    <SelectTrigger>
+                      <SelectValueText placeholder="Sélectionner un type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {documentTypes.items.map((type) => (
+                        <SelectItem key={type.value} item={type}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </SelectRoot>
+                </Box>
+
+                <Box>
+                  <Text fontSize="sm" fontWeight="medium" mb={1.5}>Tags</Text>
+                  <TagInput
+                    value={formData.tags}
+                    onChange={(tags) => setFormData({ ...formData, tags })}
+                    availableTags={availableTags}
+                  />
+                </Box>
+
+                <FormInput
+                  label="Date d'expiration"
+                  type="date"
+                  value={formData.dateExpiration}
+                  onChange={(e) => setFormData({ ...formData, dateExpiration: e.target.value })}
+                />
+              </VStack>
+            </Box>
+          </Flex>
         </DialogBody>
         <DialogFooter>
           <Button  variant="ghost" onClick={onClose} disabled={isLoading}>

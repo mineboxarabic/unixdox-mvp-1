@@ -17,17 +17,17 @@ export class DemarcheExportService {
     });
 
     if (!demarche) {
-      throw new Error('Demarche not found');
+      throw new Error('Démarche non trouvée');
     }
 
     if (demarche.idUtilisateur !== userId) {
-      throw new Error('Unauthorized access to demarche');
+      throw new Error('Accès non autorisé à la démarche');
     }
 
     // 2. Get Associated Documents
     const documentsAssocies = demarche.documentsAssocies as Record<string, string> | null;
     if (!documentsAssocies || Object.keys(documentsAssocies).length === 0) {
-      throw new Error('No documents to export');
+      throw new Error('Aucun document à exporter');
     }
 
     const documentIds = Object.values(documentsAssocies);
@@ -39,7 +39,7 @@ export class DemarcheExportService {
     });
 
     if (documents.length === 0) {
-      throw new Error('No valid documents found');
+      throw new Error('Aucun document valide trouvé');
     }
 
     // 3. Prepare Google Drive Auth
@@ -64,7 +64,7 @@ export class DemarcheExportService {
           archive.append(fileStream, { name: filename });
         } catch (error) {
           console.error(`Failed to download document ${doc.id}:`, error);
-          archive.append(Buffer.from(`Failed to download: ${doc.nomFichier}`), { name: `${doc.nomFichier}_error.txt` });
+          archive.append(Buffer.from(`Échec du téléchargement : ${doc.nomFichier}`), { name: `${doc.nomFichier}_error.txt` });
         }
       }
     }

@@ -35,11 +35,12 @@ import Link from 'next/link';
 import { DemarcheStatut, DemarcheCategorie, Document } from '@prisma/client';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteDemarcheAction, updateDemarcheAction, linkDocumentAction } from '../../actions';
+import { deleteDemarcheAction, updateDemarcheAction, linkDocumentAction, unlinkDocumentAction } from '../../actions';
 import { EditDemarcheDialog } from '../EditDemarcheDialog';
 import { LinkDocumentDialog } from '../LinkDocumentDialog';
 import { toaster } from '@/shared/components/ui/toaster';
 import { DocumentDetailsDialog } from '../../../documents/ui/components/DocumentDetailsDialog';
+import { EditDocumentDialog } from '@/features/documents/ui/components/EditDocumentDialog';
 
 interface DemarcheViewPageProps {
   demarche: {
@@ -76,6 +77,7 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
   const [selectedRequirement, setSelectedRequirement] = useState<string>('');
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const router = useRouter();
 
   // Get the documents associated with this demarche
@@ -225,8 +227,9 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
     setIsLinkDialogOpen(true);
   };
 
-  const handleOpenDocumentDetails = (doc: Document) => {
+  const handleOpenDocumentDetails = (doc: Document, requirement: string) => {
     setSelectedDocument(doc);
+    setSelectedRequirement(requirement);
     setIsDetailsDialogOpen(true);
   };
 
@@ -511,7 +514,7 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
                     p={4}
                     transition="all 0.2s"
                     cursor={associatedDoc ? 'pointer' : 'default'}
-                    onClick={() => associatedDoc && handleOpenDocumentDetails(associatedDoc)}
+                    onClick={() => associatedDoc && handleOpenDocumentDetails(associatedDoc, requirement)}
                     _hover={{
                       boxShadow: 'md',
                       borderColor: isTypeMismatch ? 'orange.400' : (isComplete ? 'green.300' : 'primary.200'),
@@ -649,19 +652,35 @@ export function DemarcheViewPage({ demarche, userDocuments }: DemarcheViewPagePr
             nomFichier: selectedDocument.nomFichier
           }}
           onEdit={() => {
-            toaster.create({
-              title: "Non implémenté",
-              description: "La modification depuis cette vue n'est pas encore disponible",
-              type: "info",
-            });
+            setIsDetailsDialogOpen(false);
+            setIsEditDialogOpen(true);
           }}
-          onDelete={() => {
-            toaster.create({
-              title: "Non implémenté",
-              description: "La suppression depuis cette vue n'est pas encore disponible",
-              type: "info",
-            });
+          onDelete={async () => {
+            if (!selectedRequirement) return;
+            const result = await unlinkDocumentAction(demarche.id, selectedRequirement);
+            if (result.success) {
+              toaster.create({
+                title: "Document détaché",
+                type: "success",
+              });
+              setIsDetailsDialogOpen(false);
+              router.refresh();
+            } else {
+              toaster.create({
+                title: "Erreur",
+                description: result.error || "Erreur lors du détachement du document",
+                type: "error",
+              });
+            }
           }}
+        />
+      )}
+
+      {selectedDocument && (
+        <EditDocumentDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          document={selectedDocument as any}
         />
       )}
     </Box>

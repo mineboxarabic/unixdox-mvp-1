@@ -41,9 +41,9 @@ export function Sidebar({ user, counts, storage }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const defaultUser: UserAccountType = {
-    name: user?.name || 'Segun Adebayo',
-    email: user?.email || 'segunadebayo@example.com',
+const defaultUser: UserAccountType = {
+    name: user?.name || 'Utilisateur',
+    email: user?.email || 'utilisateur@exemple.com',
     avatarUrl: user?.avatarUrl,
     role: user?.role,
     isPremium: user?.isPremium,
@@ -95,7 +95,7 @@ export function Sidebar({ user, counts, storage }: SidebarProps) {
         zIndex={10}
       >
         <IconButton
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={isCollapsed ? 'Développer la barre latérale' : 'Réduire la barre latérale'}
           size="sm"
           borderRadius="full"
           bg="bg.surface"
@@ -158,7 +158,7 @@ export function Sidebar({ user, counts, storage }: SidebarProps) {
                 </Text>
                 <NavButton
                   item={{
-                    label: 'All Models',
+                    label: 'Tous les modèles',
                     icon: LuShield,
                     href: '/admin/modele-demarche',
                     isActive: pathname?.startsWith('/admin/modele-demarche') && pathname !== '/admin/modele-demarche/create',
@@ -167,7 +167,7 @@ export function Sidebar({ user, counts, storage }: SidebarProps) {
                 />
                 <NavButton
                   item={{
-                    label: 'Create Model',
+                    label: 'Créer un modèle',
                     icon: LuPlus,
                     href: '/admin/modele-demarche/create',
                     isActive: pathname === '/admin/modele-demarche/create',

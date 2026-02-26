@@ -33,24 +33,24 @@ export function EditModeleDemarcheClient({ modele }: EditModeleDemarcheClientPro
       });
 
       if (result.success) {
-        toaster.create({
-          title: "Success",
-          description: "Model updated successfully!",
+toaster.create({
+          title: "Succès",
+          description: "Modèle mis à jour avec succès !",
           type: "success",
         });
         router.push("/admin/modele-demarche");
         router.refresh();
       } else {
-        toaster.create({
-          title: "Error",
-          description: "Failed to update model",
+toaster.create({
+          title: "Erreur",
+          description: "Échec de la mise à jour du modèle",
           type: "error",
         });
       }
     } catch (e) {
-      toaster.create({
-        title: "Error",
-        description: "An unexpected error occurred",
+toaster.create({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
         type: "error",
       });
     }
@@ -62,9 +62,9 @@ export function EditModeleDemarcheClient({ modele }: EditModeleDemarcheClientPro
       initialData={modele}
       onSubmit={handleSubmit}
       loading={loading}
-      title="Edit Modele Demarche"
-      description="Update the procedure template."
-      submitLabel="Update Model"
+title="Modifier le modèle de démarche"
+      description="Mettez à jour le modèle de procédure."
+      submitLabel="Mettre à jour le modèle"
     />
   );
 }

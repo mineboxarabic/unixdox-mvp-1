@@ -262,7 +262,7 @@ export function HomePage({
                   _hover={{ bg: "purple.100" }}
                 >
                   <LuShield size={16} />
-                  Admin Panel
+                  Panneau Admin
                 </Button>
               </Link>
             )}

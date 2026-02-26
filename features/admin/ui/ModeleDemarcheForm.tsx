@@ -45,10 +45,10 @@ export function ModeleDemarcheForm({
             <form action={onSubmit}>
                 <CardBody>
                     <VStack gap={5} align="stretch">
-                        <FormInput
-                            label="Title"
+<FormInput
+                            label="Titre"
                             name="titre"
-                            placeholder="e.g. Renewal of Passport"
+                            placeholder="ex. Renouvellement de passeport"
                             required
                             defaultValue={initialData?.titre || ""}
                         />
@@ -56,7 +56,7 @@ export function ModeleDemarcheForm({
                         <FormInput
                             label="Description"
                             name="description"
-                            placeholder="Detailed description of the process..."
+                            placeholder="Description détaillée du processus..."
                             textarea
                             rows={3}
                             resize="vertical"
@@ -64,7 +64,7 @@ export function ModeleDemarcheForm({
                         />
 
                         <Box>
-                            <Text fontSize="sm" fontWeight="medium" mb={1.5}>Category</Text>
+                            <Text fontSize="sm" fontWeight="medium" mb={1.5}>Catégorie</Text>
                             <chakra.select
                                 name="categorie"
                                 width="full"
@@ -91,8 +91,8 @@ export function ModeleDemarcheForm({
                             </chakra.select>
                         </Box>
 
-                        <Box>
-                            <Text fontSize="sm" fontWeight="medium" mb={2}>Required Documents</Text>
+<Box>
+                            <Text fontSize="sm" fontWeight="medium" mb={2}>Documents requis</Text>
                             <Box
                                 p={4}
                                 borderWidth="1px"
@@ -116,15 +116,15 @@ export function ModeleDemarcheForm({
                                     ))}
                                 </SimpleGrid>
                             </Box>
-                            <Text fontSize="xs" color="fg.muted" mt={1}>
-                                Select all documents required for this procedure.
+<Text fontSize="xs" color="fg.muted" mt={1}>
+                                Sélectionnez tous les documents requis pour cette procédure.
                             </Text>
                         </Box>
                     </VStack>
                 </CardBody>
                 <CardFooter>
                     <Button type="submit" disabled={loading} width="full">
-                        {loading ? "Saving..." : submitLabel}
+                        {loading ? "Enregistrement..." : submitLabel}
                     </Button>
                 </CardFooter>
             </form>

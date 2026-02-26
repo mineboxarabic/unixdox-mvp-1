@@ -17,18 +17,18 @@ export function SearchResultItem({
   onClick,
 }: SearchResultItemProps) {
   /**
-   * Prevent the search input from losing focus (blur) before
-   * the click event fires. Without this, the dropdown closes
-   * in 200 ms via handleSearchBlur before onClick is processed.
+   * We need to handle the action on mousedown because the search input blurs
+   * and closes the dropdown before onClick can fire on mobile/some browsers.
    */
   const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent input from losing focus immediately
+    // Call the click handler immediately on mousedown
+    onClick();
   };
 
   return (
     <Box
       as="button"
-      onClick={onClick}
       onMouseDown={handleMouseDown}
       px="2"
       py="2"

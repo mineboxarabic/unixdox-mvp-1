@@ -265,3 +265,36 @@ export async function linkDocumentAction(
     };
   }
 }
+
+/**
+ * Unlink a document from a demarche requirement
+ */
+export async function unlinkDocumentAction(
+  demarcheId: string,
+  requirementName: string
+) {
+  try {
+    const session = await auth();
+    
+    if (!session?.user?.id) {
+      return { success: false, error: 'Non authentifié' };
+    }
+
+    const updated = await demarcheService.unlinkDocument(
+      demarcheId,
+      session.user.id,
+      requirementName
+    );
+
+    revalidatePath('/demarches');
+    revalidatePath(`/demarches/${demarcheId}`);
+    
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error('Error unlinking document:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Erreur lors du détachement du document' 
+    };
+  }
+}

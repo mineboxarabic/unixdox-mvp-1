@@ -15,7 +15,7 @@ export function AuthButtons({ authenticated }: { authenticated: boolean }) {
             type="submit"
             className="rounded bg-black px-4 py-2 text-white hover:opacity-90"
           >
-            Sign in with Google
+            Se connecter avec Google
           </button>
         </form>
       )}
@@ -30,7 +30,7 @@ export function AuthButtons({ authenticated }: { authenticated: boolean }) {
             type="submit"
             className="rounded border px-4 py-2 hover:bg-gray-100"
           >
-            Sign out
+            Se déconnecter
           </button>
         </form>
       )}

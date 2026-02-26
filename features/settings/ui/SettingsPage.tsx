@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Box, Badge, Flex, Heading, Switch, Text } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { toaster } from '@/shared/components/ui/toaster';
+import { Tooltip } from '@/shared/components/ui/tooltip';
 import type { UserPreferences } from '../types/schemas';
 import { updatePreferencesAction } from '../actions';
 import { updateUserSubscription } from '@/features/users/actions';
@@ -207,16 +208,21 @@ export function SettingsPage({ preferences, userPlan }: SettingsPageProps) {
                     </Flex>
                   </Flex>
 
-                  <Switch.Root
-                    checked={currentPreferences[toggle.key]}
-                    onCheckedChange={({ checked }) => setNotificationField(toggle.key, checked)}
-                    disabled={isPending}
-                  >
-                    <Switch.HiddenInput />
-                    <Switch.Control>
-                      <Switch.Thumb />
-                    </Switch.Control>
-                  </Switch.Root>
+                  <Tooltip content="Nous implémenterons cela à l'avenir">
+                    <Box display="inline-block" cursor="not-allowed">
+                      <Switch.Root
+                        checked={currentPreferences[toggle.key]}
+                        onCheckedChange={({ checked }) => setNotificationField(toggle.key, checked)}
+                        disabled={true}
+                        pointerEvents="none"
+                      >
+                        <Switch.HiddenInput />
+                        <Switch.Control>
+                          <Switch.Thumb />
+                        </Switch.Control>
+                      </Switch.Root>
+                    </Box>
+                  </Tooltip>
                 </Flex>
 
                 {/* Divider between toggles (not after the last one) */}
@@ -252,15 +258,19 @@ export function SettingsPage({ preferences, userPlan }: SettingsPageProps) {
                 const isActive = currentPreferences.language === option.value;
 
                 return (
-                  <Button
-                    key={option.value}
-                    variant={isActive ? 'solid' : 'outline'}
-                    colorPalette={isActive ? 'blue' : 'gray'}
-                    onClick={() => setLanguage(option.value)}
-                    disabled={isPending}
-                  >
-                    {option.label}
-                  </Button>
+                  <Tooltip key={option.value} content="Nous implémenterons cela à l'avenir">
+                    <Box display="inline-block" cursor="not-allowed">
+                      <Button
+                        variant={isActive ? 'solid' : 'outline'}
+                        colorPalette={isActive ? 'blue' : 'gray'}
+                        onClick={() => setLanguage(option.value)}
+                        disabled={true}
+                        pointerEvents="none"
+                      >
+                        {option.label}
+                      </Button>
+                    </Box>
+                  </Tooltip>
                 );
               })}
             </Flex>
@@ -370,14 +380,20 @@ export function SettingsPage({ preferences, userPlan }: SettingsPageProps) {
                     Cette action est irréversible. Toutes vos données seront supprimées.
                   </Text>
                 </Flex>
-                <Button
-                  variant="outline"
-                  colorPalette="red"
-                  size="sm"
-                >
-                  <LuTrash2 size={16} />
-                  Supprimer
-                </Button>
+                <Tooltip content="Nous implémenterons cela à l'avenir">
+                  <Box display="inline-block" cursor="not-allowed">
+                    <Button
+                      variant="outline"
+                      colorPalette="red"
+                      size="sm"
+                      disabled={true}
+                      pointerEvents="none"
+                    >
+                      <LuTrash2 size={16} />
+                      Supprimer
+                    </Button>
+                  </Box>
+                </Tooltip>
               </Flex>
             </Box>
           </Flex>

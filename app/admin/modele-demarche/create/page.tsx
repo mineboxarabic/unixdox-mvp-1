@@ -30,24 +30,24 @@ export default function CreateModeleDemarchePage() {
             });
 
             if (result.success) {
-                toaster.create({
-                    title: "Success",
-                    description: "Model created successfully!",
+toaster.create({
+                    title: "Succès",
+                    description: "Modèle créé avec succès !",
                     type: "success",
                 });
                 router.push("/admin/modele-demarche");
             } else {
-                toaster.create({
-                    title: "Error",
-                    description: "Failed to create model",
+toaster.create({
+                    title: "Erreur",
+                    description: "Échec de la création du modèle",
                     type: "error",
                 });
             }
 
         } catch (e) {
-            toaster.create({
-                title: "Error",
-                description: "An unexpected error occurred",
+toaster.create({
+                title: "Erreur",
+                description: "Une erreur inattendue s'est produite",
                 type: "error",
             });
         }
@@ -59,9 +59,9 @@ export default function CreateModeleDemarchePage() {
             <ModeleDemarcheForm
                 onSubmit={handleSubmit}
                 loading={loading}
-                title="Create New Modele Demarche"
-                description="Define a new procedure template for users."
-                submitLabel="Create Model"
+title="Créer un nouveau modèle de démarche"
+                description="Définissez un nouveau modèle de procédure pour les utilisateurs."
+                submitLabel="Créer le modèle"
             />
         </Container>
     );

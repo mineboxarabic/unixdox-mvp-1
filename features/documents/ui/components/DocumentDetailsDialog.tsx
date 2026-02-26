@@ -88,7 +88,7 @@ export function DocumentDetailsDialog({
                   width="100%"
                   height="100%"
                   style={{ minHeight: "400px", border: "none" }}
-                  title="Document Preview"
+                  title="Aperçu du document"
                 />
               ) : (
                 <VStack color="gray.500">

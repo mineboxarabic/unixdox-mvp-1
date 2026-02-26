@@ -70,7 +70,7 @@ export function DemarcheCard({
         >
           <img
             src="/folder.svg"
-            alt="Folder"
+            alt="Dossier"
             width="160"
             height="160"
             style={{
