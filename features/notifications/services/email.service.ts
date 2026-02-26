@@ -29,14 +29,21 @@ export class EmailService {
     const pass = process.env.SMTP_PASS;
 
     if (host && user && pass) {
+      const isGmail = host.includes('gmail.com');
       return nodemailer.createTransport({
-        host: host,
+        service: isGmail ? 'gmail' : undefined,
+        host: isGmail ? undefined : host,
         port: port,
         secure: process.env.SMTP_SECURE === 'true',
         auth: {
           user: user,
           pass: pass,
         },
+        // Connection optimizations
+        pool: true,
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,    // 10 seconds
+        socketTimeout: 30000,      // 30 seconds
       });
     } else {
       console.warn('SMTP configuration is missing. Generating Ethereal Email test account...');
