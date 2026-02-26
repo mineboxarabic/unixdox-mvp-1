@@ -39,17 +39,16 @@ export class EmailService {
         },
         // Connection optimizations
         pool: true,
-        connectionTimeout: 20000, // Increase to 20 seconds
+        connectionTimeout: 20000, // 20 seconds
         greetingTimeout: 20000,
         socketTimeout: 30000,
         // Networking fixes
-        dnsV6Order: false, // Force IPv4 (important for some cloud environments)
+        dnsV6Order: false, // Force IPv4
         tls: {
-          // Do not fail on invalid certificates (helpful for some proxy environments)
           rejectUnauthorized: false,
-          servername: host // Explicitly set server name
+          servername: host
         }
-      });
+      } as any);
     } else {
       console.warn('SMTP configuration is missing. Generating Ethereal Email test account...');
       const testAccount = await nodemailer.createTestAccount();
@@ -57,12 +56,12 @@ export class EmailService {
       return nodemailer.createTransport({
         host: 'smtp.ethereal.email',
         port: 587,
-        secure: false, // true for 465, false for other ports
+        secure: false,
         auth: {
-          user: testAccount.user, // generated ethereal user
-          pass: testAccount.pass, // generated ethereal password
+          user: testAccount.user,
+          pass: testAccount.pass,
         },
-      });
+      } as any);
     }
   }
 
