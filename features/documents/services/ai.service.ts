@@ -30,7 +30,7 @@ export class AIService {
   // Updated model list with valid Gemini API model names
   // Priority: stable models first, then fallback options
   private models = [
-    'gemini-2.0-flash',         // Latest stable flash model
+    'gemini-2.5-flash',         // Latest stable flash model
   ];
 
   async matchDocumentsToRequirements(
@@ -64,7 +64,7 @@ export class AIService {
         // For now, we send all documents to give AI full context.
 
         const prompt = this.getMatchingPrompt(missing, userDocuments);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }); // Use fast stable model for matching
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }); // Use fast stable model for matching
 
         const result = await model.generateContent(prompt);
         const response = await result.response;

@@ -17,6 +17,7 @@ interface DocumentsPageProps {
         type?: string;
         statut?: string;
         tags?: string;
+        id?: string;
     };
 }
 
@@ -30,6 +31,9 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
 
     // Await searchParams as it's now a Promise in Next.js
     const params = await searchParams;
+
+    // Document to auto-open from search/deep-link
+    const initialDocumentId = params.id;
 
     const filters = {
         search: params.search,
@@ -61,7 +65,7 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
             </Flex>
 
             <Suspense fallback={<DocumentsGridSkeleton />}>
-                <DocumentsList documents={documents} />
+                <DocumentsList documents={documents} initialDocumentId={initialDocumentId} />
             </Suspense>
         </PageLayout>
     );

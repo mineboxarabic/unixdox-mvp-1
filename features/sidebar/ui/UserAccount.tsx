@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
-import { LuChevronDown, LuCrown } from 'react-icons/lu';
+import { LuChevronsUpDown, LuCrown } from 'react-icons/lu';
 import { useSession } from 'next-auth/react';
 import type { UserAccount as UserAccountType } from '../types';
 import { Avatar } from '@/shared/components/ui/avatar';
@@ -71,50 +71,56 @@ export function UserAccount({ user, isCollapsed = false, onClick }: UserAccountP
   return (
     <Flex
       align="center"
-      gap={2}
-      p={3}
-      bg="bg.surface"
+      gap={1}
+      pl={2.5}
+      pr={0.5}
+      py={3}
+      bg="white"
       border="1px solid"
-      borderColor="border.default"
+      borderColor="neutral.200"
       borderRadius="xl"
       cursor="pointer"
       onClick={onClick}
       _hover={{ bg: 'bg.muted' }}
       transition="all 0.2s"
     >
-      <Avatar
-        name={user.name}
-        src={avatarUrl}
-        size="sm"
-      />
-      <Box flex="1" minW={0}>
-        <Flex align="center" gap={1.5}>
+      <Flex flex="1" align="center" gap={2} minW={0}>
+        <Avatar
+          name={user.name}
+          src={avatarUrl}
+          size="sm"
+        />
+        <Box flex="1" minW={0}>
+          <Flex align="center" gap={1.5}>
+            <Text
+              fontSize="sm"
+              fontWeight="medium"
+              color="gray.700"
+              truncate
+            >
+              {user.name}
+            </Text>
+            {user.isPremium && <PremiumBadge />}
+          </Flex>
           <Text
-            fontSize="sm"
-            fontWeight="medium"
-            color="text.fg"
+            fontSize="xs"
+            color="gray.600"
             truncate
           >
-            {user.name}
+            {user.email}
           </Text>
-          {user.isPremium && <PremiumBadge />}
-        </Flex>
-        <Text
-          fontSize="xs"
-          color="text.fg.muted"
-          truncate
-        >
-          {user.email}
-        </Text>
-      </Box>
+        </Box>
+      </Flex>
       <Box
         display="flex"
         alignItems="center"
         justifyContent="center"
-        p={2}
+        w="36px"
+        h="36px"
         borderRadius="full"
+        flexShrink={0}
       >
-        <LuChevronDown size={16} />
+        <LuChevronsUpDown size={18} />
       </Box>
     </Flex>
   );

@@ -14,13 +14,20 @@ import { DocumentStatusBadge } from '@/shared/components/documents/DocumentStatu
 
 interface DocumentsListProps {
     documents: Document[];
+    /** Document id to automatically open the details dialog for (e.g. from search) */
+    initialDocumentId?: string;
 }
 
-export function DocumentsList({ documents }: DocumentsListProps) {
-    const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+export function DocumentsList({ documents, initialDocumentId }: DocumentsListProps) {
+    // Find the document to auto-open (e.g. navigated from search)
+    const initialDoc = initialDocumentId
+        ? (documents.find((d) => d.id === initialDocumentId) ?? null)
+        : null;
+
+    const [selectedDoc, setSelectedDoc] = useState<Document | null>(initialDoc);
     const { open: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
     const { open: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
-    const { open: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
+    const { open: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure({ defaultOpen: initialDoc !== null });
 
     const handleEdit = (doc: Document) => {
         setSelectedDoc(doc);

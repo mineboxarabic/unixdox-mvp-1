@@ -25,7 +25,7 @@ export default async function EcheancesRoute() {
         getEcheancesAction(),
     ]);
 
-    const isPremium = user?.plan === 'PREMIUM' || user?.plan === 'ENTERPRISE';
+    const isPremium = user?.plan !== 'FREE' && user?.plan != null;
     const echeances = echeancesResult.success ? echeancesResult.data || [] : [];
 
     return (

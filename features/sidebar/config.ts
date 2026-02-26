@@ -17,7 +17,7 @@ export const mainNavItems: NavItem[] = [
     isActive: true,
   },
   {
-    label: 'Démarches',
+    label: 'Mes démarches',
     icon: LuFolderOpen,
     href: '/demarches',
   },
@@ -36,11 +36,6 @@ export const mainNavItems: NavItem[] = [
 
 export const bottomNavItems: NavItem[] = [
   {
-    label: 'Déconnexion',
-    icon: LuLogOut,
-    href: '#',
-  },
-  {
     label: 'Paramètres',
     icon: LuSettings,
     href: '/settings',
@@ -49,6 +44,11 @@ export const bottomNavItems: NavItem[] = [
     label: 'Aide',
     icon: LuCircleHelp,
     href: '/help',
+  },
+  {
+    label: 'Déconnexion',
+    icon: LuLogOut,
+    href: '#',
   },
 ];
 

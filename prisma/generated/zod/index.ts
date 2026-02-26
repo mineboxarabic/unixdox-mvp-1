@@ -316,6 +316,9 @@ export type Tag = z.infer<typeof TagSchema>
 
 export const UserPreferencesSchema = z.object({
   notifications: z.boolean(),
+  notificationEmail: z.boolean(),
+  notificationSms: z.boolean(),
+  notificationInApp: z.boolean(),
   language: z.string(),
 })
 
@@ -625,6 +628,9 @@ export const UserPreferencesArgsSchema: z.ZodType<Prisma.UserPreferencesDefaultA
 
 export const UserPreferencesSelectSchema: z.ZodType<Prisma.UserPreferencesSelect> = z.object({
   notifications: z.boolean().optional(),
+  notificationEmail: z.boolean().optional(),
+  notificationSms: z.boolean().optional(),
+  notificationInApp: z.boolean().optional(),
   language: z.boolean().optional(),
 }).strict()
 
@@ -2518,6 +2524,9 @@ export const UserPreferencesNullableCompositeFilterSchema: z.ZodType<Prisma.User
 
 export const UserPreferencesObjectEqualityInputSchema: z.ZodType<Prisma.UserPreferencesObjectEqualityInput> = z.strictObject({
   notifications: z.boolean(),
+  notificationEmail: z.boolean(),
+  notificationSms: z.boolean(),
+  notificationInApp: z.boolean(),
   language: z.string(),
 });
 
@@ -2565,6 +2574,9 @@ export const SessionListRelationFilterSchema: z.ZodType<Prisma.SessionListRelati
 
 export const UserPreferencesOrderByInputSchema: z.ZodType<Prisma.UserPreferencesOrderByInput> = z.strictObject({
   notifications: z.lazy(() => SortOrderSchema).optional(),
+  notificationEmail: z.lazy(() => SortOrderSchema).optional(),
+  notificationSms: z.lazy(() => SortOrderSchema).optional(),
+  notificationInApp: z.lazy(() => SortOrderSchema).optional(),
   language: z.lazy(() => SortOrderSchema).optional(),
 });
 
@@ -3313,6 +3325,9 @@ export const UserPreferencesNullableCreateEnvelopeInputSchema: z.ZodType<Prisma.
 
 export const UserPreferencesCreateInputSchema: z.ZodType<Prisma.UserPreferencesCreateInput> = z.strictObject({
   notifications: z.boolean().optional(),
+  notificationEmail: z.boolean().optional(),
+  notificationSms: z.boolean().optional(),
+  notificationInApp: z.boolean().optional(),
   language: z.string().optional(),
 });
 
@@ -4093,6 +4108,9 @@ export const UserPreferencesWhereInputSchema: z.ZodType<Prisma.UserPreferencesWh
   OR: z.lazy(() => UserPreferencesWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => UserPreferencesWhereInputSchema), z.lazy(() => UserPreferencesWhereInputSchema).array() ]).optional(),
   notifications: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
+  notificationEmail: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
+  notificationSms: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
+  notificationInApp: z.union([ z.lazy(() => BoolFilterSchema), z.boolean() ]).optional(),
   language: z.union([ z.lazy(() => StringFilterSchema), z.string() ]).optional(),
 });
 
@@ -6070,6 +6088,9 @@ export const SessionCreateManyUserInputSchema: z.ZodType<Prisma.SessionCreateMan
 
 export const UserPreferencesUpdateInputSchema: z.ZodType<Prisma.UserPreferencesUpdateInput> = z.strictObject({
   notifications: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  notificationEmail: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  notificationSms: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  notificationInApp: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   language: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 });
 

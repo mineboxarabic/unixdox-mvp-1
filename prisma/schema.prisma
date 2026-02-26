@@ -113,8 +113,11 @@ model User {
 }
 
 type UserPreferences {
-  notifications Boolean @default(true)
-  language      String  @default("fr")
+  notifications     Boolean @default(true)
+  notificationEmail Boolean @default(true)
+  notificationSms   Boolean @default(false)
+  notificationInApp Boolean @default(true)
+  language          String  @default("fr")
 }
 
 model Document {
@@ -154,7 +157,7 @@ model Dossier {
   idProprietaire String     @db.ObjectId
   nom            String
   idsDocuments   String[]   @db.ObjectId
-  couleur        String     @default("#3B82F6")
+  couleur        String     @default("#2f45ff")
   icone          String     @default("folder")
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt

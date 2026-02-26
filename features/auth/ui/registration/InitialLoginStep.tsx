@@ -1,9 +1,11 @@
-import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
+import { VStack, Heading, Text } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
 import { loginWithGoogle } from '@/shared/auth/actions';
 
-// Google Icon SVG component
+/**
+ * Google Icon SVG component for OAuth sign-in buttons.
+ */
 function GoogleIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -15,6 +17,13 @@ function GoogleIcon() {
   );
 }
 
+/**
+ * Initial registration step - Google OAuth signup.
+ * Matches Figma v3.0 "Sign in step 01" design:
+ * - Title: "Inscription" in gray.600 (2xl)
+ * - Subtitle: "Découvrez votre assistant administratif personnel" in gray.700 (xl)
+ * - Dark pill Google button (gray.800 bg, rounded full)
+ */
 export function InitialLoginStep({ onNext }: StepComponentProps) {
   const handleGoogleSignIn = async () => {
     await loginWithGoogle();
@@ -29,13 +38,14 @@ export function InitialLoginStep({ onNext }: StepComponentProps) {
       align="flex-start"
       gap={6}
       overflow="hidden"
+      px={8}
     >
       <VStack align="flex-start" gap={2}>
         <Heading
           as="h1"
           fontSize="2xl"
           fontWeight="normal"
-          color="text.fg.muted"
+          color="gray.600"
           lineHeight="8"
         >
           Inscription
@@ -43,21 +53,27 @@ export function InitialLoginStep({ onNext }: StepComponentProps) {
         <Text
           fontSize="xl"
           fontWeight="normal"
-          color="text.fg"
+          color="gray.700"
           lineHeight="1.5"
         >
           Découvrez votre assistant administratif personnel
         </Text>
       </VStack>
 
+      {/* Google OAuth button - dark pill style per Figma */}
       <Button
         w="full"
-        size="md"
+        h="40px"
         variant="solid"
         colorPalette="gray"
+        borderRadius="full"
+        bg="gray.800"
+        color="white"
+        fontSize="sm"
         onClick={handleGoogleSignIn}
-        leftIcon={<GoogleIcon />}
+        _hover={{ bg: 'gray.700' }}
       >
+        <GoogleIcon />
         S&apos;inscrire avec Google
       </Button>
     </VStack>

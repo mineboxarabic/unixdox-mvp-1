@@ -84,7 +84,7 @@ export function FileUpload({
         onClick={() => document.getElementById("file-input")?.click()}
         _hover={{
           borderColor: "primary.400",
-          bg: "primary.25",
+          bg: "primary.50",
           transform: "scale(1.01)",
         }}
       >

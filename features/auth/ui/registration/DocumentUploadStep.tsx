@@ -81,8 +81,8 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
         showActionResultToast(result);
 
         if (result.success) {
-          // Redirect to main page after successful upload
-          router.push('/');
+          // Force hard navigation to clear Next.js client router cache
+          window.location.assign('/');
         }
       } catch (error) {
         toaster.create({

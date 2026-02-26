@@ -33,7 +33,7 @@ export default async function RootLayout({
   let isPremium = false;
 
   if (session?.user?.id) {
-    const [counts, user, storage] = await Promise.all([
+    const [countsResult, userResult, storageResult] = await Promise.allSettled([
       getSidebarCounts(),
       prisma.user.findUnique({
         where: { id: session.user.id },
@@ -41,9 +41,18 @@ export default async function RootLayout({
       }),
       getSidebarStorageInfo(),
     ]);
-    sidebarCounts = counts;
-    sidebarStorage = storage ?? undefined;
-    isPremium = user?.plan === 'PREMIUM' || user?.plan === 'ENTERPRISE';
+
+    sidebarCounts = countsResult.status === 'fulfilled'
+      ? countsResult.value
+      : { demarchesCount: 0, documentsCount: 0, echeancesCount: 0 };
+
+    sidebarStorage = storageResult.status === 'fulfilled'
+      ? (storageResult.value ?? undefined)
+      : undefined;
+
+    isPremium = userResult.status === 'fulfilled'
+      ? (userResult.value?.plan !== 'FREE' && userResult.value?.plan != null)
+      : false;
   }
 
   const userWithPremium = session?.user ? {

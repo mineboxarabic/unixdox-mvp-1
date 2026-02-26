@@ -27,28 +27,28 @@ export function StorageIndicator({ storage, isCollapsed = false }: StorageIndica
 
   return (
     <Box
-      bg="bg.surface"
+      bg="white"
       border="1px solid"
-      borderColor="border.default"
+      borderColor="neutral.200"
       borderRadius="xl"
       p={2.5}
     >
       <Flex direction="column" gap={1}>
         <Flex align="center" gap={1.5}>
-          <LuHardDrive size={18} color="#52525b" />
-          <Text fontSize="sm" color="text.fg.muted">
+          <LuHardDrive size={20} color="#52525b" />
+          <Text fontSize="sm" color="gray.600">
             Espace de stockage
           </Text>
         </Flex>
 
         <Flex direction="column" gap={2} py={2}>
           <Flex align="center" gap={1.5} w="full">
-            <Text fontSize="sm" color="text.fg.muted">
+            <Text fontSize="sm" color="gray.600" flexShrink={0}>
               {storage.used}/{storage.total}{storage.unit}
             </Text>
             <Box flex="1" bg="bg.muted" borderRadius="full" h="6px" overflow="hidden">
               <Box
-                bg="primary.600"
+                bg="primary.solid"
                 h="full"
                 w={`${percentage}%`}
                 borderRadius="full"

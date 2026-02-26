@@ -3,7 +3,7 @@
 import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { Input } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
-import { LuPlus, LuSearch, LuFilePlus, LuFolderPlus, LuShield } from "react-icons/lu";
+import { LuSearch, LuFilePlus, LuFolderOpen, LuShield } from "react-icons/lu";
 import { UpcomingDeadlinesCard } from "../components/UpcomingDeadlinesCard";
 import { RecentDocumentsCard } from "../components/RecentDocumentsCard";
 import { RecentDemarchesCard } from "../components/RecentDemarchesCard";
@@ -13,8 +13,9 @@ import { useRef, useState, useEffect } from "react";
 import { ProcessingState } from "@/shared/components/documents/ProcessingState";
 import { SearchDropdown } from "@/features/search";
 import { getSearchData } from "@/features/search/actions";
-import type { SearchData } from "@/features/search/types";
+import type { SearchData, SearchDocument } from "@/features/search/types";
 import { useRouter } from "next/navigation";
+import { DocumentViewDialog } from "@/features/documents/ui/components/DocumentViewDialog";
 
 export interface HomePageProps {
   data: HomeData;
@@ -49,6 +50,7 @@ export function HomePage({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchData, setSearchData] = useState<SearchData | null>(null);
   const [searchPosition, setSearchPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [viewingDocument, setViewingDocument] = useState<SearchDocument | null>(null);
   const router = useRouter();
 
   const handleFileUpload = async (files: File[]) => {
@@ -108,8 +110,9 @@ export function HomePage({
 
   const handleDocumentClick = (documentId: string) => {
     setSearchOpen(false);
-    // Navigate to document (adjust route as needed)
-    router.push(`/documents?id=${documentId}`);
+    // Open the document details dialog directly without navigating away
+    const doc = searchData?.documents.find((d) => d.id === documentId) ?? null;
+    setViewingDocument(doc);
   };
 
   const handleDemarcheClick = (demarcheId: string) => {
@@ -136,9 +139,10 @@ export function HomePage({
   }, [searchOpen]);
 
   return (
-    <Box minH="100vh" bg="bg.canvas" p="6">
+    <Box minH="100vh" bg="bg.canvas">
       <ProcessingState isOpen={isProcessing} onOpenChange={(e) => setIsProcessing(e.open)} />
 
+      {/* Hidden file input for document upload */}
       <input
         type="file"
         ref={fileInputRef}
@@ -146,27 +150,31 @@ export function HomePage({
         onChange={onHeaderFileChange}
         multiple
       />
-      <Box maxW="1400px" mx="auto">
-        {/* Header */}
+
+      {/* Content wrapper — centered with consistent spacing */}
+      <Flex direction="column" gap="6" px="6" alignItems="center">
+        {/* Head section — welcome title, search bar, action buttons */}
         <Flex
           direction="column"
           alignItems="center"
           justifyContent="center"
-          gap="6"
-          mb="10"
+          gap="5"
+          py="12"
+          w="full"
+          maxW="1200px"
         >
-          <Text fontSize="4xl" fontWeight="bold" color="neutral.900">
+          <Text fontSize="4xl" fontWeight="medium" color="gray.600">
             Bienvenue sur Unidox
           </Text>
 
-          {/* Search Input */}
-          <Box position="relative" width="full" maxW="750px">
+          {/* Search Input — pill-shaped, constrained width */}
+          <Box position="relative" w="388px">
             <Box
               position="absolute"
               left="3"
               top="50%"
               transform="translateY(-50%)"
-              color="text.fg.subtle"
+              color="gray.400"
               zIndex="1"
             >
               <LuSearch size={18} />
@@ -174,10 +182,12 @@ export function HomePage({
             <Input
               ref={searchInputRef}
               placeholder="Recherchez un fichier, une démarche..."
-              style={{ paddingLeft: "2.5rem", backgroundColor: "var(--chakra-colors-bg-surface)" }}
-              size="lg"
+              style={{ paddingLeft: "2.5rem" }}
+              size="md"
               width="full"
               borderRadius="full"
+              bg="white"
+              borderColor="neutral.200"
               onFocus={handleSearchFocus}
               onBlur={handleSearchBlur}
             />
@@ -193,38 +203,65 @@ export function HomePage({
             position={searchPosition}
           />
 
-          {/* Action Buttons */}
-          <Flex gap="4">
+          {/* Read-only document view — opened when clicking a search result */}
+          {viewingDocument && (
+            <DocumentViewDialog
+              isOpen={true}
+              onClose={() => setViewingDocument(null)}
+              document={{
+                id: viewingDocument.id,
+                name: viewingDocument.nomFichier,
+                type: viewingDocument.type,
+                status: viewingDocument.statut,
+                url: viewingDocument.urlStockage,
+                size: viewingDocument.size,
+                tags: viewingDocument.tags,
+                expirationDate: viewingDocument.dateExpiration,
+              }}
+            />
+          )}
+
+          {/* Action Buttons — subtle filled + outline styles */}
+          <Flex gap="2">
             <Button
-              size="md"
-              bg="primary.50"
-              color="primary.600"
-              _hover={{ bg: "primary.100" }}
+              size="sm"
+              h="36px"
+              bg="primary.100"
+              color="primary.900"
+              border="1px solid"
+              borderColor="primary.200"
+              borderRadius="full"
+              _hover={{ bg: "primary.200" }}
               onClick={onHeaderUploadClick}
-              leftIcon={<LuFilePlus size={18} />}
             >
+              <LuFilePlus size={16} />
               Ajouter un document
             </Button>
             <Button
-              size="md"
-              bg="primary.50"
-              color="primary.600"
-              _hover={{ bg: "primary.100" }}
+              size="sm"
+              h="36px"
+              variant="outline"
+              color="primary.900"
+              borderColor="primary.200"
+              borderRadius="full"
+              _hover={{ bg: "primary.50" }}
               onClick={onCreateProcedure}
-              leftIcon={<LuFolderPlus size={18} />}
             >
+              <LuFolderOpen size={16} />
               Commencer une démarche
             </Button>
 
             {(userRole === "ADMIN" || userRole === "MANAGER") && (
               <Link href="/admin/modele-demarche">
                 <Button
-                  size="md"
+                  size="sm"
+                  h="36px"
                   bg="purple.50"
                   color="purple.600"
+                  borderRadius="full"
                   _hover={{ bg: "purple.100" }}
-                  leftIcon={<LuShield size={18} />}
                 >
+                  <LuShield size={16} />
                   Admin Panel
                 </Button>
               </Link>
@@ -232,40 +269,43 @@ export function HomePage({
           </Flex>
         </Flex>
 
-        {/* Grid Layout */}
-        <Grid
-          templateColumns={{
-            base: "1fr",
-            lg: "repeat(2, 1fr)",
-          }}
-          gap="6"
-        >
-          <RecentDemarchesCard
-            demarches={data.recentDemarches}
-            automaticDemarchesCount={data.automaticDemarchesCount}
-            automaticDemarchesTotal={data.automaticDemarchesTotal}
-            onViewAll={onViewAllProcedures}
-            onCreateDemarche={onCreateProcedure}
-            onViewDetail={(id) => router.push(`/demarches/${id}`)}
-          />
-
-          <UpcomingDeadlinesCard
-            deadlines={data.upcomingDeadlines}
-            isPremiumUser={data.isPremiumUser}
-            onViewAll={onViewAllDeadlines}
-            onUpgrade={onUpgradeToPremium}
-            onRenew={onRenewDocument}
-          />
-
-          <Box gridColumn={{ lg: "span 2" }}>
-            <RecentDocumentsCard
-              documents={data.recentDocuments}
-              onViewAll={onViewAllDocuments}
-              onFileUpload={handleFileUpload}
+        {/* Cards section — constrained to 1200px */}
+        <Box w="full" maxW="1200px">
+          <Grid
+            templateColumns={{
+              base: "1fr",
+              lg: "repeat(2, 1fr)",
+            }}
+            gap="4"
+          >
+            {/* Left card — Dossiers récents */}
+            <RecentDemarchesCard
+              demarches={data.recentDemarches}
+              onViewAll={onViewAllProcedures}
+              onCreateDemarche={onCreateProcedure}
+              onViewDetail={(id) => router.push(`/demarches/${id}`)}
             />
-          </Box>
-        </Grid>
-      </Box>
+
+            {/* Right card — Échéances à venir */}
+            <UpcomingDeadlinesCard
+              deadlines={data.upcomingDeadlines}
+              isPremiumUser={data.isPremiumUser}
+              onViewAll={onViewAllDeadlines}
+              onUpgrade={onUpgradeToPremium}
+              onRenew={onRenewDocument}
+            />
+
+            {/* Full-width card — Documents récents */}
+            <Box gridColumn={{ lg: "span 2" }}>
+              <RecentDocumentsCard
+                documents={data.recentDocuments}
+                onViewAll={onViewAllDocuments}
+                onFileUpload={handleFileUpload}
+              />
+            </Box>
+          </Grid>
+        </Box>
+      </Flex>
     </Box>
   );
 }

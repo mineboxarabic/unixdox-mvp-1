@@ -1,11 +1,13 @@
 'use client';
 
-import { Box, Flex, VStack, Image, Heading, Text } from '@chakra-ui/react';
+import { VStack, Heading, Text } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
-import { BackgroundGradients } from '@/shared/auth/components/BackgroundGradients';
+import { AuthLayout } from '@/shared/auth/components/AuthLayout';
 import { login } from '@/shared/auth/actions';
 
-// Google Icon SVG component
+/**
+ * Google Icon SVG component for OAuth sign-in buttons.
+ */
 function GoogleIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -17,86 +19,65 @@ function GoogleIcon() {
   );
 }
 
+/**
+ * Login page with Figma v3.0 two-panel layout.
+ * Left: Connexion form with Google OAuth.
+ * Right: Gradient background with UNIDOX logo.
+ */
 export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     await login();
   };
 
   return (
-    <Box w="full" h="100vh" bg="bg.canvas" overflow="hidden" position="relative">
-      {/* Background Gradients */}
-      <BackgroundGradients />
-
-      {/* Main Content */}
-      <Flex h="full" position="relative" zIndex={1}>
-        {/* Left Side - Login Content */}
-        <Flex
-          flex="1"
-          bg="bg.surface"
-          borderRight="1px solid"
-          borderColor="border.muted"
-          direction="column"
+    <AuthLayout>
+      <VStack w="full" flex="1" justify="center" align="center">
+        <VStack
+          maxW="513px"
+          w="full"
           justify="center"
-          align="center"
+          align="flex-start"
+          gap={6}
+          px={8}
         >
-          <VStack w="full" flex="1" justify="center" align="center">
-            <VStack
-              w="513px"
-              justify="center"
-              align="flex-start"
-              gap={6}
+          <VStack align="flex-start" gap={2}>
+            <Heading
+              as="h1"
+              fontSize="2xl"
+              fontWeight="normal"
+              color="gray.600"
+              lineHeight="8"
             >
-              <VStack align="flex-start" gap={2}>
-                <Heading
-                  as="h1"
-                  fontSize="2xl"
-                  fontWeight="normal"
-                  color="text.fg.muted"
-                  lineHeight="8"
-                >
-                  Connexion
-                </Heading>
-                <Text
-                  fontSize="xl"
-                  fontWeight="normal"
-                  color="text.fg"
-                  lineHeight="1.5"
-                >
-                  Découvrez votre assistant administratif personnel
-                </Text>
-              </VStack>
-
-              <Button
-                w="full"
-                size="md"
-                variant="solid"
-                colorPalette="gray"
-                onClick={handleGoogleSignIn}
-                leftIcon={<GoogleIcon />}
-              >
-                Se connecter avec Google
-              </Button>
-            </VStack>
+              Connexion
+            </Heading>
+            <Text
+              fontSize="xl"
+              fontWeight="normal"
+              color="gray.700"
+              lineHeight="1.5"
+            >
+              Retrouvez votre assistant administratif personnel
+            </Text>
           </VStack>
-        </Flex>
 
-        {/* Right Side - Logo */}
-        <Flex
-          flex="1"
-          h="full"
-          p={2.5}
-          overflow="hidden"
-          justify="center"
-          align="center"
-        >
-          <Image
-            src="/logo.svg"
-            alt="UNIDOX Logo"
-            width="305px"
-            height="85px"
-          />
-        </Flex>
-      </Flex>
-    </Box>
+          {/* Google OAuth button - dark pill style per Figma */}
+          <Button
+            w="full"
+            h="40px"
+            variant="solid"
+            colorPalette="gray"
+            borderRadius="full"
+            bg="gray.800"
+            color="white"
+            fontSize="sm"
+            onClick={handleGoogleSignIn}
+            _hover={{ bg: 'gray.700' }}
+          >
+            <GoogleIcon />
+            Se connecter avec Google
+          </Button>
+        </VStack>
+      </VStack>
+    </AuthLayout>
   );
 }

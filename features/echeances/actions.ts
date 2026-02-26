@@ -119,7 +119,7 @@ export async function checkPremiumAccessAction(): Promise<{
             select: { plan: true },
         });
 
-        const isPremium = user?.plan === 'PREMIUM' || user?.plan === 'ENTERPRISE';
+        const isPremium = user?.plan !== 'FREE' && user?.plan != null;
 
         return { success: true, isPremium };
     } catch (error) {

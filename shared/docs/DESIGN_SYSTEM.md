@@ -13,15 +13,22 @@ This document describes the design system configuration for the UnixDox applicat
 
 ## Color Palette
 
-### Primary Colors (Blue)
+### Primary Colors (Electric Indigo Blue)
 Brand identity colors used for CTAs, links, and interactive elements.
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `primary.100` | #DBEAFE | Light backgrounds, hover states |
-| `primary.400` | #60A5FA | Gradient accents |
-| `primary.500` | #3B82F6 | Main brand color, primary buttons |
-| `primary.600` | #2563EB | Active states, selected items |
+| `primary.50` | #e8f1ff | Very light backgrounds |
+| `primary.100` | #d5e4ff | Light backgrounds, hover states |
+| `primary.200` | #b3ccff | Borders, subtle accents |
+| `primary.300` | #85a8ff | Gradient accents, secondary |
+| `primary.400` | #5676ff | Gradient accents, active |
+| `primary.500` | #2f45ff | Main brand color, primary buttons |
+| `primary.600` | #0c0eff | Active states, solid buttons |
+| `primary.700` | #0000fd | Deep active states |
+| `primary.800` | #0609cd | Dark accents |
+| `primary.900` | #10169f | Very dark accents |
+| `primary.950` | #0a0b5c | Darkest brand shade |
 
 ### Neutral Colors (Gray Scale)
 Used for text, backgrounds, and borders.
@@ -48,18 +55,49 @@ Used for text, backgrounds, and borders.
 Semantic tokens automatically adapt to light/dark mode and provide meaningful naming.
 
 ### Text Colors
-- `text.fg` - Default foreground text (neutral.700)
-- `text.fg.muted` - Secondary/muted text (neutral.600)
-- `text.fg.subtle` - Tertiary/placeholder text (neutral.500)
+- `text.fg` - Default foreground text (gray.700 / gray.50)
+- `text.fg.muted` - Secondary/muted text (gray.600 / gray.400)
+- `text.fg.subtle` - Tertiary/placeholder text (gray.400 / gray.500)
+- `text.fg.md` - Medium text (#787d84 / gray.400)
+- `text.fg.inverted` - Inverted text (gray.50 / gray.800)
+- `text.fg.error` - Error text (red.500 / red.400)
+- `text.fg.warning` - Warning text (yellow.600 / yellow.300)
+- `text.fg.success` - Success text (green.600 / green.300)
+- `text.fg.info` - Info text (primary.600 / primary.300)
 
 ### Background Colors
-- `bg.canvas` - Page background (white)
-- `bg.surface` - Card/component background (white)
-- `bg.muted` - Subtle backgrounds (neutral.100)
+- `bg.canvas` - Page background (white / black)
+- `bg.surface` - Card/component surface (white / gray.950)
+- `bg.subtle` - Subtle backgrounds (gray.50 / gray.950)
+- `bg.muted` - Muted backgrounds (gray.100 / gray.900)
+- `bg.emphasized` - Emphasized backgrounds (gray.200 / gray.800)
+- `bg.inverted` - Inverted backgrounds (black / white)
+- `bg.panel` - Panel backgrounds (white / gray.950)
+- `bg.error` - Error backgrounds (red.50)
+- `bg.warning` - Warning backgrounds (orange.50)
+- `bg.success` - Success backgrounds (green.50)
+- `bg.info` - Info backgrounds (primary.50)
 
 ### Border Colors
-- `border.default` - Standard borders (neutral.200)
-- `border.muted` - Subtle borders (neutral.2)
+- `border.default` - Standard borders (gray.200 / gray.800)
+- `border.subtle` - Subtle borders (gray.50 / gray.950)
+- `border.muted` - Muted borders (gray.100 / gray.900)
+- `border.emphasized` - Emphasized borders (gray.300 / gray.700)
+- `border.inverted` - Inverted borders (gray.800 / gray.200)
+- `border.error` - Error borders (red.500 / red.400)
+- `border.warning` - Warning borders (orange.500 / orange.400)
+- `border.success` - Success borders (green.500 / green.400)
+- `border.info` - Info borders (primary.500 / primary.400)
+
+### Foreground Colors
+- `fg.default` - Default foreground (gray.800 / gray.100)
+- `fg.muted` - Muted foreground (gray.600 / gray.500)
+- `fg.subtle` - Subtle foreground (gray.400 / gray.500)
+- `fg.inverted` - Inverted foreground (gray.50 / black)
+- `fg.error` - Error foreground (red.500 / red.400)
+- `fg.warning` - Warning foreground (orange.600 / orange.300)
+- `fg.success` - Success foreground (green.600 / green.300)
+- `fg.info` - Info foreground (primary.600 / primary.300)
 
 ## Typography Scale
 
@@ -106,11 +144,15 @@ Based on 4px increments for consistency.
 
 | Token | Size | Usage |
 |-------|------|-------|
+| `2xs` | 1px | Hairline borders |
+| `xs` | 2px | Tiny elements |
 | `sm` | 4px | Small elements, checkboxes |
-| `md` | 8px | Buttons, inputs |
-| `lg` | 12px | Cards, toggles |
-| `xl` | 16px | Large cards |
-| `2xl` | 24px | Hero sections |
+| `md` | 6px | Buttons, inputs |
+| `lg` | 8px | Cards, toggles |
+| `xl` | 12px | Large cards |
+| `2xl` | 16px | Hero sections |
+| `3xl` | 24px | Large sections |
+| `4xl` | 32px | Extra large sections |
 | `full` | 9999px | Pills, circular elements |
 
 ## Shadows
@@ -163,7 +205,7 @@ Edit `/config/theme.ts`:
 
 ```typescript
 primary: {
-  500: { value: '#3B82F6' }, // Change this to update everywhere
+  500: { value: '#2f45ff' }, // Change this to update everywhere
 }
 ```
 
@@ -217,5 +259,6 @@ The theme includes semantic tokens that automatically adapt to dark mode. When i
 
 ---
 
-**Last Updated**: November 22, 2025  
-**Design Reference**: [Figma - Unidox v.3](https://www.figma.com/design/jwMpm70UOdmUmdB6iPejAt/Unidox-v.3)
+**Last Updated**: June 2025  
+**Design Reference**: [Figma - RTD Unidox v.3.0](https://www.figma.com/design/HFxN3Zy8d9RCmBruqMCX16/RTD-Unidox-v.3.0)  
+**Design Tokens**: DSU-2.1

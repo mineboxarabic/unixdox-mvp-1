@@ -5,6 +5,9 @@ export const userPreferencesSchema = BaseUserPreferencesSchema;
 
 export const defaultUserPreferences: UserPreferences = {
   notifications: true,
+  notificationEmail: true,
+  notificationSms: false,
+  notificationInApp: true,
   language: 'fr',
 };
 

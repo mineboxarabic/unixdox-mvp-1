@@ -4,6 +4,7 @@ import { google } from 'googleapis';
 import { auth } from '@/auth';
 import { prisma } from '@/shared/config/prisma';
 import { getGoogleDriveAuth } from '@/shared/auth/google-drive';
+import { isPrismaConnectivityError } from '@/shared/utils/prisma-errors';
 import type { StorageInfo } from './types';
 
 export interface SidebarCounts {
@@ -45,27 +46,37 @@ export async function getSidebarCounts(): Promise<SidebarCounts> {
     const userId = session.user.id;
     const now = new Date();
 
-    const [demarchesCount, documentsCount, echeancesCount] = await Promise.all([
-        // Count demarches that are in progress (EN_COURS)
-        prisma.demarcheUtilisateur.count({
-            where: { idUtilisateur: userId, statut: 'EN_COURS' },
-        }),
-        // Count total documents
-        prisma.document.count({
-            where: { idProprietaire: userId },
-        }),
-        // Count documents with upcoming expiration (within 30 days) or expired
-        prisma.document.count({
-            where: {
-                idProprietaire: userId,
-                dateExpiration: {
-                    lte: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    try {
+        const [demarchesCount, documentsCount, echeancesCount] = await Promise.all([
+            // Count demarches that are in progress (EN_COURS)
+            prisma.demarcheUtilisateur.count({
+                where: { idUtilisateur: userId, statut: 'EN_COURS' },
+            }),
+            // Count total documents
+            prisma.document.count({
+                where: { idProprietaire: userId },
+            }),
+            // Count documents with upcoming expiration (within 30 days) or expired
+            prisma.document.count({
+                where: {
+                    idProprietaire: userId,
+                    dateExpiration: {
+                        lte: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+                    },
                 },
-            },
-        }),
-    ]);
+            }),
+        ]);
 
-    return { demarchesCount, documentsCount, echeancesCount };
+        return { demarchesCount, documentsCount, echeancesCount };
+    } catch (error) {
+        if (isPrismaConnectivityError(error)) {
+            console.warn('Sidebar counts unavailable: database is temporarily unreachable.');
+        } else {
+            console.error('Failed to fetch sidebar counts', error);
+        }
+
+        return { demarchesCount: 0, documentsCount: 0, echeancesCount: 0 };
+    }
 }
 
 /**
@@ -92,7 +103,11 @@ export async function getSidebarStorageInfo(): Promise<StorageInfo | null> {
 
         return mapBytesToStorageInfo(usage, limit);
     } catch (error) {
-        console.error('Failed to fetch Google Drive storage quota', error);
+        if (isPrismaConnectivityError(error)) {
+            console.warn('Sidebar storage unavailable: database is temporarily unreachable.');
+        } else {
+            console.error('Failed to fetch Google Drive storage quota', error);
+        }
         return null;
     }
 }

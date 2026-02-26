@@ -110,6 +110,7 @@ export function HomePageClient({
         onViewAllProcedures={() => router.push('/demarches')}
         onViewAllDeadlines={() => router.push('/settings')}
         onViewAllDocuments={() => router.push('/documents')}
+        onUpgradeToPremium={() => router.push('/upgrade')}
         onRenewDocument={() => setIsDialogOpen(true)}
       />
 

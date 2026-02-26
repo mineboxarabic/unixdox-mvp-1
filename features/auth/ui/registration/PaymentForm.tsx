@@ -1,16 +1,112 @@
+'use client';
+
+import { useState } from 'react';
 import { VStack, HStack, Box, Text, Input } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
+import { LuCreditCard, LuCheck, LuLoader } from 'react-icons/lu';
 
 interface PaymentFormProps {
   onContinue: () => void;
 }
 
+/**
+ * Fake Stripe-like payment form.
+ * Accepts any input and simulates a 2-second payment processing animation
+ * followed by a brief success state before calling onContinue.
+ */
 export function PaymentForm({ onContinue }: PaymentFormProps) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement payment processing
+
+    // Start fake processing animation
+    setIsProcessing(true);
+
+    // Simulate payment processing (2 seconds)
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Show success state briefly (1 second)
+    setIsProcessing(false);
+    setIsSuccess(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Advance to next step
     onContinue();
   };
+
+  // Processing state UI
+  if (isProcessing) {
+    return (
+      <VStack w="full" gap={4} py={8} align="center">
+        {/* Inject keyframes globally */}
+        <style>{`
+          @keyframes payment-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          @keyframes payment-pulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+          }
+        `}</style>
+        <Box
+          w="48px"
+          h="48px"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="primary.500"
+          style={{ animation: 'payment-spin 1s linear infinite' }}
+        >
+          <LuLoader size={32} />
+        </Box>
+        <Text fontSize="md" fontWeight="medium" color="text.fg" data-testid="payment-processing">
+          Traitement en cours...
+        </Text>
+        <Text fontSize="sm" color="text.fg.muted">
+          Veuillez patienter pendant que nous traitons votre paiement
+        </Text>
+      </VStack>
+    );
+  }
+
+  // Success state UI
+  if (isSuccess) {
+    return (
+      <VStack w="full" gap={4} py={8} align="center">
+        <style>{`
+          @keyframes payment-pulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+          }
+        `}</style>
+        <Box
+          w="48px"
+          h="48px"
+          borderRadius="full"
+          bg="green.100"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="green.600"
+          style={{ animation: 'payment-pulse 0.4s ease-out' }}
+        >
+          <LuCheck size={28} />
+        </Box>
+        <Text fontSize="md" fontWeight="medium" color="green.600" data-testid="payment-success">
+          Paiement accepté !
+        </Text>
+        <Text fontSize="sm" color="text.fg.muted">
+          Votre abonnement a été activé avec succès
+        </Text>
+      </VStack>
+    );
+  }
 
   return (
     <VStack
@@ -26,15 +122,26 @@ export function PaymentForm({ onContinue }: PaymentFormProps) {
         <Text fontSize="sm" fontWeight="normal" color="text.fg">
           Numéro de carte
         </Text>
-        <Input
-          placeholder="1111 2222 3333 4444"
-          size="md"
-          bg="bg.surface"
-          borderColor="border.default"
-          _hover={{ borderColor: 'neutral.400' }}
-          _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-          required
-        />
+        <HStack gap={0} position="relative">
+          <Input
+            placeholder="1111 2222 3333 4444"
+            size="md"
+            bg="bg.surface"
+            borderColor="border.default"
+            _hover={{ borderColor: 'neutral.400' }}
+            _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
+            data-testid="card-number"
+          />
+          <Box
+            position="absolute"
+            right={3}
+            top="50%"
+            transform="translateY(-50%)"
+            color="text.fg.muted"
+          >
+            <LuCreditCard size={18} />
+          </Box>
+        </HStack>
       </VStack>
 
       {/* Expiration Date & Security Code */}
@@ -51,7 +158,7 @@ export function PaymentForm({ onContinue }: PaymentFormProps) {
             _hover={{ borderColor: 'neutral.400' }}
             _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
             maxLength={5}
-            required
+            data-testid="card-expiry"
           />
         </VStack>
 
@@ -67,7 +174,7 @@ export function PaymentForm({ onContinue }: PaymentFormProps) {
             _hover={{ borderColor: 'neutral.400' }}
             _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
             maxLength={3}
-            required
+            data-testid="card-cvv"
           />
         </VStack>
       </HStack>
@@ -84,7 +191,7 @@ export function PaymentForm({ onContinue }: PaymentFormProps) {
           borderColor="border.default"
           _hover={{ borderColor: 'neutral.400' }}
           _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-          required
+          data-testid="card-holder"
         />
       </VStack>
 
@@ -107,6 +214,7 @@ export function PaymentForm({ onContinue }: PaymentFormProps) {
         variant="solid"
         colorPalette="gray"
         mt={2}
+        data-testid="payment-submit"
       >
         Continuer
       </Button>

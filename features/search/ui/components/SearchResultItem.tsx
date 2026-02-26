@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 export interface SearchResultItemProps {
   icon: ReactNode;
@@ -16,18 +16,32 @@ export function SearchResultItem({
   rightIcon,
   onClick,
 }: SearchResultItemProps) {
+  /**
+   * Prevent the search input from losing focus (blur) before
+   * the click event fires. Without this, the dropdown closes
+   * in 200 ms via handleSearchBlur before onClick is processed.
+   */
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <Box
       as="button"
       onClick={onClick}
+      onMouseDown={handleMouseDown}
       px="2"
-      py="1.5"
-      borderRadius="sm"
+      py="2"
+      borderRadius="md"
       width="full"
       textAlign="left"
       cursor="pointer"
-      _hover={{ bg: "bg.muted" }}
-      transition="background 0.15s ease"
+      role="option"
+      aria-label={label}
+      _hover={{ bg: "bg.muted", transform: "translateX(2px)" }}
+      _active={{ bg: "bg.subtle" }}
+      _focusVisible={{ outline: "2px solid", outlineColor: "colorPalette.focusRing", outlineOffset: "-2px" }}
+      transition="all 0.15s ease"
     >
       <Flex gap="1.5" alignItems="center">
         <Box flexShrink={0} display="flex" alignItems="center">

@@ -58,7 +58,7 @@ export async function getHomeData(): Promise<HomeData> {
     }),
   ]);
 
-  const isPremiumUser = user?.plan === "PREMIUM" || user?.plan === "ENTERPRISE";
+  const isPremiumUser = user?.plan !== "FREE" && user?.plan != null;
 
   const upcomingDeadlines = (documentsWithExpiration || []).map((doc) => {
     const daysUntilExpiration = Math.ceil(

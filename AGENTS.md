@@ -7,6 +7,8 @@ Use SOLID Principles
 Use standard naming conventions for files
 Use standard project structure for backend code.
 
+Use TDD test driven development.
+
 You can delete files and folders if needed to follow standard project structure.
 
 We will use feature folder structure.

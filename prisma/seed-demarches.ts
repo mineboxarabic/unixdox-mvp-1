@@ -67,6 +67,11 @@ async function seedDemarches() {
 
     const allModeles = await prisma.modeleDemarche.findMany();
 
+    // Clear existing demarches for this user to avoid duplicates on re-run
+    await prisma.demarcheUtilisateur.deleteMany({
+      where: { idUtilisateur: firstUser.id },
+    });
+
     // Create sample DemarcheUtilisateur instances
     for (let i = 0; i < Math.min(15, allModeles.length * 3); i++) {
       const modele = allModeles[i % allModeles.length];
@@ -79,9 +84,10 @@ async function seedDemarches() {
           idModele: modele.id,
           statut: status,
           complete: status === DemarcheStatut.COMPLETE,
-          dateDebut: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000), // Random date in last 90 days
-          dateCompletion: status === DemarcheStatut.COMPLETE 
-            ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+          // Spread dates across the last 90 days
+          dateDebut: new Date(Date.now() - (i * 6 + 1) * 24 * 60 * 60 * 1000),
+          dateCompletion: status === DemarcheStatut.COMPLETE
+            ? new Date(Date.now() - i * 2 * 24 * 60 * 60 * 1000)
             : null,
           notes: `Notes pour ${modele.titre}`,
         },

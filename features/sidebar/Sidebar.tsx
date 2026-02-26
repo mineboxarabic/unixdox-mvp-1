@@ -114,12 +114,13 @@ export function Sidebar({ user, counts, storage }: SidebarProps) {
         direction="column"
         gap={4}
         h="full"
-        p={2}
+        px={2}
         pt={2}
+        pb={4}
         overflow="hidden"
       >
         {/* Logo */}
-        <Box px={1} pt={1}>
+        <Box>
           <Link href="/">
             <Logo isCollapsed={isCollapsed} />
           </Link>

@@ -103,7 +103,7 @@ const TAGS = [
  * Dossiers pour organiser les documents (with nice colors)
  */
 const DOSSIERS = [
-  { nom: 'Documents Personnels', couleur: '#3B82F6', icone: 'user' },
+  { nom: 'Documents Personnels', couleur: '#2f45ff', icone: 'user' },
   { nom: 'Travail', couleur: '#10B981', icone: 'briefcase' },
   { nom: 'Logement', couleur: '#F59E0B', icone: 'home' },
   { nom: 'Santé', couleur: '#EF4444', icone: 'heart' },
@@ -143,7 +143,10 @@ async function seedModelesDemarches() {
 
 async function seedDossiers(userId: string) {
   console.log('📁 Creating dossiers...');
-  
+
+  // Remove any existing demo dossiers for this user to avoid duplicates on re-run
+  await prisma.dossier.deleteMany({ where: { idProprietaire: userId } });
+
   const createdDossiers = [];
   for (const dossier of DOSSIERS) {
     const created = await prisma.dossier.create({
@@ -156,14 +159,17 @@ async function seedDossiers(userId: string) {
     });
     createdDossiers.push(created);
   }
-  
+
   console.log(`✅ Created ${createdDossiers.length} dossiers`);
   return createdDossiers;
 }
 
 async function seedDemarchesUtilisateur(userId: string) {
   console.log('📝 Creating user démarches...');
-  
+
+  // Remove existing user démarches to avoid duplicates on re-run
+  await prisma.demarcheUtilisateur.deleteMany({ where: { idUtilisateur: userId } });
+
   const modeles = await prisma.modeleDemarche.findMany();
   let createdCount = 0;
   

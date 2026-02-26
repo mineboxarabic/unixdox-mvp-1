@@ -60,15 +60,18 @@ export async function updateUserSubscription(plan: SubscriptionPlan): Promise<Ac
   const session = await requireAuth();
   const userId = session.user?.id;
 
+  console.log('updateUserSubscription called with userId:', userId, 'plan:', plan);
+
   if (!userId) {
     return { success: false, error: 'Unauthorized' };
   }
 
   try {
     const updated = await userService.updateUser(userId, { plan });
-    revalidatePath('/profile');
+    revalidatePath('/', 'layout');
     return { success: true, data: updated };
   } catch (error: any) {
+    console.error('Error in updateUserSubscription:', error);
     return { success: false, error: error.message || 'Failed to update subscription' };
   }
 }

@@ -6,6 +6,10 @@ export interface SearchDocument {
   type: DocumentType;
   statut: DocumentStatut;
   updatedAt: Date;
+  urlStockage?: string | null;
+  size: number;
+  tags: string[];
+  dateExpiration?: Date | null;
 }
 
 export interface SearchDemarche {

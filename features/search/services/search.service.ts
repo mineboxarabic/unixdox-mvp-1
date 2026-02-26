@@ -13,6 +13,10 @@ export const searchService = {
         type: true,
         statut: true,
         updatedAt: true,
+        urlStockage: true,
+        size: true,
+        tags: true,
+        dateExpiration: true,
       },
       orderBy: {
         updatedAt: 'desc',

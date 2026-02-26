@@ -5,6 +5,7 @@ import { demarcheService } from './services/demarche.service';
 import { StartDemarcheSchema, UpdateDemarcheSchema } from './types/schemas';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/shared/config/prisma';
+import { isPrismaConnectivityError } from '@/shared/utils/prisma-errors';
 
 /**
  * Get all demarches for the current user
@@ -14,13 +15,22 @@ export async function getUserDemarchesAction() {
     const session = await auth();
     
     if (!session?.user?.id) {
-      return { success: false, error: 'Non authentifié' };
+      return { success: false, error: 'Non authentifié', errorCode: 'UNAUTHENTICATED' };
     }
 
     const demarches = await demarcheService.getUserDemarches(session.user.id);
     
     return { success: true, data: demarches };
   } catch (error) {
+    if (isPrismaConnectivityError(error)) {
+      console.warn('Database temporarily unreachable while fetching user demarches.');
+      return {
+        success: false,
+        error: 'Base de données temporairement indisponible',
+        errorCode: 'DB_UNAVAILABLE',
+      };
+    }
+
     console.error('Error fetching user demarches:', error);
     return { 
       success: false, 

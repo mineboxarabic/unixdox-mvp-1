@@ -2,10 +2,6 @@
 
 import { Box, Flex, Text } from "@chakra-ui/react";
 import {
-    Card,
-    CardHeader,
-    CardBody,
-    CardFooter,
     EmptyState,
     Separator,
 } from "@/shared/components/ui";
@@ -18,17 +14,17 @@ import { fr } from "date-fns/locale";
 
 export interface RecentDemarchesCardProps {
     demarches: Array<DemarcheUtilisateur & { modele: { titre: string } }>;
-    automaticDemarchesCount?: number;
-    automaticDemarchesTotal?: number;
     onViewAll?: () => void;
     onCreateDemarche?: () => void;
     onViewDetail?: (demarcheId: string) => void;
 }
 
+/**
+ * Dossiers récents card — shows recent dossiers/demarches
+ * Matches Figma v3.0: white bg, neutral.200 border, rounded 2xl, h=277px
+ */
 export function RecentDemarchesCard({
     demarches,
-    automaticDemarchesCount = 0,
-    automaticDemarchesTotal = 1,
     onViewAll,
     onCreateDemarche,
     onViewDetail,
@@ -49,105 +45,92 @@ export function RecentDemarchesCard({
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <Flex justifyContent="space-between" alignItems="center" width="full">
-                    <Flex gap="3" alignItems="center">
-                        <LuFolder size={24} color="var(--chakra-colors-neutral-400)" />
-                        <Text fontSize="lg" fontWeight="semibold" color="text.fg">
-                            Démarches récentes
-                        </Text>
-                    </Flex>
-                    <Flex gap="1" fontSize="sm" color="text.fg.muted">
-                        <Text>Démarches automatiques ce mois ci :</Text>
-                        <Text fontWeight="medium" color="text.fg">
-                            {automaticDemarchesCount}/{automaticDemarchesTotal}
-                        </Text>
-                    </Flex>
-                </Flex>
-            </CardHeader>
-            <CardBody>
+        <Box
+            bg="white"
+            border="1px solid"
+            borderColor="neutral.200"
+            borderRadius="2xl"
+            p="4"
+            h="277px"
+            overflow="hidden"
+            display="flex"
+            flexDirection="column"
+        >
+            {/* Card header */}
+            <Flex gap="2" alignItems="center" pb="3">
+                <LuFolder size={20} color="var(--chakra-colors-gray-500)" />
+                <Text fontSize="lg" fontWeight="semibold" color="gray.800">
+                    Dossiers récents
+                </Text>
+            </Flex>
+
+            {/* Card body */}
+            <Box flex="1" overflow="auto">
                 {demarches.length === 0 ? (
-                    <Box position="relative" overflow="hidden" minH="300px" mx="-6" mb="-6" px="6" pb="6">
-                        {/* Wave/Mountain Gradient Background */}
-                        <Box
-                            position="absolute"
-                            left="50%"
-                            bottom="0"
-                            transform="translateX(-50%)"
-                            width="500px"
-                            height="300px"
-                            bgGradient="radial-gradient(ellipse 500px 300px at 50% 100%, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.12) 30%, rgba(59, 130, 246, 0.06) 50%, transparent 75%)"
-                            filter="blur(50px)"
-                            pointerEvents="none"
-                            zIndex="0"
-                        />
-                        <Box position="relative" zIndex="1">
-                            <EmptyState
-                                icon={<LuFolder size={64} />}
-                                description="Aucune démarche pour le moment"
-                                action={
-                                    <Button
-                                        size="lg"
-                                        colorPalette="blue"
-                                        onClick={onCreateDemarche}
-                                    >
-                                        <LuFolderPlus size={18} />
-                                        Commencez une démarche
-                                    </Button>
-                                }
-                            />
-                        </Box>
-                    </Box>
+                    <EmptyState
+                        icon={<LuFolder size={48} />}
+                        description="Aucun dossier pour le moment"
+                        action={
+                            <Button
+                                size="sm"
+                                colorPalette="blue"
+                                borderRadius="full"
+                                onClick={onCreateDemarche}
+                            >
+                                <LuFolderPlus size={16} />
+                                Commencez une démarche
+                            </Button>
+                        }
+                    />
                 ) : (
                     <Flex direction="column" gap="0">
-                        {demarches.map((demarche, index) => {
-                            return (
-                                <Box key={demarche.id}>
-                                    <Flex
-                                        py="3"
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                        gap="4"
-                                    >
-                                        <Flex direction="column" gap="1" flex="1">
-                                            <Flex alignItems="center" gap="2">
-                                                <Text fontSize="sm" fontWeight="medium" color="text.fg">
-                                                    {demarche.titre || demarche.modele.titre}
-                                                </Text>
-                                                {demarche.complete && (
-                                                    <Badge colorScheme="success" size="sm">
-                                                        Complétée
-                                                    </Badge>
-                                                )}
-                                            </Flex>
-                                            <Text fontSize="xs" color="text.fg.muted">
-                                                {formatDate(demarche.dateDebut)}
+                        {demarches.map((demarche, index) => (
+                            <Box key={demarche.id}>
+                                <Flex
+                                    py="2.5"
+                                    alignItems="center"
+                                    justifyContent="space-between"
+                                    gap="3"
+                                >
+                                    <Flex direction="column" gap="0.5" flex="1" minW={0}>
+                                        <Flex alignItems="center" gap="2">
+                                            <Text fontSize="sm" fontWeight="medium" color="gray.800" truncate>
+                                                {demarche.titre || demarche.modele.titre}
                                             </Text>
+                                            {demarche.complete && (
+                                                <Badge colorScheme="success" size="sm">
+                                                    Complétée
+                                                </Badge>
+                                            )}
                                         </Flex>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDetail?.(demarche.id)}
-                                            rightIcon={<LuExternalLink size={14} />}
-                                        >
-                                            Voir le détail
-                                        </Button>
+                                        <Text fontSize="xs" color="gray.500">
+                                            {formatDate(demarche.dateDebut)}
+                                        </Text>
                                     </Flex>
-                                    {index < demarches.length - 1 && <Separator />}
-                                </Box>
-                            );
-                        })}
+                                    <Button
+                                        variant="outline"
+                                        size="xs"
+                                        onClick={() => onViewDetail?.(demarche.id)}
+                                    >
+                                        <LuExternalLink size={12} />
+                                        Détail
+                                    </Button>
+                                </Flex>
+                                {index < demarches.length - 1 && <Separator />}
+                            </Box>
+                        ))}
                     </Flex>
                 )}
-            </CardBody>
+            </Box>
+
+            {/* Footer — view all link */}
             {demarches.length > 0 && (
-                <CardFooter>
-                    <Button variant="ghost" size="sm" onClick={onViewAll}>
+                <Flex pt="2" justifyContent="flex-end">
+                    <Button variant="ghost" size="xs" onClick={onViewAll}>
                         Voir tout
                     </Button>
-                </CardFooter>
+                </Flex>
             )}
-        </Card>
+        </Box>
     );
 }

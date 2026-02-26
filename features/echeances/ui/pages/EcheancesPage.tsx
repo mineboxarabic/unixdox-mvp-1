@@ -9,6 +9,7 @@ import { EcheanceGrid } from '../components/EcheanceGrid';
 import { EcheancesFilters } from '../components/EcheancesFilters';
 import type { Echeance } from '../../types';
 import { EcheanceStatut } from '../../types';
+import { useRouter } from 'next/navigation';
 
 interface EcheancesPageProps {
     echeances: Echeance[];
@@ -21,6 +22,7 @@ interface EcheancesPageProps {
  * Shown to non-premium users
  */
 function PremiumUpgradePrompt() {
+    const router = useRouter();
     return (
         <VStack
             py={16}
@@ -63,6 +65,7 @@ function PremiumUpgradePrompt() {
                     borderRadius="full"
                     w="full"
                     _hover={{ bg: 'primary.500' }}
+                    onClick={() => router.push('/upgrade')}
                 >
                     <Flex align="center" gap={2}>
                         <LuCrown size={18} />

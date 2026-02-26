@@ -22,17 +22,18 @@ export function NavButton({ item, isCollapsed = false }: NavButtonProps) {
       cursor={item.isDisabled ? 'not-allowed' : 'pointer'}
       opacity={item.isDisabled ? 0.43 : 1}
       bg={item.isActive ? 'bg.surface' : 'transparent'}
-      border={item.isActive ? '1px solid' : 'none'}
-      borderColor={item.isActive ? 'neutral.2' : 'transparent'}
+      border={item.isActive ? '1px solid' : '1px solid'}
+      borderColor={item.isActive ? 'neutral.200' : 'transparent'}
       _hover={!item.isDisabled ? { bg: 'bg.muted' } : {}}
       transition="all 0.2s"
       justifyContent={isCollapsed ? 'center' : 'flex-start'}
       w="full"
     >
+      {/* Active state left indicator bar */}
       {item.isActive && !isCollapsed && (
         <Box
           position="absolute"
-          left="4px"
+          left="3px"
           top="50%"
           transform="translateY(-50%)"
           w="2px"
@@ -47,10 +48,10 @@ export function NavButton({ item, isCollapsed = false }: NavButtonProps) {
         alignItems="center"
         justifyContent="center"
         flexShrink={0}
-        w="18px"
-        h="18px"
+        w="24px"
+        h="24px"
       >
-        <item.icon />
+        <item.icon style={{ width: 20, height: 20 }} />
       </Box>
 
       {!isCollapsed && (
@@ -59,14 +60,14 @@ export function NavButton({ item, isCollapsed = false }: NavButtonProps) {
             flex="1"
             fontSize="sm"
             fontWeight="normal"
-            color={item.isActive ? 'neutral.700' : 'neutral.600'}
+            color={item.isActive ? 'gray.700' : 'gray.600'}
           >
             {item.label}
           </Text>
 
           {item.isPremium && (
             <Box display="flex" alignItems="center" justifyContent="center">
-              <LuCrown size={18} />
+              <LuCrown size={20} color="#D97706" />
             </Box>
           )}
 
@@ -77,8 +78,9 @@ export function NavButton({ item, isCollapsed = false }: NavButtonProps) {
               justifyContent="center"
               px={1}
               borderRadius="full"
+              opacity={item.isPremium ? 0.43 : 1}
             >
-              <Text fontSize="xs" color="neutral.600">
+              <Text fontSize="xs" color="gray.600">
                 {item.badge}
               </Text>
             </Box>

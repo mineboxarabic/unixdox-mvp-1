@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { SettingsPage, preferencesService } from "@/features/settings";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export default async function Settings() {
   const session = await auth();
@@ -9,7 +12,13 @@ export default async function Settings() {
     redirect("/login");
   }
 
-  const preferences = await preferencesService.getPreferences(session.user.id);
+  const [preferences, user] = await Promise.all([
+    preferencesService.getPreferences(session.user.id),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    }),
+  ]);
 
-  return <SettingsPage preferences={preferences} />;
+  return <SettingsPage preferences={preferences} userPlan={user?.plan ?? 'FREE'} />;
 }
