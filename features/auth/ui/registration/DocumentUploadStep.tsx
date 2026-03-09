@@ -34,6 +34,7 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -66,12 +67,13 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
   };
 
   const handleSkip = () => {
-    console.log('Skip upload clicked');
+    setIsLoading(true);
     onNext();
   };
 
   const handleContinue = async () => {
     if (uploadedFile) {
+      setIsLoading(true);
       const formData = new FormData();
       formData.append('file', uploadedFile);
 
@@ -83,6 +85,7 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
         if (result.success) {
           // Force hard navigation to clear Next.js client router cache
           window.location.assign('/');
+          return;
         }
       } catch (error) {
         toaster.create({
@@ -91,6 +94,7 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
           type: 'error',
         });
       }
+      setIsLoading(false);
     }
   };
 
@@ -204,6 +208,7 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
           colorPalette="gray"
           flex="1"
           onClick={onBack}
+          disabled={isLoading}
         >
           Retour
         </Button>
@@ -214,6 +219,8 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
           colorPalette="gray"
           flex="1"
           onClick={handleSkip}
+          disabled={isLoading}
+          loading={isLoading && !uploadedFile}
         >
           Passer cette étape
         </Button>
@@ -225,6 +232,7 @@ export function DocumentUploadStep({ onNext, onBack, uploadDocumentFile }: StepC
             colorPalette="gray"
             flex="1"
             onClick={handleContinue}
+            loading={isLoading}
           >
             Continuer
           </Button>
