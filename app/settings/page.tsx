@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { SettingsPage, preferencesService } from "@/features/settings";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/shared/config/prisma";
 
 export default async function Settings() {
   const session = await auth();
