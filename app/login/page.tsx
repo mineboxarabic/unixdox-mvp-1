@@ -3,7 +3,7 @@
 import { VStack, Heading, Text } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { AuthLayout } from '@/shared/auth/components/AuthLayout';
-import { signIn } from 'next-auth/react';
+import { login } from '@/shared/auth/actions';
 
 /**
  * Google Icon SVG component for OAuth sign-in buttons.
@@ -25,8 +25,8 @@ function GoogleIcon() {
  * Right: Gradient background with UNIDOX logo.
  */
 export default function LoginPage() {
-  const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/' });
+  const handleGoogleSignIn = async () => {
+    await login();
   };
 
   return (

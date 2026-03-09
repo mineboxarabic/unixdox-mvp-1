@@ -22,14 +22,19 @@ export const authConfig = {
   trustHost: true,
   // Debug logs
   logger: {
-    error: (code, ...message) => {
-      console.error(code, message)
+    error: (error: unknown) => {
+      // Log the full error including nested cause for diagnosability
+      const cause = (error as any)?.cause;
+      console.error('[Auth.js Error]', error);
+      if (cause) {
+        console.error('[Auth.js Error Cause]', cause);
+      }
     },
-    warn: (code, ...message) => {
-      console.warn(code, message)
+    warn: (code: unknown) => {
+      console.warn('[Auth.js Warn]', code);
     },
-    debug: (code, ...message) => {
-      console.debug(code, message)
+    debug: (message: unknown) => {
+      console.debug('[Auth.js Debug]', message);
     },
   },
   pages: {
