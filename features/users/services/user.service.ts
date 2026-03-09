@@ -61,14 +61,22 @@ class UserService {
     }) as unknown as Promise<SafeUser>;
   }
 
-  async updateUser(id: string, data: Prisma.UserUpdateInput): Promise<SafeUser> {
+  async updateUser(id: string, data: Prisma.UserUpdateInput): Promise<SafeUser | null> {
     if (data.password && typeof data.password === 'string') {
       data.password = await bcrypt.hash(data.password, 10);
     }
 
-    return prisma.user.update({
+    const result = await prisma.user.updateMany({
       where: { id },
       data,
+    });
+
+    if (result.count === 0) {
+      return null;
+    }
+
+    return prisma.user.findUnique({
+      where: { id },
       select: {
         id: true,
         email: true,
@@ -79,7 +87,7 @@ class UserService {
         updatedAt: true,
         preferences: true,
       },
-    }) as unknown as Promise<SafeUser>;
+    }) as unknown as Promise<SafeUser | null>;
   }
 
   async deleteUser(id: string): Promise<SafeUser> {

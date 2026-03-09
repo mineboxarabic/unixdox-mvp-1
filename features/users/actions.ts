@@ -10,6 +10,10 @@ import { User, SubscriptionPlan } from '@prisma/client';
 // Define SafeUser type locally or import if exported from service
 type SafeUser = Omit<User, 'password' | 'googleId'>;
 
+function toErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
+
 // Note: User creation is typically handled by Auth provider (NextAuth) or a specific registration flow.
 // If you need an admin action to create users, you can add it here.
 
@@ -32,10 +36,13 @@ export async function updateCurrentUser(input: unknown): Promise<ActionResult<Sa
 
   try {
     const updated = await userService.updateUser(userId, parsed.data);
+    if (!updated) {
+      return { success: false, error: 'Session invalide. Veuillez vous reconnecter.' };
+    }
     revalidatePath('/profile');
     return { success: true, data: updated };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update user' };
+  } catch (error: unknown) {
+    return { success: false, error: toErrorMessage(error, 'Failed to update user') };
   }
 }
 
@@ -51,8 +58,8 @@ export async function deleteCurrentUser(): Promise<ActionResult<void>> {
     await userService.deleteUser(userId);
     // Redirect or sign out logic should be handled by the client after success
     return { success: true, data: undefined };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete user' };
+  } catch (error: unknown) {
+    return { success: false, error: toErrorMessage(error, 'Failed to delete user') };
   }
 }
 
@@ -68,10 +75,13 @@ export async function updateUserSubscription(plan: SubscriptionPlan): Promise<Ac
 
   try {
     const updated = await userService.updateUser(userId, { plan });
+    if (!updated) {
+      return { success: false, error: 'Session invalide. Veuillez vous reconnecter.' };
+    }
     revalidatePath('/profile');
     return { success: true, data: updated };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in updateUserSubscription:', error);
-    return { success: false, error: error.message || 'Failed to update subscription' };
+    return { success: false, error: toErrorMessage(error, 'Failed to update subscription') };
   }
 }

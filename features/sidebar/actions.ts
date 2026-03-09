@@ -103,7 +103,14 @@ export async function getSidebarStorageInfo(): Promise<StorageInfo | null> {
 
         return mapBytesToStorageInfo(usage, limit);
     } catch (error) {
-        if (isPrismaConnectivityError(error)) {
+            const message = error instanceof Error ? error.message : String(error);
+
+            if (message.includes('Google account not linked')) {
+                // Normal state for users who have not connected Drive yet.
+                return null;
+            }
+
+            if (isPrismaConnectivityError(error)) {
             console.warn('Sidebar storage unavailable: database is temporarily unreachable.');
         } else {
             console.error('Failed to fetch Google Drive storage quota', error);
