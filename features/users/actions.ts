@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { userService } from './services/user.service';
 import { UserUpdateSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
@@ -37,7 +38,8 @@ export async function updateCurrentUser(input: unknown): Promise<ActionResult<Sa
   try {
     const updated = await userService.updateUser(userId, parsed.data);
     if (!updated) {
-      return { success: false, error: 'Session invalide. Veuillez vous reconnecter.' };
+     
+      redirect('/login');
     }
     revalidatePath('/profile');
     return { success: true, data: updated };
@@ -76,7 +78,7 @@ export async function updateUserSubscription(plan: SubscriptionPlan): Promise<Ac
   try {
     const updated = await userService.updateUser(userId, { plan });
     if (!updated) {
-      return { success: false, error: 'Session invalide. Veuillez vous reconnecter.' };
+      redirect('/login');
     }
     revalidatePath('/profile');
     return { success: true, data: updated };

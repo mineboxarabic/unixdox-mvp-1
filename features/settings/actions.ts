@@ -21,7 +21,7 @@ export async function updatePreferencesAction(data: unknown) {
   try {
     const wasUpdated = await preferencesService.updatePreferences(session.user.id, parsed.data);
     if (!wasUpdated) {
-      return { error: 'Session invalide. Veuillez vous reconnecter.' };
+      redirect('/login');
     }
   } catch (error) {
     console.error('Failed to update user preferences', error);
