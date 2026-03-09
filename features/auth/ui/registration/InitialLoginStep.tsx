@@ -1,7 +1,7 @@
 import { VStack, Heading, Text } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
-import { loginWithGoogle } from '@/shared/auth/actions';
+import { signIn } from 'next-auth/react';
 
 /**
  * Google Icon SVG component for OAuth sign-in buttons.
@@ -25,8 +25,8 @@ function GoogleIcon() {
  * - Dark pill Google button (gray.800 bg, rounded full)
  */
 export function InitialLoginStep({ onNext }: StepComponentProps) {
-  const handleGoogleSignIn = async () => {
-    await loginWithGoogle();
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl: '/register' });
   };
 
   return (

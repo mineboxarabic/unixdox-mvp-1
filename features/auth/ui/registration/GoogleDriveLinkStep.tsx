@@ -2,6 +2,7 @@ import { VStack, Heading, Text, HStack } from '@chakra-ui/react';
 import { Button } from '@/shared/components/ui/button';
 import { StepComponentProps } from './types';
 import { linkGoogleAccount } from '@/shared/auth/actions';
+import { signIn } from 'next-auth/react';
 
 // Google Drive Icon SVG component
 function GoogleDriveIcon() {
@@ -19,7 +20,9 @@ function GoogleDriveIcon() {
 
 export function GoogleDriveLinkStep({ onNext }: StepComponentProps) {
   const handleGoogleDriveLink = async () => {
+    // First clean up existing account on the server, then redirect client-side
     await linkGoogleAccount();
+    signIn('google', { callbackUrl: '/register?step=3' });
   };
 
   return (

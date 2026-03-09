@@ -28,9 +28,4 @@ export async function linkGoogleAccount() {
       console.error('Failed to delete existing account:', error);
     }
   }
-
-  // Force consent to ensure we get a refresh token
-  await signIn('google', { 
-    redirectTo: '/register?step=3',
-  });
 }
