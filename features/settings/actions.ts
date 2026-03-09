@@ -1,6 +1,6 @@
 'use server';
 
-import { redirect, unstable_rethrow } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { preferencesService } from './services/preferences.service';
 import { userPreferencesSchema } from './types/schemas';
@@ -21,10 +21,9 @@ export async function updatePreferencesAction(data: unknown) {
   try {
     const wasUpdated = await preferencesService.updatePreferences(session.user.id, parsed.data);
     if (!wasUpdated) {
-      redirect('/login');
+      return { error: 'Utilisateur introuvable.' };
     }
   } catch (error) {
-    unstable_rethrow(error);
     console.error('Failed to update user preferences', error);
     return { error: 'Impossible de mettre à jour vos préférences pour le moment.' };
   }
