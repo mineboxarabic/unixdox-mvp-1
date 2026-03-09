@@ -74,7 +74,9 @@ export const authConfig = {
       }
 
       if (isLoginPage) {
-        if (isLoggedIn) return Response.redirect(new URL('/', nextUrl));
+        // Always allow access — the page itself checks DB validity
+        // and redirects valid users to /. This prevents redirect loops
+        // when a stale JWT exists for a deleted user.
         return true;
       }
 

@@ -45,15 +45,13 @@ export default async function Home() {
     redirect("/register");
   }
 
-  let onboardingCompleted: boolean | null = null;
+  let user: { onboardingCompleted: boolean } | null = null;
 
   try {
-    const user = await prisma.user.findUnique({
+    user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { onboardingCompleted: true },
     });
-
-    onboardingCompleted = user?.onboardingCompleted ?? false;
   } catch (error) {
     if (isPrismaConnectivityError(error)) {
       console.warn("Onboarding status unavailable: database is temporarily unreachable.");
@@ -62,7 +60,12 @@ export default async function Home() {
     }
   }
 
-  if (onboardingCompleted === false) {
+  // Stale session: JWT exists but user was deleted from DB
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (!user.onboardingCompleted) {
     redirect("/register");
   }
 
