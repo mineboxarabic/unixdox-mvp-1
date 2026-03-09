@@ -68,7 +68,7 @@ export async function updateUserSubscription(plan: SubscriptionPlan): Promise<Ac
 
   try {
     const updated = await userService.updateUser(userId, { plan });
-    revalidatePath('/', 'layout');
+    revalidatePath('/profile');
     return { success: true, data: updated };
   } catch (error: any) {
     console.error('Error in updateUserSubscription:', error);

@@ -135,7 +135,7 @@ export function DocumentViewDialog({
                 <HStack wrap="wrap" gap={2}>
                   {document.tags && document.tags.length > 0 ? (
                     document.tags.map((tag, index) => (
-                      <Badge key={index} variant="subtle" colorScheme="blue">
+                      <Badge key={index} variant="subtle" colorScheme="blue" fontSize="xs">
                         {tag}
                       </Badge>
                     ))
