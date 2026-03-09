@@ -3,6 +3,7 @@ import { VStack, HStack, Box, Text, Separator } from '@chakra-ui/react';
 import { StepComponentProps, PricingPlan, EngagementType } from './types';
 import { PricingCard } from './PricingCard';
 import { PaymentForm } from './PaymentForm';
+import { Button } from '@/shared/components/ui/button';
 import { SubscriptionPlan } from '@prisma/client';
 import { toaster } from '@/shared/components/ui/toaster';
 
@@ -192,6 +193,15 @@ export function SubscriptionSelectionStep({ onNext, onBack, updateUserSubscripti
             <PaymentForm onContinue={handleContinue} />
           </VStack>
         )}
+
+        {/* Skip button - stay on FREE plan */}
+        <Button
+          variant="outline"
+          size="md"
+          onClick={onNext}
+        >
+          Passer cette étape
+        </Button>
       </VStack>
     </VStack>
   );

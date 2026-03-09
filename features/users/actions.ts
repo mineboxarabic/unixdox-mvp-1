@@ -85,3 +85,19 @@ export async function updateUserSubscription(plan: SubscriptionPlan): Promise<Ac
     return { success: false, error: toErrorMessage(error, 'Failed to update subscription') };
   }
 }
+
+export async function completeOnboarding(): Promise<ActionResult<void>> {
+  const session = await requireAuth();
+  const userId = session.user?.id;
+
+  if (!userId) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  try {
+    await userService.updateUser(userId, { onboardingCompleted: true });
+    return { success: true, data: undefined };
+  } catch (error: unknown) {
+    return { success: false, error: toErrorMessage(error, 'Failed to complete onboarding') };
+  }
+}

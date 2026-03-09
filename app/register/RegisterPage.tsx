@@ -10,7 +10,7 @@ import { SubscriptionSelectionStep } from '@/features/auth/ui/registration/Subsc
 import { GoogleDriveLinkStep } from '@/features/auth/ui/registration/GoogleDriveLinkStep';
 import { DocumentUploadStep } from '@/features/auth/ui/registration/DocumentUploadStep';
 import { RegistrationStep } from '@/features/auth/ui/registration/types';
-import { updateUserSubscription } from '@/features/users/actions';
+import { updateUserSubscription, completeOnboarding } from '@/features/users/actions';
 import { uploadDocumentFile } from '@/features/documents/actions';
 
 // Define the registration steps (after initial login)
@@ -70,11 +70,13 @@ export default function RegisterPage({ isAuthenticated = false }: RegisterPagePr
     setIsLoggedIn(true);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < registrationSteps.length) {
       const nextStep = currentStep + 1;
       router.push(`/register?step=${nextStep}`);
     } else {
+      // Mark onboarding as completed before navigating to home
+      await completeOnboarding();
       // Force hard navigation to clear Next.js client router cache
       window.location.assign('/');
     }
