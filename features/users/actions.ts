@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { redirect, unstable_rethrow } from 'next/navigation';
 import { userService } from './services/user.service';
 import { UserUpdateSchema } from './types/schemas';
 import { ActionResult } from '@/shared/types/actions';
@@ -44,6 +44,7 @@ export async function updateCurrentUser(input: unknown): Promise<ActionResult<Sa
     revalidatePath('/profile');
     return { success: true, data: updated };
   } catch (error: unknown) {
+    unstable_rethrow(error);
     return { success: false, error: toErrorMessage(error, 'Failed to update user') };
   }
 }
@@ -61,6 +62,7 @@ export async function deleteCurrentUser(): Promise<ActionResult<void>> {
     // Redirect or sign out logic should be handled by the client after success
     return { success: true, data: undefined };
   } catch (error: unknown) {
+    unstable_rethrow(error);
     return { success: false, error: toErrorMessage(error, 'Failed to delete user') };
   }
 }
@@ -83,6 +85,7 @@ export async function updateUserSubscription(plan: SubscriptionPlan): Promise<Ac
     revalidatePath('/profile');
     return { success: true, data: updated };
   } catch (error: unknown) {
+    unstable_rethrow(error);
     console.error('Error in updateUserSubscription:', error);
     return { success: false, error: toErrorMessage(error, 'Failed to update subscription') };
   }
