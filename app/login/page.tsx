@@ -25,10 +25,6 @@ function GoogleIcon() {
  * Right: Gradient background with UNIDOX logo.
  */
 export default function LoginPage() {
-  const handleGoogleSignIn = async () => {
-    await login();
-  };
-
   return (
     <AuthLayout>
       <VStack w="full" flex="1" justify="center" align="center">
@@ -60,22 +56,24 @@ export default function LoginPage() {
             </Text>
           </VStack>
 
-          {/* Google OAuth button - dark pill style per Figma */}
-          <Button
-            w="full"
-            h="40px"
-            variant="solid"
-            colorPalette="gray"
-            borderRadius="full"
-            bg="gray.800"
-            color="white"
-            fontSize="sm"
-            onClick={handleGoogleSignIn}
-            _hover={{ bg: 'gray.700' }}
-          >
-            <GoogleIcon />
-            Se connecter avec Google
-          </Button>
+          {/* Google OAuth button - uses form action for proper redirect handling */}
+          <form action={login} style={{ width: '100%' }}>
+            <Button
+              type="submit"
+              w="full"
+              h="40px"
+              variant="solid"
+              colorPalette="gray"
+              borderRadius="full"
+              bg="gray.800"
+              color="white"
+              fontSize="sm"
+              _hover={{ bg: 'gray.700' }}
+            >
+              <GoogleIcon />
+              Se connecter avec Google
+            </Button>
+          </form>
         </VStack>
       </VStack>
     </AuthLayout>

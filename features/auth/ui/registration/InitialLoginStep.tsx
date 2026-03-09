@@ -25,10 +25,6 @@ function GoogleIcon() {
  * - Dark pill Google button (gray.800 bg, rounded full)
  */
 export function InitialLoginStep({ onNext }: StepComponentProps) {
-  const handleGoogleSignIn = async () => {
-    await loginWithGoogle();
-  };
-
   return (
     <VStack
       maxW="513px"
@@ -60,22 +56,24 @@ export function InitialLoginStep({ onNext }: StepComponentProps) {
         </Text>
       </VStack>
 
-      {/* Google OAuth button - dark pill style per Figma */}
-      <Button
-        w="full"
-        h="40px"
-        variant="solid"
-        colorPalette="gray"
-        borderRadius="full"
-        bg="gray.800"
-        color="white"
-        fontSize="sm"
-        onClick={handleGoogleSignIn}
-        _hover={{ bg: 'gray.700' }}
-      >
-        <GoogleIcon />
-        S&apos;inscrire avec Google
-      </Button>
+      {/* Google OAuth button - uses form action for proper redirect handling */}
+      <form action={loginWithGoogle} style={{ width: '100%' }}>
+        <Button
+          type="submit"
+          w="full"
+          h="40px"
+          variant="solid"
+          colorPalette="gray"
+          borderRadius="full"
+          bg="gray.800"
+          color="white"
+          fontSize="sm"
+          _hover={{ bg: 'gray.700' }}
+        >
+          <GoogleIcon />
+          S&apos;inscrire avec Google
+        </Button>
+      </form>
     </VStack>
   );
 }

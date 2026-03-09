@@ -18,10 +18,6 @@ function GoogleDriveIcon() {
 }
 
 export function GoogleDriveLinkStep({ onNext }: StepComponentProps) {
-  const handleGoogleDriveLink = async () => {
-    await linkGoogleAccount();
-  };
-
   return (
     <VStack
       maxW="513px"
@@ -54,16 +50,18 @@ export function GoogleDriveLinkStep({ onNext }: StepComponentProps) {
         </Text>
       </VStack>
 
-      <Button
-        w="full"
-        size="md"
-        variant="solid"
-        colorPalette="gray"
-        onClick={handleGoogleDriveLink}
-        leftIcon={<GoogleDriveIcon />}
-      >
-        Lier votre google Drive
-      </Button>
+      <form action={linkGoogleAccount} style={{ width: '100%' }}>
+        <Button
+          type="submit"
+          w="full"
+          size="md"
+          variant="solid"
+          colorPalette="gray"
+          leftIcon={<GoogleDriveIcon />}
+        >
+          Lier votre google Drive
+        </Button>
+      </form>
     </VStack>
   );
 }
