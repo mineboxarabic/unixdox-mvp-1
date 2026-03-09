@@ -221,11 +221,15 @@ export async function uploadDocumentFile(formData: FormData): Promise<ActionResu
       });
     }
 
-    // 7. Mark onboarding as completed
-    await prisma.user.update({
+    // 7. Mark onboarding as completed (best effort for stale sessions)
+    const onboardingUpdateResult = await prisma.user.updateMany({
       where: { id: userId },
       data: { onboardingCompleted: true },
     });
+
+    if (onboardingUpdateResult.count === 0) {
+      console.warn('Skipped onboardingCompleted update: user not found for current session', { userId });
+    }
 
     revalidatePath('/documents');
     return {

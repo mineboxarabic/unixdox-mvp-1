@@ -19,7 +19,10 @@ export async function updatePreferencesAction(data: unknown) {
   }
 
   try {
-    await preferencesService.updatePreferences(session.user.id, parsed.data);
+    const wasUpdated = await preferencesService.updatePreferences(session.user.id, parsed.data);
+    if (!wasUpdated) {
+      return { error: 'Session invalide. Veuillez vous reconnecter.' };
+    }
   } catch (error) {
     console.error('Failed to update user preferences', error);
     return { error: 'Impossible de mettre à jour vos préférences pour le moment.' };

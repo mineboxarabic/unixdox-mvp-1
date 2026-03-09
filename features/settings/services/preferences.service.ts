@@ -25,14 +25,15 @@ class PreferencesService {
     };
   }
 
-  async updatePreferences(userId: string, preferences: UserPreferences) {
+  async updatePreferences(userId: string, preferences: UserPreferences): Promise<boolean> {
     const sanitizedPreferences = userPreferencesSchema.parse(preferences);
 
-    await prisma.user.update({
+    const result = await prisma.user.updateMany({
       where: { id: userId },
       data: { preferences: sanitizedPreferences },
-      select: { id: true },
     });
+
+    return result.count > 0;
   }
 }
 
