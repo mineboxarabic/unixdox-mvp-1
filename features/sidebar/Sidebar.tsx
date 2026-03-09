@@ -6,7 +6,8 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuShield,
-  LuPlus
+  LuPlus,
+  LuUsers
 } from 'react-icons/lu';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -171,6 +172,15 @@ const defaultUser: UserAccountType = {
                     icon: LuPlus,
                     href: '/admin/modele-demarche/create',
                     isActive: pathname === '/admin/modele-demarche/create',
+                  }}
+                  isCollapsed={isCollapsed}
+                />
+                <NavButton
+                  item={{
+                    label: 'Utilisateurs',
+                    icon: LuUsers,
+                    href: '/admin/utilisateurs',
+                    isActive: pathname?.startsWith('/admin/utilisateurs'),
                   }}
                   isCollapsed={isCollapsed}
                 />
